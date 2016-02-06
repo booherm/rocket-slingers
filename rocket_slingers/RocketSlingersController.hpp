@@ -1,15 +1,22 @@
 #ifndef ROCKETSLINGERSCONTROLLER_HPP
 #define ROCKETSLINGERSCONTROLLER_HPP
 
-#include "RenderWindow.hpp"
+#include "GameState.hpp"
+#include "PoAxes.hpp"
+#include "PoPendulum.hpp"
 
 class RocketSlingersController {
 public:
 	RocketSlingersController();
+	void start();
 	~RocketSlingersController();
 
 private:
-	RenderWindow* renderWindow;
+	void initGameObjects();
+	void updateGameState();
+	GameState* gameState;
+	PhysicalObject* pt;
+	PhysicalObject* axes;
 };
 
 #endif

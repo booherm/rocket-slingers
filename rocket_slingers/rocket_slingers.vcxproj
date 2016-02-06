@@ -89,7 +89,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>external\glfw-3.1.2\include\GLFW;external\glew-1.13.0\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>external\glm-0.9.7.1\glm;external\glfw-3.1.2\include\GLFW;external\glew-1.13.0\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -122,7 +122,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>external\glfw-3.1.2\include\GLFW;external\glew-1.13.0\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>external\glm-0.9.7.1\glm;external\glfw-3.1.2\include\GLFW;external\glew-1.13.0\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -152,13 +152,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="EventListener.cpp" />
+    <ClCompile Include="GameState.cpp" />
     <ClCompile Include="GuiConsole.cpp" />
+    <ClCompile Include="InputEvent.cpp" />
+    <ClCompile Include="InputQueue.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="OglShaderProgram.cpp" />
+    <ClCompile Include="PhysicalObject.cpp" />
+    <ClCompile Include="PoAxes.cpp" />
+    <ClCompile Include="PoPendulum.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
     <ClCompile Include="RocketSlingersController.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.hpp" />
+    <ClInclude Include="EventListener.hpp" />
+    <ClInclude Include="GameState.hpp" />
     <ClInclude Include="GuiConsole.hpp" />
+    <ClInclude Include="InputEvent.hpp" />
+    <ClInclude Include="InputQueue.hpp" />
+    <ClInclude Include="OglShaderProgram.hpp" />
+    <ClInclude Include="PhysicalObject.hpp" />
+    <ClInclude Include="PoAxes.hpp" />
+    <ClInclude Include="PoPendulum.hpp" />
     <ClInclude Include="RenderWindow.hpp" />
     <ClInclude Include="RocketSlingersController.hpp" />
   </ItemGroup>

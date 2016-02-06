@@ -1,4 +1,8 @@
 #include "GuiConsole.hpp"
+#include <io.h>
+#include <fcntl.h>
+#include <windows.h>
+#include <iostream>
 
 void startConsole() {
 	// allocate a console and bind cout

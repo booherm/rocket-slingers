@@ -3,26 +3,29 @@
 
 #include <glew.h>
 #include <glfw3.h>
-#include <iostream>
+#include "GameState.hpp"
 
-//const GLuint GL_WINDOW_WIDTH = 1920;
-//const GLuint GL_WINDOW_HEIGHT = 1080;
+class GameState;
 
 class RenderWindow {
 
 public:
-	RenderWindow();
-	void doRender();
+	RenderWindow(GameState* gameState);
+	~RenderWindow();
+	void publishFrame();
+	bool processInput();
+	double getTimeSeconds();
 
 private:
-
-	// OpenGL variables
 	GLFWwindow* glWindow;
+	static GameState* gameState;
 
-	// member functions
 	void initGlWindow();
-	void initShaders();
-	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
+	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers);
+	static void cursorPositionCallback(GLFWwindow* window, double xPosition, double yPostion);
+	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int modifiers);
+	static void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
+	static void glfwErrorCallback(int error, const char* description);
 };
 
 #endif
