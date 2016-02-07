@@ -19,9 +19,14 @@ public:
 	InputQueue* inputQueue;
 	RenderWindow* renderWindow;
 	Camera* camera;
+	unsigned int resolutionWidth = 1920;  // debug hardcode
+	unsigned int resolutionHeight = 1080;
 	double frameTimeStart;
 	double framesPerSecond;
 	double lastFrameTotalTime;
+	double lastFrameMousePosX = (double)resolutionWidth / 2;
+	double lastFrameMousePosY = (double)resolutionHeight / 2;
+	float aspectRatio = (float) resolutionWidth / resolutionHeight;
 
 private:
 	const unsigned int fpsFrameRange = 10;

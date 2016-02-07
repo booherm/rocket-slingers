@@ -13,6 +13,8 @@ void GameState::frameStart() {
 }
 
 void GameState::frameEnd() {
+	renderWindow->getCurrentCursorPosition(&lastFrameMousePosX, &lastFrameMousePosY);
+
 	// calculate frames per second
 	lastFrameTotalTime = renderWindow->getTimeSeconds() - frameTimeStart;
 	if (fpsIterationCounter == fpsFrameRange) {

@@ -95,47 +95,41 @@ void PoAxes::updatePhysicalState() {
 	transformSize = 0;
 
 	// transform axes
-	
-	// base axes lines
+	//modelX = glm::translate(modelX, glm::vec3(xMin, 0.0f, 0.0f));
+	//model = glm::rotate(model, ((float)i / axesCount) * (float)glm::sin(currentTime) * 25.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	//	modelX = glm::scale(modelX, glm::vec3(xMax - xMin, 1.0f, 1.0f));
+
 	// x axis
 	glm::mat4 modelX;
 	modelX = glm::translate(modelX, glm::vec3(xMin, 0.0f, 0.0f));
-	//model = glm::rotate(model, ((float)i / axesCount) * (float)glm::sin(currentTime) * 25.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	modelX = glm::rotate(modelX, 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 	modelX = glm::scale(modelX, glm::vec3(xMax - xMin, 1.0f, 1.0f));
-	glm::mat4 viewX;
-	viewX = glm::translate(viewX, glm::vec3(0.0f, 0.0f, -3.0f));
-	glm::mat4 projectionX;
-	projectionX = glm::perspective(0.45f, 1920.0f / 1280.0f, 0.1f, 100.0f);
-	glm::mat4 transformX = projectionX * viewX * modelX;
-	transformData[transformSize++] = transformX;
+	pushAxisTransform(modelX);
 
 	// y axis
 	glm::mat4 modelY;
 	modelY = glm::translate(modelY, glm::vec3(0.0f, yMin, 0.0f));
-	modelY = glm::rotate(modelY, -glm::quarter_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
-	modelY = glm::scale(modelY, glm::vec3(1.0f, yMax - yMin, 1.0f));
-	glm::mat4 viewY;
-	viewY = glm::translate(viewY, glm::vec3(0.0f, 0.0f, -3.0f));
-	glm::mat4 projectionY;
-	projectionY = glm::perspective(0.45f, 1920.0f / 1280.0f, 0.1f, 100.0f);
-	glm::mat4 transformY = projectionY * viewY * modelY;
-	transformData[transformSize++] = transformY;
+	modelY = glm::rotate(modelY, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
+	modelY = glm::scale(modelY, glm::vec3(yMax - yMin, 1.0f, 1.0f));
+	pushAxisTransform(modelY);
 
 	// z axis
 	glm::mat4 modelZ;
 	modelZ = glm::translate(modelZ, glm::vec3(0.0f, 0.0f, zMin));
-	modelZ = glm::rotate(modelZ, -glm::quarter_pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
-	modelZ = glm::scale(modelZ, glm::vec3(1.0f, 1.0f, zMax - zMin));
-	glm::mat4 viewZ;
-	viewZ = glm::translate(viewZ, glm::vec3(0.0f, 0.0f, -3.0f));
-	glm::mat4 projectionZ;
-	projectionZ = glm::perspective(0.45f, 1920.0f / 1280.0f, 0.1f, 100.0f);
-	glm::mat4 transformZ = projectionZ * viewZ * modelZ;
-	transformData[transformSize++] = transformZ;
+	modelZ = glm::rotate(modelZ, -glm::half_pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
+	modelZ = glm::scale(modelZ, glm::vec3(zMax - zMin, 1.0f, 1.0f));
+	pushAxisTransform(modelZ);
 
 	// buffer axes transform data
 	glBindBuffer(GL_ARRAY_BUFFER, transformVbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * transformSize, transformData.data());
+}
+
+void PoAxes::pushAxisTransform(glm::mat4 model) {
+	glm::mat4 view = gameState->camera->getViewTransform();
+	glm::mat4 projection = gameState->camera->getProjectionTransform();
+	glm::mat4 transform = projection * view * model;
+	transformData[transformSize++] = transform;
 }
 
 void PoAxes::render() {

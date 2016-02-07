@@ -131,10 +131,12 @@ std::map<InputEvent::InputEventKey, std::string> InputEvent::eventKeyDescription
 	{InputEvent::IEK_MOUSE_BUTTON_5, "IEK_MOUSE_BUTTON_5"},
 	{InputEvent::IEK_MOUSE_BUTTON_6, "IEK_MOUSE_BUTTON_6"},
 	{InputEvent::IEK_MOUSE_BUTTON_7, "IEK_MOUSE_BUTTON_7"},
-	{InputEvent::IEK_MOUSE_BUTTON_8, "IEK_MOUSE_BUTTON_8"}
+	{InputEvent::IEK_MOUSE_BUTTON_8, "IEK_MOUSE_BUTTON_8"},
+	{InputEvent::IEK_MOUSE_MOVE, "IEK_MOUSE_MOVE"}
 };
 
 std::map<InputEvent::InputEventKeyState, std::string> InputEvent::eventKeyStateDescriptions = {
+	{InputEvent::IEKS_NO_STATE, "IEKS_NO_STATE" },
 	{InputEvent::IEKS_PRESS, "IEKS_PRESS"},
 	{InputEvent::IEKS_RELEASE, "IEKS_RELEASE"},
 	{InputEvent::IEKS_REPEAT, "IEKS_REPEAT"}

@@ -19,20 +19,38 @@ void InputQueue::addEvent(int glfwKey, int glfwKeyState, unsigned char glfwKeyMo
 	e.modifierControl = (binary2 & glfwKeyModifier) == binary2;
 	e.modifierAlt = (binary4 & glfwKeyModifier) == binary4;
 	e.modifierSuper = (binary8 & glfwKeyModifier) == binary8;
-	e.xCoordinate = (unsigned int) xPosition;
-	e.yCoordinate = (unsigned int) yPosition;
+	e.xCoordinate = xPosition;
+	e.yCoordinate = yPosition;
 
-	inputQueue[inputQueueNextSlot++] = e;
+	enqueueEvent(e);
+}
+
+void InputQueue::addMouseMovementEvent(double xPosition, double yPosition) {
+	InputEvent e;
+	e.eventKey = InputEvent::IEK_MOUSE_MOVE;
+	e.eventKeyState = InputEvent::IEKS_NO_STATE;
+	e.modifierShift = false;
+	e.modifierControl = false;
+	e.modifierAlt = false;
+	e.modifierSuper = false;
+	e.xCoordinate = xPosition;
+	e.yCoordinate = yPosition;
+
+	enqueueEvent(e);
+}
+
+void InputQueue::enqueueEvent(InputEvent inputEvent) {
+	inputQueue[inputQueueNextSlot++] = inputEvent;
 	if (inputQueueNextSlot == inputEventRetention)
 		inputQueueNextSlot = 0;
 
 	// call subscribers to this event
-	subscriptionKey key(e.eventKey, e.eventKeyState);
+	subscriptionKey key(inputEvent.eventKey, inputEvent.eventKeyState);
 	std::pair<std::multimap<subscriptionKey, EventListener*>::iterator, std::multimap<subscriptionKey, EventListener*>::iterator> subscribersRange;
 	subscribersRange = eventSubscriptions.equal_range(key);
 	for (std::multimap<subscriptionKey, EventListener*>::iterator it = subscribersRange.first; it != subscribersRange.second; ++it) {
 		EventListener* callbackObject = &*(it->second);
-		callbackObject->inputEventCallback(e);
+		callbackObject->inputEventCallback(inputEvent);
 	}
 }
 

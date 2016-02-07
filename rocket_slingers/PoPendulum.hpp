@@ -15,7 +15,7 @@ private:
 	void initGeometry();
 	void initShaders();
 
-	const unsigned int pendulumCount = 5;
+	const unsigned int pendulumCount = 4;
 	unsigned int clickCount = 0;
 	GLfloat xInc;
 	GLfloat yInc;

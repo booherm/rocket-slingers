@@ -24,6 +24,7 @@ private:
 
 	void initGeometry();
 	void initShaders();
+	void pushAxisTransform(glm::mat4 model);
 };
 
 #endif

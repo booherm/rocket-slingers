@@ -136,10 +136,12 @@ public:
 		IEK_MOUSE_BUTTON_5,
 		IEK_MOUSE_BUTTON_6,
 		IEK_MOUSE_BUTTON_7,
-		IEK_MOUSE_BUTTON_8
+		IEK_MOUSE_BUTTON_8,
+		IEK_MOUSE_MOVE
 	};
 
 	enum InputEventKeyState {
+		IEKS_NO_STATE,
 		IEKS_PRESS,
 		IEKS_RELEASE,
 		IEKS_REPEAT
@@ -151,8 +153,8 @@ public:
 	bool modifierControl;
 	bool modifierAlt;
 	bool modifierSuper;
-	unsigned int xCoordinate;
-	unsigned int yCoordinate;
+	double xCoordinate;
+	double yCoordinate;
 
 private:
 	static std::map<InputEventKey, std::string> eventKeyDescriptions;

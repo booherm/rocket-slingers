@@ -15,6 +15,7 @@ public:
 	void publishFrame();
 	bool processInput();
 	double getTimeSeconds();
+	void getCurrentCursorPosition(double* x, double* y);
 
 private:
 	GLFWwindow* glWindow;

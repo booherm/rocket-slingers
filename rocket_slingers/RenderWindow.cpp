@@ -38,20 +38,44 @@ void RenderWindow::initGlWindow() {
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 	//GLFW_SAMPLES ?
 
-	// debug - hardcoded resolution and monitor for now
-	const unsigned int width = 1920;
-	const unsigned int height = 1080;
-	int frameBufferWidth;
-	int frameBufferHeight;
-	glWindow = glfwCreateWindow(width, height, "Rocket Slingers", nullptr, nullptr);
+	// get right most monitor
+	int monitorCount;
+	int rightMostMonitorPosX;
+	GLFWmonitor* rightMostMonitor = nullptr;
+	GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
+	for (int i = 0; i < monitorCount; i++) {
+		GLFWmonitor* monitor = monitors[i];
+		int mPosX, mPosY;
+		glfwGetMonitorPos(monitor, &mPosX, &mPosY);
+
+		if (rightMostMonitor == nullptr || mPosX > rightMostMonitorPosX) {
+			rightMostMonitor = monitor;
+			rightMostMonitorPosX = mPosX;
+		}
+
+		/*
+		int mWidth, mHeight;
+		glfwGetMonitorPhysicalSize(monitor, &mWidth, &mHeight);
+		std::cout << "--------------------------" << std::endl;
+		std::cout << "Monitor " << i << ":" << std::endl;
+		std::cout << "            Name: " << glfwGetMonitorName(monitor) << std::endl;
+		std::cout << "   Physical size: (" << mWidth << "x" << mHeight << ")" << std::endl;
+		std::cout << "Virtual position: (" << mPosX << ", " << mPosY << ")" << std::endl;
+		*/
+	}
+
+	// create window
+	glWindow = glfwCreateWindow(gameState->resolutionWidth, gameState->resolutionHeight, "Rocket Slingers", rightMostMonitor, nullptr);
 	glfwMakeContextCurrent(glWindow);
-	glfwSetWindowPos(glWindow, width, 0);
+	int frameBufferWidth, frameBufferHeight;
 	glfwGetFramebufferSize(glWindow, &frameBufferWidth, &frameBufferHeight);
+	glViewport(0, 0, frameBufferWidth, frameBufferHeight);
 	glfwSwapInterval(1);
 
 	// setup window input
 	glfwSetInputMode(glWindow, GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetInputMode(glWindow, GLFW_STICKY_MOUSE_BUTTONS, GL_TRUE);
+	glfwSetInputMode(glWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetKeyCallback(glWindow, keyCallback);
 	glfwSetCursorPosCallback(glWindow, cursorPositionCallback);
 	glfwSetMouseButtonCallback(glWindow, mouseButtonCallback);
@@ -64,25 +88,12 @@ void RenderWindow::initGlWindow() {
 		throw std::string("Failed to initialize GLEW");
 	}
 
-	glViewport(0, 0, frameBufferWidth, frameBufferHeight);
-	//glOrtho((float) width / height, -((float) width / height), -1.0f, 1.0f, 0.8f, 100.0f);
-//	glMatrixMode(GL_PROJECTION);
-//	glLoadIdentity();
-//	glOrtho(0.0f, (float) width / height, -((float) width / height), 0.0f, 0.0f, 1.0f);
-//	float windowAspectRation = (float) width / height;
-//	glOrtho(-windowAspectRation, windowAspectRation, -1.0f, 1.0f, 0.8f, 100.0f);
-
-	// enable face culling since we're only going to render in 2d
-	//glCullFace(GL_FRONT);  // this may end up backwards
-	//glEnable(GL_CULL_FACE);
-
 	// enable color alpha blending
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	//glFrustum(0.0f, 1.0f, 0.0f, 1.0f, 1.0f, -1.0f);
 	publishFrame();
 	glfwShowWindow(glWindow);
 }
@@ -104,11 +115,12 @@ void RenderWindow::keyCallback(GLFWwindow* window, int key, int scancode, int ac
 	double x, y;
 	glfwGetCursorPos(window, &x, &y);
 	gameState->inputQueue->addEvent(key, action, modifiers, x, y);
-
 }
 
 void RenderWindow::cursorPositionCallback(GLFWwindow* window, double xPosition, double yPostion) {
-	//std::cout << "received cursor input" << std::endl;
+	double x, y;
+	glfwGetCursorPos(window, &x, &y);
+	gameState->inputQueue->addMouseMovementEvent(x, y);
 }
 
 void RenderWindow::mouseButtonCallback(GLFWwindow* window, int button, int action, int modifiers) {
@@ -119,6 +131,10 @@ void RenderWindow::mouseButtonCallback(GLFWwindow* window, int button, int actio
 
 void RenderWindow::scrollCallback(GLFWwindow* window, double xOffset, double yOffset){
 	std::cout << "received scroll input" << std::endl;
+}
+
+void RenderWindow::getCurrentCursorPosition(double* x, double* y) {
+	glfwGetCursorPos(glWindow, x, y);
 }
 
 RenderWindow::~RenderWindow() {

@@ -11,6 +11,7 @@ class InputQueue {
 public:
 	InputQueue();
 	void addEvent(int glfwKey, int glfwKeyState, unsigned char glfwKeyModifier, double xPosition, double yPosition);
+	void addMouseMovementEvent(double xPosition, double yPosition);
 	void subscribeToInputEvent(
 		InputEvent::InputEventKey inputEventKey,
 		InputEvent::InputEventKeyState inputEventKeyState,
@@ -24,6 +25,7 @@ private:
 	std::vector<InputEvent> inputQueue;
 	unsigned int inputQueueNextSlot;
 	std::multimap<subscriptionKey, EventListener*> eventSubscriptions;
+	void enqueueEvent(InputEvent inputEvent);
 };
 
 #endif

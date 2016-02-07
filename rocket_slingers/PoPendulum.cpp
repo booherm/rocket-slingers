@@ -129,32 +129,18 @@ void PoPendulum::updatePhysicalState() {
 		pendulumColorVector = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
 
 	// transform pendulums
-	GLfloat transY = -0.25f;
+	GLfloat transY = 0.0f;
 	for (unsigned int i = 0; i < pendulumCount; i++) {
-
-		GLfloat transX = (i * (xInc)) - 0.25f;
 
 		// color
 		colorData[colorSize++] = pendulumColorVector;
 
-		/*	// translate logical cell location to world space
-		unsigned int tailId = scp->sourceSiteId;
-		unsigned int tailCol = tailId % cols;
-		unsigned int tailRow = rows - (tailId / cols) - 1; // logical location row (x) is top down, but the GL window row (x) is bottom up
-		glm::vec2 tail((((tailCol * xInc) + (xInc / 2.0f)) * 2.0f) - 1.0f, (((tailRow * yInc) + (yInc / 2.0f)) * 2.0f) - 1.0f);
-		unsigned int headId = scp->destinationSiteId;
-		unsigned int headCol = headId % cols;
-		unsigned int headRow = rows - (headId / cols) - 1; // logical location row (x) is top down, but the GL window row (x) is bottom up
-		glm::vec2 head((((headCol * xInc) + (xInc / 2.0f)) * 2.0f) - 1.0f, (((headRow * yInc) + (yInc / 2.0f)) * 2.0f) - 1.0f);
-		*/
-		glm::mat4 model;
-
-
 		// translate
+		GLfloat transX = i * xInc;
+		glm::mat4 model;
 		model = glm::translate(model, glm::vec3(transX, transY, 0.0f));
 
 		// rotate
-		//GLfloat theta = angleBetweenVectors(glm::vec2(1.0f, 0.0f), glm::vec2(head.x - tail.x, head.y - tail.y));
 		//transform = glm::rotate(transform, glm::quarter_pi<float>() * ((float) i / pendulumCount) * (float) currentTime * 25.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::rotate(model, ((float)i / pendulumCount) * (float)glm::sin(gameState->frameTimeStart) * 25.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::rotate(model, ((float)i / pendulumCount) * (float)glm::sin(gameState->frameTimeStart) * 25.0f, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -162,21 +148,14 @@ void PoPendulum::updatePhysicalState() {
 		// scale
 		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 1.0f));
 
-
 		// view
-		glm::mat4 view = gameState->camera->GetViewMatrix();
-		//		view = glm::translate(view, glm::vec3(-0.5f, -0.5f, -500.0f));
-		//view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		glm::mat4 view = gameState->camera->getViewTransform();
 
-		glm::mat4 projection;
-		projection = glm::perspective(0.45f, 1920.0f / 1280.0f, 0.1f, 100.0f);
+		// projection
+		glm::mat4 projection = gameState->camera->getProjectionTransform();
+
+		// combine transform
 		glm::mat4 transform = projection * view * model;
-
-		//glm::mat4 ortho;
-		//		ortho = glm::ortho(-1920.0f / 1280.0f, 1920.0f / 1280.0f, 1920.0f, 0.0f, 1280.0f);
-		//		glm::mat4 transform = ortho * view * model;
-
-
 		transformData[transformSize++] = transform;
 	}
 
