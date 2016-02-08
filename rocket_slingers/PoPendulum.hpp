@@ -15,10 +15,11 @@ private:
 	void initGeometry();
 	void initShaders();
 
-	const unsigned int pendulumCount = 4;
+	unsigned int pendulumCount;
+	const unsigned int maxPendulumCount = 100;
 	unsigned int clickCount = 0;
-	GLfloat xInc;
-	GLfloat yInc;
+	std::vector<glm::vec3> pendulumOrigins;
+	std::vector<float> pendulumInitialTimes;
 };
 
 #endif

@@ -39,7 +39,7 @@ private:
 	float mouseSensitivity;
 	float zoom;
 
-	void translateCamera(CameraTranslation direction, float deltaTime);
+	void translateCamera(CameraTranslation direction);
 	void updateCameraDirection(float xoffset, float yoffset, bool constrainPitch);
 	void updateCameraZoom(float yoffset);
 	void updateCameraVectors();

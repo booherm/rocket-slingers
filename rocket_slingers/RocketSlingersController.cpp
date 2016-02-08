@@ -8,8 +8,10 @@ RocketSlingersController::RocketSlingersController() {
 }
 
 void RocketSlingersController::initGameObjects() {
-	pt = new PoPendulum(gameState);
+	pg = new PoGuy(gameState);
+	pendulum = new PoPendulum(gameState);
 	axes = new PoAxes(gameState);
+	rope = new PoRope(gameState);
 }
 
 void RocketSlingersController::start() {
@@ -29,14 +31,20 @@ void RocketSlingersController::updateGameState() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	axes->updatePhysicalState();
 	axes->render();
-	pt->updatePhysicalState();
-	pt->render();
+	pg->updatePhysicalState();
+	pg->render();
+	pendulum->updatePhysicalState();
+	pendulum->render();
+	rope->updatePhysicalState();
+	rope->render();
 }
 
 RocketSlingersController::~RocketSlingersController() {
-	delete pt;
+	delete pg;
+	delete pendulum;
 	delete axes;
 	delete gameState;
+	delete rope;
 
 	std::cout << "controller destructed" << std::endl;
 }

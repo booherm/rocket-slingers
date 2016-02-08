@@ -5,7 +5,7 @@
 Camera::Camera(GameState* gameState) {
 
 	this->gameState = gameState;
-	position = glm::vec3(0.0f, 0.0f, 3.0f);
+	position = glm::vec3(0.0f, 0.0f, 0.0f);
 	worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	yaw = -glm::half_pi<float>();
 	pitch = 0.0f;
@@ -17,12 +17,18 @@ Camera::Camera(GameState* gameState) {
 
 	// view transform
 	viewTransform = glm::lookAt(position, position + front, up);
-
-	// projection transform
+	/*
+	// perspective projection transform
 	float yFieldOfView = glm::quarter_pi<float>();
 	float nearClippingPlaneDistance = 0.1f;
 	float farClippingPlaneDistance = 100.0f;
 	projectionTransform = glm::perspective(yFieldOfView, gameState->aspectRatio, nearClippingPlaneDistance, farClippingPlaneDistance);
+	*/
+
+	// orthographic projection transform
+//	projectionTransform = glm::ortho(-gameState->aspectRatio, gameState->aspectRatio, -1.0f, 1.0f);
+	projectionTransform = glm::ortho(0.0f, gameState->aspectRatio, 0.0f, 1.0f);
+//projectionTransform = glm::ortho(-gameState->aspectRatio - (-gameState->aspectRatio, 2.0f * gameState->aspectRatio, -1.0f, 1.0f);
 
 	// add camera as listener for input events
 	InputQueue* iq = gameState->inputQueue;
@@ -30,48 +36,43 @@ Camera::Camera(GameState* gameState) {
 	iq->subscribeToInputEvent(InputEvent::IEK_KEY_RIGHT, InputEvent::IEKS_PRESS, this);
 	iq->subscribeToInputEvent(InputEvent::IEK_KEY_UP, InputEvent::IEKS_PRESS, this);
 	iq->subscribeToInputEvent(InputEvent::IEK_KEY_DOWN, InputEvent::IEKS_PRESS, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_W, InputEvent::IEKS_PRESS, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_A, InputEvent::IEKS_PRESS, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_S, InputEvent::IEKS_PRESS, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_D, InputEvent::IEKS_PRESS, this);
 	iq->subscribeToInputEvent(InputEvent::IEK_KEY_LEFT, InputEvent::IEKS_REPEAT, this);
 	iq->subscribeToInputEvent(InputEvent::IEK_KEY_RIGHT, InputEvent::IEKS_REPEAT, this);
 	iq->subscribeToInputEvent(InputEvent::IEK_KEY_UP, InputEvent::IEKS_REPEAT, this);
 	iq->subscribeToInputEvent(InputEvent::IEK_KEY_DOWN, InputEvent::IEKS_REPEAT, this);
+	/*	iq->subscribeToInputEvent(InputEvent::IEK_KEY_W, InputEvent::IEKS_PRESS, this);
+	iq->subscribeToInputEvent(InputEvent::IEK_KEY_A, InputEvent::IEKS_PRESS, this);
+	iq->subscribeToInputEvent(InputEvent::IEK_KEY_S, InputEvent::IEKS_PRESS, this);
+	iq->subscribeToInputEvent(InputEvent::IEK_KEY_D, InputEvent::IEKS_PRESS, this);
 	iq->subscribeToInputEvent(InputEvent::IEK_KEY_W, InputEvent::IEKS_REPEAT, this);
 	iq->subscribeToInputEvent(InputEvent::IEK_KEY_A, InputEvent::IEKS_REPEAT, this);
 	iq->subscribeToInputEvent(InputEvent::IEK_KEY_S, InputEvent::IEKS_REPEAT, this);
 	iq->subscribeToInputEvent(InputEvent::IEK_KEY_D, InputEvent::IEKS_REPEAT, this);
 	iq->subscribeToInputEvent(InputEvent::IEK_MOUSE_MOVE, InputEvent::IEKS_NO_STATE, this);
+	*/
 }
 
 void Camera::inputEventCallback(InputEvent inputEvent) {
+
+	// debug - constant time map
 	switch (inputEvent.eventKey) {
-		case InputEvent::IEK_KEY_A:
 		case InputEvent::IEK_KEY_LEFT:
-			translateCamera(CT_LEFT, (float) glfwGetTime());
+			translateCamera(CT_LEFT);
 			break;
-		case InputEvent::IEK_KEY_D:
 		case InputEvent::IEK_KEY_RIGHT:
-			translateCamera(CT_RIGHT, (float)glfwGetTime());
-			break;
-		case InputEvent::IEK_KEY_W:
-			translateCamera(CT_FORWARD, (float)glfwGetTime());
-			break;
-		case InputEvent::IEK_KEY_S:
-			translateCamera(CT_BACKWARD, (float)glfwGetTime());
+			translateCamera(CT_RIGHT);
 			break;
 		case InputEvent::IEK_KEY_UP:
-			translateCamera(CT_UP, (float)glfwGetTime());
+			translateCamera(CT_UP);
 			break;
 		case InputEvent::IEK_KEY_DOWN:
-			translateCamera(CT_DOWN, (float)glfwGetTime());
+			translateCamera(CT_DOWN);
 			break;
-		case InputEvent::IEK_MOUSE_MOVE:
+/*		case InputEvent::IEK_MOUSE_MOVE:
 			float xOffset = (float)(inputEvent.xCoordinate - gameState->lastFrameMousePosX);
 			float yOffset = (float)(inputEvent.yCoordinate - gameState->lastFrameMousePosY);
 			updateCameraDirection(xOffset, yOffset, false);
-			break;
+			break; */
 	}
 
 	// update view and projection transform matrix
@@ -86,7 +87,7 @@ glm::mat4 Camera::getProjectionTransform() {
 	return projectionTransform;
 }
 
-void Camera::translateCamera(CameraTranslation direction, float deltaTime) {
+void Camera::translateCamera(CameraTranslation direction) {
 	float velocity = movementSpeed * (float)gameState->lastFrameTotalTime;
 
 	switch (direction) {

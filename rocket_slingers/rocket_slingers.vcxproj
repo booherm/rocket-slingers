@@ -162,9 +162,12 @@
     <ClCompile Include="OglShaderProgram.cpp" />
     <ClCompile Include="PhysicalObject.cpp" />
     <ClCompile Include="PoAxes.cpp" />
+    <ClCompile Include="PoGuy.cpp" />
     <ClCompile Include="PoPendulum.cpp" />
+    <ClCompile Include="PoRope.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
     <ClCompile Include="RocketSlingersController.cpp" />
+    <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.hpp" />
@@ -176,9 +179,12 @@
     <ClInclude Include="OglShaderProgram.hpp" />
     <ClInclude Include="PhysicalObject.hpp" />
     <ClInclude Include="PoAxes.hpp" />
+    <ClInclude Include="PoGuy.hpp" />
     <ClInclude Include="PoPendulum.hpp" />
+    <ClInclude Include="PoRope.hpp" />
     <ClInclude Include="RenderWindow.hpp" />
     <ClInclude Include="RocketSlingersController.hpp" />
+    <ClInclude Include="Utilities.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

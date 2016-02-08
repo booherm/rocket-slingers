@@ -1,29 +1,40 @@
 #include "PoPendulum.hpp"
 #include <iostream>
 #include <gtc/matrix_transform.hpp>
+#include <gtc/quaternion.hpp>
+#include <gtx/quaternion.hpp>
 
 PoPendulum::PoPendulum(GameState* gameState) : PhysicalObject(gameState) {
-	xInc = 1.0f / pendulumCount;
-	yInc = 1.0f / pendulumCount;
-
 	initGeometry();
 	initShaders();
+	pendulumCount = 0;
 
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_1, InputEvent::IEKS_PRESS, this);
+	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_2, InputEvent::IEKS_PRESS, this);
 }
 
 void PoPendulum::inputEventCallback(InputEvent inputEvent){
 	std::cout << "this is the call back! inputEvent = " << std::endl;
 	inputEvent.print();
+
+	float worldX = ((float) inputEvent.xCoordinate * gameState->aspectRatio) / gameState->resolutionWidth;
+	float worldY = 1.0f - ((float) inputEvent.yCoordinate / gameState->resolutionHeight);
+	std::cout << "world space coords (" << worldX << ", " << worldY << ")" << std::endl;
+
+	if (pendulumCount < maxPendulumCount) {
+		pendulumOrigins.push_back(glm::vec3(worldX, worldY, 0.0f));
+		pendulumInitialTimes.push_back((float) gameState->frameTimeStart);
+		pendulumCount++;
+	}
+
 	clickCount++;
 }
 
 void PoPendulum::initGeometry() {
 
 	// init buffers and vertex array object
-	colorSize = pendulumCount;
+	colorSize = maxPendulumCount;
 	colorData.resize(colorSize);
-	transformSize = pendulumCount;
+	transformSize = maxPendulumCount;
 	transformData.resize(transformSize);
 	glGenVertexArrays(1, &masterVao);
 	glGenBuffers(1, &modelVbo);
@@ -95,7 +106,7 @@ void PoPendulum::initShaders() {
 		"\n"
 		"void main()\n"
 		"{\n"
-		"    gl_Position = transformMatrix * vec4(position, 0.0f, 1.0f);\n"
+		"    gl_Position = transformMatrix * vec4(position.x + -0.3f, position.y + -1.0f, 0.0f, 1.0f);\n" // applying origin shift here
 		"    fragShaderColor = inColor;\n"
 		"}\n";
 
@@ -118,6 +129,10 @@ void PoPendulum::initShaders() {
 }
 
 void PoPendulum::updatePhysicalState() {
+
+	if (pendulumCount == 0)
+		return;
+
 	transformSize = 0;
 	colorSize = 0;
 
@@ -129,33 +144,40 @@ void PoPendulum::updatePhysicalState() {
 		pendulumColorVector = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
 
 	// transform pendulums
-	GLfloat transY = 0.0f;
+	GLfloat scalingFactor = 0.25f;
 	for (unsigned int i = 0; i < pendulumCount; i++) {
 
 		// color
-		colorData[colorSize++] = pendulumColorVector;
+		colorData[colorSize++] = pendulumColorVector; 
 
-		// translate
-		GLfloat transX = i * xInc;
-		glm::mat4 model;
-		model = glm::translate(model, glm::vec3(transX, transY, 0.0f));
+		// model
+		glm::mat4 modelTransform;
 
-		// rotate
-		//transform = glm::rotate(transform, glm::quarter_pi<float>() * ((float) i / pendulumCount) * (float) currentTime * 25.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::rotate(model, ((float)i / pendulumCount) * (float)glm::sin(gameState->frameTimeStart) * 25.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::rotate(model, ((float)i / pendulumCount) * (float)glm::sin(gameState->frameTimeStart) * 25.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::vec3 initialPosition = pendulumOrigins[i];
+		float elapsedTime = (float)gameState->frameTimeStart - pendulumInitialTimes[i];
+		/*
+		// distance travelled due to gravity
+		float distance = initialPosition.y - ((0.5f * (9.8f * elapsedTime * elapsedTime)) / 20.0f);
+		if (distance < 0.1f)
+			distance = 0.1f;
+			modelTransform = glm::translate(modelTransform, glm::vec3(initialPosition.x, distance, initialPosition.z));
+		*/
 
-		// scale
-		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 1.0f));
-
+		modelTransform = glm::translate(modelTransform, initialPosition);
+		modelTransform = glm::scale(modelTransform, glm::vec3(scalingFactor, scalingFactor, 1.0f));
+		float theta = glm::cos( glm::sqrt(9.8f) * elapsedTime) * (1.0f / elapsedTime);
+		//glm::quat rotationQuaternion = glm::angleAxis(glm::sin((float) gameState->frameTimeStart), glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::quat rotationQuaternion = glm::angleAxis(theta, glm::vec3(0.0f, 0.0f, 1.0f));
+		modelTransform = modelTransform * glm::toMat4(rotationQuaternion);
+ 
 		// view
-		glm::mat4 view = gameState->camera->getViewTransform();
-
+		glm::mat4 viewTransform = gameState->camera->getViewTransform();
+		
 		// projection
-		glm::mat4 projection = gameState->camera->getProjectionTransform();
+		glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
 
 		// combine transform
-		glm::mat4 transform = projection * view * model;
+		glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
 		transformData[transformSize++] = transform;
 	}
 

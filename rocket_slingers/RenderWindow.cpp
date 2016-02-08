@@ -36,7 +36,7 @@ void RenderWindow::initGlWindow() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-	//GLFW_SAMPLES ?
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
 	// get right most monitor
 	int monitorCount;
@@ -75,7 +75,7 @@ void RenderWindow::initGlWindow() {
 	// setup window input
 	glfwSetInputMode(glWindow, GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetInputMode(glWindow, GLFW_STICKY_MOUSE_BUTTONS, GL_TRUE);
-	glfwSetInputMode(glWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(glWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetKeyCallback(glWindow, keyCallback);
 	glfwSetCursorPosCallback(glWindow, cursorPositionCallback);
 	glfwSetMouseButtonCallback(glWindow, mouseButtonCallback);
@@ -88,7 +88,8 @@ void RenderWindow::initGlWindow() {
 		throw std::string("Failed to initialize GLEW");
 	}
 
-	// enable color alpha blending
+	// enable anti-aliasing and color alpha blending
+	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
