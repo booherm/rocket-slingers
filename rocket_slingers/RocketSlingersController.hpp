@@ -3,9 +3,9 @@
 
 #include "GameState.hpp"
 #include "PoAxes.hpp"
-#include "PoPendulum.hpp"
 #include "PoGuy.hpp"
-#include "PoRope.hpp"
+#include "PoPendulum.hpp"
+//#include "PoRope.hpp"
 
 class RocketSlingersController {
 public:
@@ -17,10 +17,10 @@ private:
 	void initGameObjects();
 	void updateGameState();
 	GameState* gameState;
-	PhysicalObject* pg;
-	PhysicalObject* pendulum;
-	PhysicalObject* axes;
-	PhysicalObject* rope;
+	PhysicalObject* poAxes;
+	PhysicalObject* poGuy;
+	PhysicalObject* poPendulum;
+	//PhysicalObject* rope;
 };
 
 #endif

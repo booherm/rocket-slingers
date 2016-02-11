@@ -27,7 +27,7 @@ double RenderWindow::getTimeSeconds() {
 }
 
 void RenderWindow::initGlWindow() {
-	
+
 	glfwSetErrorCallback(glfwErrorCallback);
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -87,6 +87,7 @@ void RenderWindow::initGlWindow() {
 		glfwTerminate();
 		throw std::string("Failed to initialize GLEW");
 	}
+	glGetError();  // consume meaningless open gl error raised by glew initialization
 
 	// enable anti-aliasing and color alpha blending
 	glEnable(GL_MULTISAMPLE);

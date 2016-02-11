@@ -161,6 +161,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OglShaderProgram.cpp" />
     <ClCompile Include="PhysicalObject.cpp" />
+    <ClCompile Include="PhysicalObjectRenderer.cpp" />
     <ClCompile Include="PoAxes.cpp" />
     <ClCompile Include="PoGuy.cpp" />
     <ClCompile Include="PoPendulum.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="InputQueue.hpp" />
     <ClInclude Include="OglShaderProgram.hpp" />
     <ClInclude Include="PhysicalObject.hpp" />
+    <ClInclude Include="PhysicalObjectRenderer.hpp" />
     <ClInclude Include="PoAxes.hpp" />
     <ClInclude Include="PoGuy.hpp" />
     <ClInclude Include="PoPendulum.hpp" />

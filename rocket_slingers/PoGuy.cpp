@@ -1,12 +1,16 @@
 #include "PoGuy.hpp"
-#include <iostream>
-#include <gtc/matrix_transform.hpp>
 
-PoGuy::PoGuy(GameState* gameState) : PhysicalObject(gameState) {
+PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
+
+	// move to base constructor?
 	initGeometry();
 	initShaders();
 
+	mass = 1.00f;
+	worldPosition = glm::vec3(0.25f, 0.75f, 0.0f);
+
 	//inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_1, InputEvent::IEKS_PRESS, this);
+	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
 void PoGuy::inputEventCallback(InputEvent inputEvent) {
@@ -16,19 +20,8 @@ void PoGuy::inputEventCallback(InputEvent inputEvent) {
 
 void PoGuy::initGeometry() {
 
-	// init buffers and vertex array object
-	colorSize = guyCount;
-	colorData.resize(guyCount);
-	guyTriangleCount = 53;
-	transformSize = guyTriangleCount;
-	transformData.resize(transformSize);
-	glGenVertexArrays(1, &masterVao);
-	glGenBuffers(1, &modelVbo);
-	glGenBuffers(1, &colorVbo);
-	glGenBuffers(1, &transformVbo);
-
 	// buffer axes model data
-	GLfloat guyModelVerticesSet[57][2] = {
+	float guyModelVerticesSet[57][2] = {
 		{ 0.0f, 0.0f },
 		{ 0.0f, 5.0f },
 		{ 2.0f, 4.0f },
@@ -144,143 +137,41 @@ void PoGuy::initGeometry() {
 		{ 56,35,34 }
 	};
 
-	GLfloat guyModelVertices[53 * 3 * 2]; // 53 triangles, 3 vertices per triangle, 2 coordinate values per vertex
 	unsigned int guyModelVertexIndex = 0;
-	for (unsigned int t = 0; t < guyTriangleCount; t++) {
+	for (unsigned int t = 0; t < 53; t++) {
 		for (unsigned int v = 0; v < 3; v++) {
-			guyModelVertices[guyModelVertexIndex++] = guyModelVerticesSet[guyModelTriangleVertexIds[t][v]][0];
-			guyModelVertices[guyModelVertexIndex++] = guyModelVerticesSet[guyModelTriangleVertexIds[t][v]][1];
+			modelVertices.push_back(glm::vec3(guyModelVerticesSet[guyModelTriangleVertexIds[t][v]][0], guyModelVerticesSet[guyModelTriangleVertexIds[t][v]][1], 0.0f));
 		}
 	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, modelVbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(guyModelVertices), guyModelVertices, GL_STATIC_DRAW);
-
-	// initialize guy color buffer
-	glBindBuffer(GL_ARRAY_BUFFER, colorVbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4) * colorSize, NULL, GL_STREAM_DRAW);
-
-	// initialize guy transform buffer
-	glBindBuffer(GL_ARRAY_BUFFER, transformVbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * transformSize, NULL, GL_STREAM_DRAW);
-
-	// start vertex array object setup
-	glBindVertexArray(masterVao);
-
-	// define position attribute (model)
-	glBindBuffer(GL_ARRAY_BUFFER, modelVbo);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	// define color attribute (instanced)
-	glBindBuffer(GL_ARRAY_BUFFER, colorVbo);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (GLvoid*)0);
-	glVertexAttribDivisor(1, 1);
-	glEnableVertexAttribArray(1);
-
-	// define transform attribute (instanced)
-	glBindBuffer(GL_ARRAY_BUFFER, transformVbo);
-	for (unsigned int i = 2; i <= 5; i++) {
-		glVertexAttribPointer(i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)((i - 2) * sizeof(glm::vec4)));
-		glVertexAttribDivisor(i, 1);
-		glEnableVertexAttribArray(i);
-	}
-
-	// end vertex array object setup
-	glBindVertexArray(0);
-}
-
-void PoGuy::initShaders() {
-	// vertex shader
-	std::string vertexShaderSource =
-		"#version 330 core\n"
-		"\n"
-		"layout (location = 0) in vec2 position;\n"
-		"layout (location = 1) in vec4 inColor;\n"
-		"layout (location = 2) in mat4 transformMatrix;\n"
-		"\n"
-		"out vec4 fragShaderColor;\n"
-		"\n"
-		"void main()\n"
-		"{\n"
-		"    gl_Position = transformMatrix * vec4(position, 0.0f, 1.0f);\n"
-		"    fragShaderColor = inColor;\n"
-		"}\n";
-
-	// fragment shader
-	std::string fragmentShaderSource =
-		"#version 330 core\n"
-		"\n"
-		"in vec4 fragShaderColor;\n"
-		"out vec4 color;\n"
-		"\n"
-		"void main()\n"
-		"{\n"
-		"    color = fragShaderColor;\n"
-		"}\n\0";
-
-	shaderProg = OglShaderProgram();
-	shaderProg.createVertexShaderFromSourceString(vertexShaderSource);
-	shaderProg.createFragmentShaderFromSourceString(fragmentShaderSource);
-	shaderProg.build();
 }
 
 void PoGuy::updatePhysicalState() {
-	transformSize = 0;
-	colorSize = 0;
 
-	glm::vec4 guyColorVector(0.0f, 0.0f, 1.0f, 1.0f);
+	//resetForce();
+	// doing things to apply forces
+	//updatePhysics();
 
-	// transform guy
-	for (unsigned int i = 0; i < guyCount; i++) {
+	modelOriginOffsetData.clear();
+	colorData.clear();
+	transformData.clear();
+	
+	modelOriginOffsetData.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 
-		// color
-		colorData[colorSize++] = guyColorVector;
+	// color
+	colorData.push_back(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 
-		// model transform
-		// translate, scale, rotate
+	// model transform: translate, scale, rotate
+	glm::mat4 modelTransform;
+	modelTransform = glm::translate(modelTransform, worldPosition);
+	modelTransform = glm::scale(modelTransform, glm::vec3(0.0015f, 0.0015f, 1.0f));
 
-		//glm::vec3 initialPosition(0.25f, 0.5f, 0.0f);
-		// distance travelled due to gravity
-		//float distance = 1.0f - ((0.5f * (9.8f * (float) gameState->frameTimeStart * (float) gameState->frameTimeStart)) / 20.0f);
-		//if (distance < 0.05f)
-//			distance = 0.05f;
-		//glm::vec3 position(0.25f, distance, 0.0f);
-		glm::vec3 position(0.25f, 0.1f, 0.0f);
+	// view
+	glm::mat4 viewTransform = gameState->camera->getViewTransform();
 
+	// projection
+	glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
 
-		glm::mat4 modelTransform;
-		modelTransform = glm::translate(modelTransform, position);
-		modelTransform = glm::scale(modelTransform, glm::vec3(0.0015f, 0.0015f, 1.0f));
-
-		// view
-		glm::mat4 viewTransform = gameState->camera->getViewTransform();
-
-		// projection
-		glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
-
-		// combine transform
-		glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
-		transformData[transformSize++] = transform;
-	}
-
-	// buffer pendulum color data
-	glBindBuffer(GL_ARRAY_BUFFER, colorVbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec4) * colorSize, colorData.data());
-
-	// buffer pendulum transform data
-	glBindBuffer(GL_ARRAY_BUFFER, transformVbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * transformSize, transformData.data());
-}
-
-void PoGuy::render() {
-	shaderProg.use();
-	glBindVertexArray(masterVao);
-	glDrawArraysInstanced(GL_TRIANGLES, 0, guyTriangleCount * 3, guyCount);
-}
-
-PoGuy::~PoGuy() {
-	glDeleteBuffers(1, &modelVbo);
-	glDeleteBuffers(1, &transformVbo);
-	glDeleteVertexArrays(1, &masterVao);
+	// combine transform
+	glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
+	transformData.push_back(transform);
 }

@@ -4,10 +4,12 @@
 #include "RenderWindow.hpp"
 #include "InputQueue.hpp"
 #include "Camera.hpp"
+#include "PhysicalObjectRenderer.hpp"
 
 class InputQueue;
 class RenderWindow;
 class Camera;
+class PhysicalObjectRenderer;
 
 class GameState {
 public:
@@ -19,13 +21,22 @@ public:
 	InputQueue* inputQueue;
 	RenderWindow* renderWindow;
 	Camera* camera;
-	unsigned int resolutionWidth = 1920;  // debug hardcode
-	unsigned int resolutionHeight = 1080;
-	double frameTimeStart;
-	double framesPerSecond;
-	double lastFrameTotalTime;
-	double lastFrameMousePosX = (double)resolutionWidth / 2;
-	double lastFrameMousePosY = (double)resolutionHeight / 2;
+	PhysicalObjectRenderer* physicalObjectRenderer;
+
+	const unsigned int resolutionWidth = 1920;  // debug hardcode
+	const unsigned int resolutionHeight = 1080;
+	const float meterToWorldUnitScalar = 0.05f;
+	double dFrameTimeStart;
+	float fFrameTimeStart;
+	double dFramesPerSecond;
+	float fFramesPerSecond;
+	double dLastFrameTotalTime;
+	float fLastFrameTotalTime;
+	double dLastFrameMousePosX = (double)resolutionWidth / 2;
+	float fLastFrameMousePosX = (float)resolutionWidth / 2;
+	double dLastFrameMousePosY = (double)resolutionHeight / 2;
+	float fLastFrameMousePosY = (float)resolutionHeight / 2;
+
 	float aspectRatio = (float) resolutionWidth / resolutionHeight;
 
 private:

@@ -88,7 +88,7 @@ glm::mat4 Camera::getProjectionTransform() {
 }
 
 void Camera::translateCamera(CameraTranslation direction) {
-	float velocity = movementSpeed * (float)gameState->lastFrameTotalTime;
+	float velocity = movementSpeed * gameState->fLastFrameTotalTime;
 
 	switch (direction) {
 	case CT_LEFT:
