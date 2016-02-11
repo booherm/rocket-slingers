@@ -4,18 +4,16 @@
 RocketSlingersController::RocketSlingersController() {
 	gameState = new GameState();
 	initGameObjects();
-	std::cout << "controller constructed" << std::endl;
 }
 
 void RocketSlingersController::initGameObjects() {
 	poAxes = new PoAxes(gameState);
 	poGuy = new PoGuy(gameState);
 	poPendulum = new PoPendulum(gameState);
-	//rope = new PoRope(gameState);
+	poRope = new PoRope(gameState);
 }
 
 void RocketSlingersController::start() {
-	std::cout << "controller start" << std::endl;
 	bool running = true;
 	while (running) {
 		gameState->frameStart();
@@ -28,20 +26,16 @@ void RocketSlingersController::start() {
 }
 
 void RocketSlingersController::updateGameState() {
-	// clear current frame
 	poAxes->updatePhysicalState();
 	poGuy->updatePhysicalState();
 	poPendulum->updatePhysicalState();
-	//rope->updatePhysicalState();
-
+	poRope->updatePhysicalState();
 }
 
 RocketSlingersController::~RocketSlingersController() {
 	delete poAxes;
 	delete poGuy;
 	delete poPendulum;
+	delete poRope;
 	delete gameState;
-//	delete rope;
-
-	std::cout << "controller destructed" << std::endl;
 }

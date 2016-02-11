@@ -21,7 +21,7 @@ public:
 
 	std::string objectType;
 	unsigned int glRenderingMode;
-	const unsigned int maxInstanceCount = 10;
+	const unsigned int maxInstanceCount = 1000;
 
 	// rendering
 	std::vector<glm::vec3>* getModelVertices();

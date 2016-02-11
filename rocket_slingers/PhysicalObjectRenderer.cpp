@@ -38,7 +38,7 @@ unsigned int PhysicalObjectRenderer::addPhysicalObject(PhysicalObject* renderabl
 
 		// initialize transform buffer
 		glBindBuffer(GL_ARRAY_BUFFER, rs->transformVbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * 3, NULL, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * renderableObject->maxInstanceCount, NULL, GL_STATIC_DRAW);
 
 		// start vertex array object setup
 		glBindVertexArray(rs->masterVao);

@@ -5,7 +5,7 @@
 #include "PoAxes.hpp"
 #include "PoGuy.hpp"
 #include "PoPendulum.hpp"
-//#include "PoRope.hpp"
+#include "PoRope.hpp"
 
 class RocketSlingersController {
 public:
@@ -20,7 +20,7 @@ private:
 	PhysicalObject* poAxes;
 	PhysicalObject* poGuy;
 	PhysicalObject* poPendulum;
-	//PhysicalObject* rope;
+	PhysicalObject* poRope;
 };
 
 #endif
