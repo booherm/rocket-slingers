@@ -11,6 +11,7 @@ public:
 
 private:
 
+	const float scalerToMeter = 0.03936f;
 	void initGeometry();
 };
 

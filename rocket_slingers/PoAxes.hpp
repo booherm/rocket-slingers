@@ -10,12 +10,12 @@ public:
 	void inputEventCallback(InputEvent inputEvent);
 
 private:
-	const float xMin = -1.0f;
-	const float xMax = 1.0f;
-	const float yMin = -1.0f;
-	const float yMax = 1.0f;
-	const float zMin = -1.0f;
-	const float zMax = 1.0f;
+	const float xMin = 0.0f;
+	const float xMax = 20.0f * gameState->aspectRatio;
+	const float yMin = 0.0f;
+	const float yMax = 20.0f;
+	const float zMin = 0.0f;
+	const float zMax = 0.0f;
 
 	void initGeometry();
 	void pushAxisTransform(glm::mat4 model);

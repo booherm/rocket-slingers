@@ -88,7 +88,7 @@ void PhysicalObject::applyAcceleration(glm::vec3 acceleration) {
 
 void PhysicalObject::updatePhysics() {
 	if (mass != 0.0f) {
-		velocity += ((force / mass) * gameState->fLastFrameTotalTime);
-		worldPosition += (velocity * gameState->fLastFrameTotalTime);
+		velocity += ((force / mass) * gameState->fLastFrameTotalTimeSeconds);
+		worldPosition += (velocity * gameState->fLastFrameTotalTimeSeconds);
 	}
 }

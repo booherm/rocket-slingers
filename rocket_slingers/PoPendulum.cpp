@@ -9,15 +9,8 @@ PoPendulum::PoPendulum(GameState* gameState) : PhysicalObject("PO_PENDULUM", gam
 }
 
 void PoPendulum::inputEventCallback(InputEvent inputEvent){
-	std::cout << "this is the call back! inputEvent = " << std::endl;
-	inputEvent.print();
-
-	float worldX = ((float) inputEvent.xCoordinate * gameState->aspectRatio) / gameState->resolutionWidth;
-	float worldY = 1.0f - ((float) inputEvent.yCoordinate / gameState->resolutionHeight);
-	std::cout << "world space coords (" << worldX << ", " << worldY << ")" << std::endl;
-
-	worldPosition.x = worldX;
-	worldPosition.y = worldY;
+	worldPosition.x = inputEvent.xWorldCoordinate;
+	worldPosition.y = inputEvent.yWorldCoordinate;
 	shouldRender = true;
 	clickCount++;
 }
@@ -39,8 +32,6 @@ void PoPendulum::initGeometry() {
 	modelVertices.push_back(glm::vec3(0.26666666f, 1.0f, 0.0f));
 }
 
-//		"    gl_Position = transformMatrix * vec4(position.x + -0.3f, position.y + -1.0f, 0.0f, 1.0f);\n" // applying origin shift here
-
 void PoPendulum::updatePhysicalState() {
 
 	// model origin offset
@@ -57,12 +48,11 @@ void PoPendulum::updatePhysicalState() {
 	// transform
 	transformData.clear();
 	// I want the object in world space to be 2m tall.  Assuming the model to be 1m tall, scaling factor =
-	GLfloat scalingFactor = 2.0f * gameState->meterToWorldUnitScalar;
 
 	// model
 	glm::mat4 modelTransform;
-	modelTransform = glm::translate(modelTransform, worldPosition);
-	modelTransform = glm::scale(modelTransform, glm::vec3(scalingFactor, scalingFactor, 1.0f));
+	modelTransform = glm::translate(modelTransform, glm::vec3(worldPosition));
+	modelTransform = glm::scale(modelTransform, glm::vec3(scalerToMeter, scalerToMeter, 1.0f));
 //	float theta = glm::cos( glm::sqrt(9.8f) * elapsedTime) * (1.0f / elapsedTime);
 	float theta = glm::half_pi<float>();
 	//glm::quat rotationQuaternion = glm::angleAxis(glm::sin((float) gameState->frameTimeStart), glm::vec3(0.0f, 0.0f, 1.0f));

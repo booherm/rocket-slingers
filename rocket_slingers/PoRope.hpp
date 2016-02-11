@@ -20,10 +20,15 @@ private:
 		glm::vec3 velocity;
 	};
 
-	const unsigned int ropeMassCount = 20;
-	const float springStiffnessConstant = 4500.0f;
-	const float internalSpringFrictionConstant = 200.2f;
-	const float airFrictionConstant = 3.02f;
+	unsigned int ropeMassCount = 15;
+	float ropeMassMass = 0.05f;
+	float springStiffnessConstant = 10000.0f;
+	float internalSpringFrictionConstant = 0.2f;
+	float airFrictionConstant = 0.02f;
+	float gravitationalConstant = 9.81f;
+	const float maxAllowedChangeInTime = 0.002f;
+	
+
 	std::vector<RopeMass> ropeMasses;
 
 	void initGeometry();

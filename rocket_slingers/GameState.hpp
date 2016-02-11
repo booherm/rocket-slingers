@@ -25,18 +25,18 @@ public:
 
 	const unsigned int resolutionWidth = 1920;  // debug hardcode
 	const unsigned int resolutionHeight = 1080;
-	const float meterToWorldUnitScalar = 0.05f;
 	double dFrameTimeStart;
 	float fFrameTimeStart;
 	double dFramesPerSecond;
 	float fFramesPerSecond;
-	double dLastFrameTotalTime;
-	float fLastFrameTotalTime;
+	double dLastFrameTotalTimeSeconds;
+	float fLastFrameTotalTimeSeconds;
 	double dLastFrameMousePosX = (double)resolutionWidth / 2;
 	float fLastFrameMousePosX = (float)resolutionWidth / 2;
 	double dLastFrameMousePosY = (double)resolutionHeight / 2;
 	float fLastFrameMousePosY = (float)resolutionHeight / 2;
 
+	const float worldViewportScaler = 20.0f;
 	float aspectRatio = (float) resolutionWidth / resolutionHeight;
 
 private:

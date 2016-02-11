@@ -162,8 +162,8 @@ void PoGuy::updatePhysicalState() {
 
 	// model transform: translate, scale, rotate
 	glm::mat4 modelTransform;
-	modelTransform = glm::translate(modelTransform, worldPosition);
-	modelTransform = glm::scale(modelTransform, glm::vec3(0.0015f, 0.0015f, 1.0f));
+	modelTransform = glm::translate(modelTransform, glm::vec3(worldPosition));
+	modelTransform = glm::scale(modelTransform, glm::vec3(scalerToMeter, scalerToMeter, 1.0f));
 
 	// view
 	glm::mat4 viewTransform = gameState->camera->getViewTransform();

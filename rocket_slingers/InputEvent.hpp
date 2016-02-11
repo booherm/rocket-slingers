@@ -153,8 +153,10 @@ public:
 	bool modifierControl;
 	bool modifierAlt;
 	bool modifierSuper;
-	double xCoordinate;
-	double yCoordinate;
+	double xScreenCoordinate;
+	double yScreenCoordinate;
+	float xWorldCoordinate;
+	float yWorldCoordinate;
 
 private:
 	static std::map<InputEventKey, std::string> eventKeyDescriptions;

@@ -65,7 +65,8 @@ void RenderWindow::initGlWindow() {
 	}
 
 	// create window
-	glWindow = glfwCreateWindow(gameState->resolutionWidth, gameState->resolutionHeight, "Rocket Slingers", rightMostMonitor, nullptr);
+//	glWindow = glfwCreateWindow(gameState->resolutionWidth, gameState->resolutionHeight, "Rocket Slingers", rightMostMonitor, nullptr);
+	glWindow = glfwCreateWindow(gameState->resolutionWidth, gameState->resolutionHeight, "Rocket Slingers", nullptr, nullptr);
 	glfwMakeContextCurrent(glWindow);
 	int frameBufferWidth, frameBufferHeight;
 	glfwGetFramebufferSize(glWindow, &frameBufferWidth, &frameBufferHeight);

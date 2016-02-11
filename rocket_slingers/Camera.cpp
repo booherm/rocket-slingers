@@ -5,6 +5,10 @@
 Camera::Camera(GameState* gameState) {
 
 	this->gameState = gameState;
+	
+	orthoViewWidth = gameState->worldViewportScaler * gameState->aspectRatio;
+	orthoViewHeight = gameState->worldViewportScaler;
+
 	position = glm::vec3(0.0f, 0.0f, 0.0f);
 	worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	yaw = -glm::half_pi<float>();
@@ -27,7 +31,7 @@ Camera::Camera(GameState* gameState) {
 
 	// orthographic projection transform
 //	projectionTransform = glm::ortho(-gameState->aspectRatio, gameState->aspectRatio, -1.0f, 1.0f);
-	projectionTransform = glm::ortho(0.0f, gameState->aspectRatio, 0.0f, 1.0f);
+	projectionTransform = glm::ortho(0.0f, orthoViewWidth, 0.0f, orthoViewHeight);
 //projectionTransform = glm::ortho(-gameState->aspectRatio - (-gameState->aspectRatio, 2.0f * gameState->aspectRatio, -1.0f, 1.0f);
 
 	// add camera as listener for input events
@@ -88,7 +92,7 @@ glm::mat4 Camera::getProjectionTransform() {
 }
 
 void Camera::translateCamera(CameraTranslation direction) {
-	float velocity = movementSpeed * gameState->fLastFrameTotalTime;
+	float velocity = movementSpeed * gameState->fLastFrameTotalTimeSeconds;
 
 	switch (direction) {
 	case CT_LEFT:

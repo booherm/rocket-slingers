@@ -1,7 +1,7 @@
 #include "GameState.hpp"
 
 GameState::GameState() {
-	inputQueue = new InputQueue();
+	inputQueue = new InputQueue(this);
 	renderWindow = new RenderWindow(this);
 	camera = new Camera(this);
 	physicalObjectRenderer = new PhysicalObjectRenderer();
@@ -20,8 +20,8 @@ void GameState::frameEnd() {
 	fLastFrameMousePosY = (float) dLastFrameMousePosY;
 
 	// calculate frames per second
-	dLastFrameTotalTime = renderWindow->getTimeSeconds() - dFrameTimeStart;
-	fLastFrameTotalTime = (float) dLastFrameTotalTime;
+	dLastFrameTotalTimeSeconds = renderWindow->getTimeSeconds() - dFrameTimeStart;
+	fLastFrameTotalTimeSeconds = (float) dLastFrameTotalTimeSeconds;
 
 	if (fpsIterationCounter == fpsFrameRange) {
 		double totalTime = 0;
@@ -34,7 +34,7 @@ void GameState::frameEnd() {
 		//cout << "fps = " << framesPerSecond << endl;
 	}
 	else {
-		frameTimes[fpsIterationCounter++] = dLastFrameTotalTime;
+		frameTimes[fpsIterationCounter++] = dLastFrameTotalTimeSeconds;
 	}
 }
 

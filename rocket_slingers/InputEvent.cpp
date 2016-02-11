@@ -301,12 +301,14 @@ InputEvent::InputEventKeyState InputEvent::translateGlfwInputEventKeyState(int g
 
 void InputEvent::print() {
 	std::cout << "------------------------------------------------" << std::endl;
-	std::cout << "       Event Key: " << decodeInputEventKey(eventKey) << std::endl;
-	std::cout << " Event Key State: " << decodeInputEventKeyState(eventKeyState) << std::endl;
-	std::cout << "  Modifier Shift: " << modifierShift << std::endl;
-	std::cout << "Modifier Control: " << modifierControl << std::endl;
-	std::cout << "    Modifier Alt: " << modifierAlt << std::endl;
-	std::cout << "  Modifier Super: " << modifierSuper << std::endl;
-	std::cout << "    X Coordinate: " << xCoordinate << std::endl;
-	std::cout << "    Y Coordinate: " << yCoordinate << std::endl;
+	std::cout << "          Event Key: " << decodeInputEventKey(eventKey) << std::endl;
+	std::cout << "    Event Key State: " << decodeInputEventKeyState(eventKeyState) << std::endl;
+	std::cout << "     Modifier Shift: " << modifierShift << std::endl;
+	std::cout << "   Modifier Control: " << modifierControl << std::endl;
+	std::cout << "       Modifier Alt: " << modifierAlt << std::endl;
+	std::cout << "     Modifier Super: " << modifierSuper << std::endl;
+	std::cout << "X Screen Coordinate: " << xScreenCoordinate << std::endl;
+	std::cout << "Y Screen Coordinate: " << yScreenCoordinate << std::endl;
+	std::cout << " X World Coordinate: " << xWorldCoordinate << std::endl;
+	std::cout << " Y World Coordinate: " << yWorldCoordinate << std::endl;
 }

@@ -11,7 +11,7 @@ public:
 
 private:
 	void initGeometry();
-
+	const float scalerToMeter = 3.0f;
 	unsigned int clickCount = 0;
 };
 

@@ -1,9 +1,13 @@
 #include "InputQueue.hpp"
 #include <iostream>
 
-InputQueue::InputQueue() {
+InputQueue::InputQueue(GameState* gameState) {
+	this->gameState = gameState;
 	inputQueue.resize(inputEventRetention);
 	inputQueueNextSlot = 0;
+
+	screenToWorldCoordinateScalerX = (gameState->worldViewportScaler * gameState->aspectRatio) / gameState->resolutionWidth;
+	screenToWorldCoordinateScalerY = gameState->worldViewportScaler / gameState->resolutionHeight;
 }
 
 void InputQueue::addEvent(int glfwKey, int glfwKeyState, unsigned char glfwKeyModifier, double xPosition, double yPosition) {
@@ -19,8 +23,11 @@ void InputQueue::addEvent(int glfwKey, int glfwKeyState, unsigned char glfwKeyMo
 	e.modifierControl = (binary2 & glfwKeyModifier) == binary2;
 	e.modifierAlt = (binary4 & glfwKeyModifier) == binary4;
 	e.modifierSuper = (binary8 & glfwKeyModifier) == binary8;
-	e.xCoordinate = xPosition;
-	e.yCoordinate = yPosition;
+	e.xScreenCoordinate = xPosition;
+	e.yScreenCoordinate = yPosition;
+
+	e.xWorldCoordinate = (float)xPosition * screenToWorldCoordinateScalerX;
+	e.yWorldCoordinate = gameState->worldViewportScaler - ((float) yPosition * screenToWorldCoordinateScalerY);
 
 	enqueueEvent(e);
 }
@@ -33,8 +40,11 @@ void InputQueue::addMouseMovementEvent(double xPosition, double yPosition) {
 	e.modifierControl = false;
 	e.modifierAlt = false;
 	e.modifierSuper = false;
-	e.xCoordinate = xPosition;
-	e.yCoordinate = yPosition;
+	e.xScreenCoordinate = xPosition;
+	e.yScreenCoordinate = yPosition;
+
+	e.xWorldCoordinate = (float)xPosition * screenToWorldCoordinateScalerX;
+	e.yWorldCoordinate = gameState->worldViewportScaler - ((float) yPosition * screenToWorldCoordinateScalerY);
 
 	enqueueEvent(e);
 }
