@@ -49,11 +49,15 @@ protected:
 	OglShaderProgram shaderProg;
 
 	// physics
+	void prepareTimeChangeValues();
 	virtual void resetForce();
 	virtual void applyForce(glm::vec3 force);
 	virtual void applyAcceleration(glm::vec3 acceleration);
 	virtual void updatePhysics();
 	float mass;
+	unsigned int physicsUpdateIterationsRequired;
+	float changeInTime;
+	float maxAllowedChangeInTime;
 	glm::vec3 worldPosition;
 	glm::vec3 velocity;
 	glm::vec3 force;

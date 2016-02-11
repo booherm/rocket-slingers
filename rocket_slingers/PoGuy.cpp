@@ -6,16 +6,24 @@ PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
 	initGeometry();
 	initShaders();
 
-	mass = 1.00f;
+	mass = 62.00f;
+	//maxAllowedChangeInTime = 0.200f;
 	worldPosition = glm::vec3(0.25f, 0.75f, 0.0f);
 
-	//inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_1, InputEvent::IEKS_PRESS, this);
+	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_SPACE, InputEvent::IEKS_PRESS, this);
+	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_SPACE, InputEvent::IEKS_RELEASE, this);
+	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_G, InputEvent::IEKS_PRESS, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
 void PoGuy::inputEventCallback(InputEvent inputEvent) {
-	std::cout << "PoGuy callback.  InputEvent = " << std::endl;
-	inputEvent.print();
+
+	if (inputEvent.eventKey == InputEvent::IEK_KEY_SPACE) {
+		rocketOn = inputEvent.eventKeyState == InputEvent::IEKS_PRESS;
+		std::cout << "rocket " << (rocketOn ? "on" : "off") << std::endl;
+	}
+	else
+		worldPosition = glm::vec3(0.25f, 0.75f, 0.0f);
 }
 
 void PoGuy::initGeometry() {
@@ -147,14 +155,25 @@ void PoGuy::initGeometry() {
 
 void PoGuy::updatePhysicalState() {
 
-	//resetForce();
-	// doing things to apply forces
-	//updatePhysics();
+	prepareTimeChangeValues();
+	for (unsigned int i = 0; i < physicsUpdateIterationsRequired; i++) {
+		resetForce();
+
+		// rocket force
+		if (rocketOn)
+			applyForce(glm::vec3(100.0f, 0.0f, 0.0f));
+
+		// air friction
+		applyForce(-velocity * airFrictionConstant);
+
+		updatePhysics();
+
+	}
 
 	modelOriginOffsetData.clear();
 	colorData.clear();
 	transformData.clear();
-	
+
 	modelOriginOffsetData.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// color

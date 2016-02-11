@@ -6,6 +6,9 @@ PhysicalObject::PhysicalObject(const std::string& objectType, GameState* gameSta
 	mass = 0.0f;
 	shouldRender = true;
 	glRenderingMode = GL_TRIANGLES;
+	physicsUpdateIterationsRequired = 1;
+	changeInTime = 0.0f;
+	maxAllowedChangeInTime = 1.0f;
 }
 
 PhysicalObject::~PhysicalObject() {}
@@ -88,7 +91,17 @@ void PhysicalObject::applyAcceleration(glm::vec3 acceleration) {
 
 void PhysicalObject::updatePhysics() {
 	if (mass != 0.0f) {
-		velocity += ((force / mass) * gameState->fLastFrameTotalTimeSeconds);
-		worldPosition += (velocity * gameState->fLastFrameTotalTimeSeconds);
+		velocity += ((force / mass) * changeInTime);
+ 		worldPosition += (velocity * changeInTime);
+	}
+}
+
+void PhysicalObject::prepareTimeChangeValues() {
+	// Calculate the number of physics iterations required.  Change in time must be sufficiently
+	// small enough not to cause excessive accelerations.
+	changeInTime = gameState->fLastFrameTotalTimeSeconds;
+	physicsUpdateIterationsRequired = (unsigned int)(changeInTime / maxAllowedChangeInTime) + 1;
+	if (physicsUpdateIterationsRequired != 0) {
+		changeInTime = changeInTime / physicsUpdateIterationsRequired;
 	}
 }

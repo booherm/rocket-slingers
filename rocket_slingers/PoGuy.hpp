@@ -12,7 +12,9 @@ public:
 private:
 
 	const float scalerToMeter = 0.03936f;
+	bool rocketOn = false;
 	void initGeometry();
+	const float airFrictionConstant = 0.1f;
 };
 
 #endif

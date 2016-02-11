@@ -4,10 +4,13 @@ PoRope::PoRope(GameState* gameState) : PhysicalObject("PO_ROPE", gameState) {
 	initGeometry();
 	initShaders();
 
+	maxAllowedChangeInTime = 0.002f;
 	this->glRenderingMode = GL_LINES;
 	shouldRender = false;
+
 	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_1, InputEvent::IEKS_PRESS, this);
 
+	/*
 	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_Q, InputEvent::IEKS_PRESS, this);
 	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_W, InputEvent::IEKS_PRESS, this);
 	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_E, InputEvent::IEKS_PRESS, this);
@@ -21,12 +24,12 @@ PoRope::PoRope(GameState* gameState) : PhysicalObject("PO_ROPE", gameState) {
 	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_F, InputEvent::IEKS_PRESS, this);
 	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_G, InputEvent::IEKS_PRESS, this);
 	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_H, InputEvent::IEKS_PRESS, this);
+	*/
 
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
 void PoRope::inputEventCallback(InputEvent inputEvent) {
-	std::cout << "PoRope callback.  InputEvent = " << std::endl;
 
 	if (inputEvent.eventKey == InputEvent::IEK_MOUSE_BUTTON_1) {
 
@@ -137,17 +140,10 @@ void PoRope::updatePhysicalState() {
 		return;
 	
 	transformData.clear();
-
-	// Calculate the number of physics iterations required.  Change in time must be suffiently small enough not
-	// to cause excessive accelerations.
-	float changeInTime = gameState->fLastFrameTotalTimeSeconds;
-	unsigned int updateIterationsRequired = (unsigned int) (changeInTime / maxAllowedChangeInTime) + 1;
-	if (updateIterationsRequired != 0) {
-		changeInTime = changeInTime / updateIterationsRequired;
-	}
+	prepareTimeChangeValues();
 
 	// perform physical update iterations
-	for (unsigned int updateIteration = 0; updateIteration < updateIterationsRequired; updateIteration++) {
+	for (unsigned int updateIteration = 0; updateIteration < physicsUpdateIterationsRequired; updateIteration++) {
 
 		// reset forces
 		for (unsigned int massIndex = 0; massIndex < ropeMassCount; massIndex++) {

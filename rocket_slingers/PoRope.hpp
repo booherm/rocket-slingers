@@ -26,9 +26,6 @@ private:
 	float internalSpringFrictionConstant = 0.2f;
 	float airFrictionConstant = 0.02f;
 	float gravitationalConstant = 9.81f;
-	const float maxAllowedChangeInTime = 0.002f;
-	
-
 	std::vector<RopeMass> ropeMasses;
 
 	void initGeometry();
