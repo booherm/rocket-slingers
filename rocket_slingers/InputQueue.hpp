@@ -3,7 +3,6 @@
 
 #include <map>
 #include <vector>
-#include "InputEvent.hpp"
 #include "EventListener.hpp"
 #include "GameState.hpp"
 
@@ -13,27 +12,28 @@ class InputQueue {
 
 public:
 	InputQueue(GameState* gameState);
+	void subscribeToKeyboardEvent(unsigned int keyState, unsigned int key, EventListener* subscribingObject);
+	void subscribeToMouseButtonEvent(unsigned int buttonState, unsigned int buttonNumber, EventListener* subscribingObject);
 	bool processInput();
-	void subscribeToInputEvent(
-		InputEvent::InputEventKey inputEventKey,
-		InputEvent::InputEventKeyState inputEventKeyState,
-		EventListener* subscribingObject
-	);
-	~InputQueue();
+
+	float eventWorldCoordinateX;
+	float eventWorldCoordinateY;
 
 private:
 
-	void addSdlEvent(const SDL_Event& sdlEvent);
+	typedef std::pair<unsigned int, unsigned int> KeyboardSubscriptionKey;
+	typedef std::pair<unsigned int, unsigned int> MouseButtonSubscriptionKey;
 
 	GameState* gameState;
-	typedef std::pair<InputEvent::InputEventKey, InputEvent::InputEventKeyState> subscriptionKey;
-	const unsigned int inputEventRetention = 10;
-	std::vector<InputEvent> inputQueue;
-	unsigned int inputQueueNextSlot;
-	std::multimap<subscriptionKey, EventListener*> eventSubscriptions;
-	void enqueueEvent(InputEvent inputEvent);
 	float screenToWorldCoordinateScalerX;
 	float screenToWorldCoordinateScalerY;
+
+	std::multimap<KeyboardSubscriptionKey, EventListener*> keyboardSubscriptions;
+	std::multimap<MouseButtonSubscriptionKey, EventListener*> mouseButtonSubscriptions;
+	//std::multimap<MouseMotionSubscriptionKey, EventListener*> mouseMotionSubscriptions;
+	//std::multimap<MouseWheelSubscriptionKey, EventListener*> mouseWheelSubscriptions;
+
+	void callSubscribers(const SDL_Event& inputEvent);
 };
 
 #endif

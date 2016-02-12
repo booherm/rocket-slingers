@@ -156,7 +156,6 @@
     <ClCompile Include="EventListener.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="GuiConsole.cpp" />
-    <ClCompile Include="InputEvent.cpp" />
     <ClCompile Include="InputQueue.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OglShaderProgram.cpp" />
@@ -176,7 +175,6 @@
     <ClInclude Include="EventListener.hpp" />
     <ClInclude Include="GameState.hpp" />
     <ClInclude Include="GuiConsole.hpp" />
-    <ClInclude Include="InputEvent.hpp" />
     <ClInclude Include="InputQueue.hpp" />
     <ClInclude Include="OglShaderProgram.hpp" />
     <ClInclude Include="PhysicalMass.hpp" />

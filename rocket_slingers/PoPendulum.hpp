@@ -7,7 +7,7 @@ class PoPendulum : public PhysicalObject {
 public:
 	PoPendulum(GameState* gameState);
 	void doRenderUpdate();
-	void inputEventCallback(InputEvent inputEvent);
+	void inputEventCallback(const SDL_Event& inputEvent);
 
 private:
 	void doPhysicalUpdate();

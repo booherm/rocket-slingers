@@ -58,7 +58,7 @@ void PhysicalObject::updatePhysicalState() {
 
 }
 
-void PhysicalObject::inputEventCallback(InputEvent inputEvent) {}
+void PhysicalObject::inputEventCallback(const SDL_Event& inputEvent) {}
 
 void PhysicalObject::initGeometry() {}
 

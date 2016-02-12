@@ -6,7 +6,7 @@
 class PoAxes : public PhysicalObject {
 public:
 	PoAxes(GameState* gameState);
-	void inputEventCallback(InputEvent inputEvent);
+	void inputEventCallback(const SDL_Event& inputEvent);
 
 private:
 	const float xMin = 0.0f;

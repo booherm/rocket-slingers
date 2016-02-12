@@ -6,104 +6,47 @@ PoRope::PoRope(GameState* gameState) : PhysicalObject("PO_ROPE", gameState) {
 
 	maxAllowedChangeInTime = 0.002f;
 	this->glRenderingMode = GL_LINES;
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_1, InputEvent::IEKS_KEYDOWN, this);
+
+	gameState->inputQueue->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_LEFT, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
-void PoRope::inputEventCallback(InputEvent inputEvent) {
+void PoRope::inputEventCallback(const SDL_Event& inputEvent) {
+	
+	// determine rope anchor and termination coordinates
+	float worldX = gameState->inputQueue->eventWorldCoordinateX;
+	float worldY = gameState->inputQueue->eventWorldCoordinateY;
+	glm::vec3 ropeAnchorPoint(worldX, worldY, 0.0f);
+	glm::vec3 ropeTerminationPoint(10.0f, 15.0f, 0.0f);  // this is a temporary hard-coded point, would get from player position
 
-	if (inputEvent.eventKey == InputEvent::IEK_MOUSE_BUTTON_1) {
+	// calculate attributes that will apply to all rope masses
+	float overallRopeLength = glm::distance(ropeAnchorPoint, ropeTerminationPoint);
+	float ropeSegmentLength = overallRopeLength / (ropeMassCount - 1);
+	float theta = Utilities::xyAngleBetweenVectors(glm::vec3(1.0f, 0.0f, 0.0f), ropeAnchorPoint - ropeTerminationPoint);
+	float positionOffsetX = glm::cos(theta) * ropeSegmentLength;
+	float positionOffsetY = glm::sin(theta) * ropeSegmentLength;
 
-		// determine rope anchor and termination coordinates
-		glm::vec3 ropeAnchorPoint(inputEvent.xWorldCoordinate, inputEvent.yWorldCoordinate, 0.0f);
-		glm::vec3 ropeTerminationPoint(10.0f, 15.0f, 0.0f);  // this is a temporary hard-coded point, would get from player position
+	// Create rope masses.  Each rope mass is a point on the rope joined by a spring segment to it's immediate neighbor
+	// down the rope.  The first and last masses on the rope only have internal spring segments.
+	componentMasses.resize(ropeMassCount);
+	ropeSegmentLengths.resize(ropeMassCount);
+	for (unsigned int massIndex = 0; massIndex < ropeMassCount; massIndex++) {
 
-		// calculate attributes that will apply to all rope masses
-		float overallRopeLength = glm::distance(ropeAnchorPoint, ropeTerminationPoint);
-		float ropeSegmentLength = overallRopeLength / (ropeMassCount - 1);
-		float theta = Utilities::xyAngleBetweenVectors(glm::vec3(1.0f, 0.0f, 0.0f), ropeAnchorPoint - ropeTerminationPoint);
-		float positionOffsetX = glm::cos(theta) * ropeSegmentLength;
-		float positionOffsetY = glm::sin(theta) * ropeSegmentLength;
+		PhysicalMass* ropeMass = &componentMasses[massIndex];
+		ropeMass->mass = ropeMassMass;
+		RopeSegmentLength* rsl = &ropeSegmentLengths[massIndex];
+		rsl->unstretchedLength = ropeSegmentLength;
+		rsl->stretchedLength = ropeSegmentLength;
 
-		// Create rope masses.  Each rope mass is a point on the rope joined by a spring segment to it's immediate neighbor
-		// down the rope.  The first and last masses on the rope only have internal spring segments.
-		componentMasses.resize(ropeMassCount);
-		ropeSegmentLengths.resize(ropeMassCount);
-		for (unsigned int massIndex = 0; massIndex < ropeMassCount; massIndex++) {
+		// determine mass origin position
+		ropeMass->worldPosition = glm::vec3(ropeAnchorPoint.x - (positionOffsetX * massIndex),
+			ropeAnchorPoint.y - (positionOffsetY * massIndex), 0.0f);
 
-			PhysicalMass* ropeMass = &componentMasses[massIndex];
-			ropeMass->mass = ropeMassMass;
-			RopeSegmentLength* rsl = &ropeSegmentLengths[massIndex];
-			rsl->unstretchedLength = ropeSegmentLength;
-			rsl->stretchedLength = ropeSegmentLength;
-
-			// determine mass origin position
-			ropeMass->worldPosition = glm::vec3(ropeAnchorPoint.x - (positionOffsetX * massIndex),
-				ropeAnchorPoint.y - (positionOffsetY * massIndex), 0.0f);
-
-		}
-
-		shouldRender = true;
-		shouldDoPhysicalUpdate = true;
 	}
-	else
-	{
-		switch (inputEvent.eventKey) {
-			case InputEvent::IEK_KEY_Q:
-				ropeMassCount++;
-				colorData.clear();
-				for (unsigned int massIndex = 0; massIndex < ropeMassCount - 1; massIndex++) {
-					colorData.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-				}
-				break;
-			case InputEvent::IEK_KEY_W:
-				ropeMassMass += 0.25f;
-				break;
-			case InputEvent::IEK_KEY_E:
-				springStiffnessConstant += 100.0f;
-				break;
-			case InputEvent::IEK_KEY_R:
-				internalSpringFrictionConstant += 1.0f;
-				break;
-			case InputEvent::IEK_KEY_T:
-				airFrictionConstant += 1.0f;
-				break;
-			case InputEvent::IEK_KEY_Y:
-				gravitationalConstant += 0.5f;
-				break;
-			case InputEvent::IEK_KEY_A:
-				ropeMassCount--;
-				colorData.clear();
-				for (unsigned int massIndex = 0; massIndex < ropeMassCount - 1; massIndex++) {
-					colorData.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-				}
-				break;
-			case InputEvent::IEK_KEY_S:
-				ropeMassMass -= 0.25f;
-				break;
-			case InputEvent::IEK_KEY_D:
-				springStiffnessConstant -= 100.0f;
-				break;
-			case InputEvent::IEK_KEY_F:
-				internalSpringFrictionConstant -= 1.0f;
-				break;
-			case InputEvent::IEK_KEY_G:
-				airFrictionConstant -= 1.0f;
-				break;
-			case InputEvent::IEK_KEY_H:
-				gravitationalConstant -= 0.5f;
-				break;
-		}
 
-		std::cout << "------------------------------------------------------" << std::endl;
-		std::cout << "Rope variables state:" << std::endl;
-		std::cout << "                 ropeMassCount = " << ropeMassCount << std::endl;
-		std::cout << "                  ropeMassMass = " << ropeMassMass << std::endl;
-		std::cout << "       springStiffnessConstant = " << springStiffnessConstant << std::endl;
-		std::cout << "internalSpringFrictionConstant = " << internalSpringFrictionConstant << std::endl;
-		std::cout << "           airFrictionConstant = " << airFrictionConstant << std::endl;
-		std::cout << "         gravitationalConstant = " << gravitationalConstant << std::endl;
-	}
+	shouldRender = true;
+	shouldDoPhysicalUpdate = true;
+
 }
 
 void PoRope::initGeometry() {

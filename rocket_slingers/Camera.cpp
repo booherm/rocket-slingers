@@ -36,26 +36,26 @@ Camera::Camera(GameState* gameState) {
 
 	// add camera as listener for input events
 	InputQueue* iq = gameState->inputQueue;
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_LEFT, InputEvent::IEKS_KEYDOWN, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_RIGHT, InputEvent::IEKS_KEYDOWN, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_UP, InputEvent::IEKS_KEYDOWN, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_DOWN, InputEvent::IEKS_KEYDOWN, this);
+	iq->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_LEFT, this);
+	iq->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_RIGHT, this);
+	iq->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_UP, this);
+	iq->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_DOWN, this);
 }
 
-void Camera::inputEventCallback(InputEvent inputEvent) {
+void Camera::inputEventCallback(const SDL_Event& inputEvent) {
 
 	// debug - constant time map
-	switch (inputEvent.eventKey) {
-		case InputEvent::IEK_KEY_LEFT:
+	switch (inputEvent.key.keysym.sym) {
+		case SDLK_LEFT:
 			translateCamera(CT_LEFT);
 			break;
-		case InputEvent::IEK_KEY_RIGHT:
+		case SDLK_RIGHT:
 			translateCamera(CT_RIGHT);
 			break;
-		case InputEvent::IEK_KEY_UP:
+		case SDLK_UP:
 			translateCamera(CT_UP);
 			break;
-		case InputEvent::IEK_KEY_DOWN:
+		case SDLK_DOWN:
 			translateCamera(CT_DOWN);
 			break;
 /*		case InputEvent::IEK_MOUSE_MOVE:

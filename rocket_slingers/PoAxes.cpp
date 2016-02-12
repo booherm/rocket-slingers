@@ -11,9 +11,8 @@ PoAxes::PoAxes(GameState* gameState) : PhysicalObject("PO_AXES", gameState) {
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
-void PoAxes::inputEventCallback(InputEvent inputEvent) {
+void PoAxes::inputEventCallback(const SDL_Event& inputEvent) {
 	std::cout << "PoAxes callback.  InputEvent = " << std::endl;
-	inputEvent.print();
 }
 
 void PoAxes::initGeometry() {

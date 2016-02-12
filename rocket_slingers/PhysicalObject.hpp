@@ -20,7 +20,7 @@ public:
 	PhysicalObject(const std::string& objectType, GameState* gameState);
 	virtual ~PhysicalObject();
 
-	virtual void inputEventCallback(InputEvent inputEvent);
+	virtual void inputEventCallback(const SDL_Event& inputEvent);
 	std::string objectType;
 	unsigned int glRenderingMode;
 	const unsigned int maxInstanceCount = 1000;

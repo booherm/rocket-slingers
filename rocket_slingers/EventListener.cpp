@@ -1,3 +1,3 @@
 #include "EventListener.hpp"
 
-void EventListener::inputEventCallback(InputEvent inputEvent) {}
+void EventListener::inputEventCallback(const SDL_Event& inputEvent) {}

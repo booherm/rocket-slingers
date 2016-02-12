@@ -9,19 +9,22 @@ PoPendulum::PoPendulum(GameState* gameState) : PhysicalObject("PO_PENDULUM", gam
 	mainComponentMass->mass = 100.00f;
 	(&componentMasses[1])->mass = 100.0f;
 	
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_3, InputEvent::IEKS_KEYDOWN, this);
+	gameState->inputQueue->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_RIGHT, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
-void PoPendulum::inputEventCallback(InputEvent inputEvent){
+void PoPendulum::inputEventCallback(const SDL_Event& inputEvent){
 	
-	glm::vec3 originPosition = glm::vec3(inputEvent.xWorldCoordinate, inputEvent.yWorldCoordinate, 0.0f);
+	float worldX = gameState->inputQueue->eventWorldCoordinateX;
+	float worldY = gameState->inputQueue->eventWorldCoordinateY;
+	glm::vec3 originPosition = glm::vec3(worldX, worldY, 0.0f);
 	mainComponentMass->worldPosition = originPosition;
 	(&componentMasses[1])->worldPosition = originPosition + glm::vec3(1.0f, 0.0f, 0.0f);
 
 	shouldRender = true;
 	shouldDoPhysicalUpdate = true;
 	clickCount++;
+
 }
 
 void PoPendulum::initGeometry() {

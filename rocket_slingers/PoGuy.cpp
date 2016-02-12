@@ -12,16 +12,17 @@ PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
 	mainComponentMass->mass = 62.00f;
 	mainComponentMass->worldPosition = glm::vec3(0.25f, 0.75f, 0.0f);
 
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_SPACE, InputEvent::IEKS_KEYDOWN, this);
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_SPACE, InputEvent::IEKS_KEYUP, this);
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_G, InputEvent::IEKS_KEYDOWN, this);
+	gameState->inputQueue->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_SPACE, this);
+	gameState->inputQueue->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_SPACE, this);
+	gameState->inputQueue->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_g, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
-void PoGuy::inputEventCallback(InputEvent inputEvent) {
+void PoGuy::inputEventCallback(const SDL_Event& inputEvent) {
 
-	if (inputEvent.eventKey == InputEvent::IEK_KEY_SPACE) {
-		rocketOn = inputEvent.eventKeyState == InputEvent::IEKS_KEYDOWN;
+	if (inputEvent.key.keysym.sym == SDLK_SPACE) {
+
+		rocketOn = inputEvent.key.state == SDL_PRESSED;
 		std::cout << "rocket " << (rocketOn ? "on" : "off") << std::endl;
 	}
 	else
