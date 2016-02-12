@@ -3,15 +3,21 @@
 PhysicalObject::PhysicalObject(const std::string& objectType, GameState* gameState) {
 	this->objectType = objectType;
 	this->gameState = gameState;
-	mass = 0.0f;
-	shouldRender = true;
+
+	shouldRender = false;
 	glRenderingMode = GL_TRIANGLES;
-	physicsUpdateIterationsRequired = 1;
+
+	shouldDoPhysicalUpdate = false;
 	changeInTime = 0.0f;
 	maxAllowedChangeInTime = 1.0f;
 }
 
 PhysicalObject::~PhysicalObject() {}
+
+void PhysicalObject::updateRenderState() {
+	if (shouldRender)
+		doRenderUpdate();
+}
 
 std::vector<glm::vec3>* PhysicalObject::getModelVertices() {
 	return &modelVertices;
@@ -33,7 +39,25 @@ OglShaderProgram* PhysicalObject::getShaderProgram() {
 	return &shaderProg;
 }
 
-void PhysicalObject::updatePhysicalState() {}
+void PhysicalObject::updatePhysicalState() {
+
+	if (shouldDoPhysicalUpdate) {
+		// Calculate the number of physics iterations required.  Change in time must be sufficiently
+		// small enough not to cause excessive accelerations.  Each physical object can specify its
+		// own maxAllowedChangeInTime value.
+		changeInTime = gameState->fLastFrameTotalTimeSeconds;
+		unsigned int physicsUpdateIterationsRequired = (unsigned int)(changeInTime / maxAllowedChangeInTime) + 1;
+		if (physicsUpdateIterationsRequired != 0) {
+			changeInTime = changeInTime / physicsUpdateIterationsRequired;
+		}
+
+		for (unsigned int i = 0; i < physicsUpdateIterationsRequired; i++) {
+			doPhysicalUpdate();
+		}
+	}
+
+}
+
 void PhysicalObject::inputEventCallback(InputEvent inputEvent) {}
 
 void PhysicalObject::initGeometry() {}
@@ -75,33 +99,13 @@ void PhysicalObject::initShaders() {
 	shaderProg.build();
 }
 
-void PhysicalObject::resetForce() {
-	force.x = 0.0f;
-	force.y = 0.0f;
-	force.z = 0.0f;
-}
+void PhysicalObject::resetForces() {
 
-void PhysicalObject::applyForce(glm::vec3 force) {
-	this->force += force;
-}
-
-void PhysicalObject::applyAcceleration(glm::vec3 acceleration) {
-	force += (mass * acceleration);
-}
-
-void PhysicalObject::updatePhysics() {
-	if (mass != 0.0f) {
-		velocity += ((force / mass) * changeInTime);
- 		worldPosition += (velocity * changeInTime);
+	for (auto &mass : componentMasses) {
+		mass.force = glm::vec3();
 	}
+
 }
 
-void PhysicalObject::prepareTimeChangeValues() {
-	// Calculate the number of physics iterations required.  Change in time must be sufficiently
-	// small enough not to cause excessive accelerations.
-	changeInTime = gameState->fLastFrameTotalTimeSeconds;
-	physicsUpdateIterationsRequired = (unsigned int)(changeInTime / maxAllowedChangeInTime) + 1;
-	if (physicsUpdateIterationsRequired != 0) {
-		changeInTime = changeInTime / physicsUpdateIterationsRequired;
-	}
-}
+void PhysicalObject::doPhysicalUpdate() {}
+void PhysicalObject::doRenderUpdate() {}

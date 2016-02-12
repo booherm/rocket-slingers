@@ -1,14 +1,16 @@
 #include "PoGuy.hpp"
 
 PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
-
-	// move to base constructor?
 	initGeometry();
 	initShaders();
 
-	mass = 62.00f;
-	//maxAllowedChangeInTime = 0.200f;
-	worldPosition = glm::vec3(0.25f, 0.75f, 0.0f);
+	shouldRender = true;
+	shouldDoPhysicalUpdate = true;
+	componentMasses.resize(1);
+	mainComponentMass = &componentMasses[0];
+
+	mainComponentMass->mass = 62.00f;
+	mainComponentMass->worldPosition = glm::vec3(0.25f, 0.75f, 0.0f);
 
 	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_SPACE, InputEvent::IEKS_PRESS, this);
 	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_SPACE, InputEvent::IEKS_RELEASE, this);
@@ -23,7 +25,7 @@ void PoGuy::inputEventCallback(InputEvent inputEvent) {
 		std::cout << "rocket " << (rocketOn ? "on" : "off") << std::endl;
 	}
 	else
-		worldPosition = glm::vec3(0.25f, 0.75f, 0.0f);
+		((PhysicalMass*) &componentMasses[0])->worldPosition = glm::vec3(0.25f, 0.75f, 0.0f);
 }
 
 void PoGuy::initGeometry() {
@@ -153,22 +155,21 @@ void PoGuy::initGeometry() {
 	}
 }
 
-void PoGuy::updatePhysicalState() {
+void PoGuy::doPhysicalUpdate() {
 
-	prepareTimeChangeValues();
-	for (unsigned int i = 0; i < physicsUpdateIterationsRequired; i++) {
-		resetForce();
+	mainComponentMass->resetForce();
 
-		// rocket force
-		if (rocketOn)
-			applyForce(glm::vec3(100.0f, 0.0f, 0.0f));
+	// rocket force
+	if (rocketOn)
+		mainComponentMass->force += glm::vec3(100.0f, 0.0f, 0.0f);
 
-		// air friction
-		applyForce(-velocity * airFrictionConstant);
+	// air friction
+	mainComponentMass->force += (mainComponentMass->velocity * -airFrictionConstant);
 
-		updatePhysics();
+	mainComponentMass->updatePhysics(changeInTime);
+}
 
-	}
+void PoGuy::doRenderUpdate() {
 
 	modelOriginOffsetData.clear();
 	colorData.clear();
@@ -181,7 +182,7 @@ void PoGuy::updatePhysicalState() {
 
 	// model transform: translate, scale, rotate
 	glm::mat4 modelTransform;
-	modelTransform = glm::translate(modelTransform, glm::vec3(worldPosition));
+	modelTransform = glm::translate(modelTransform, mainComponentMass->worldPosition);
 	modelTransform = glm::scale(modelTransform, glm::vec3(scalerToMeter, scalerToMeter, 1.0f));
 
 	// view
@@ -193,4 +194,5 @@ void PoGuy::updatePhysicalState() {
 	// combine transform
 	glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
 	transformData.push_back(transform);
+
 }

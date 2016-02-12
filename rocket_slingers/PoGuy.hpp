@@ -6,7 +6,8 @@
 class PoGuy : public PhysicalObject {
 public:
 	PoGuy(GameState* gameState);
-	void updatePhysicalState();
+	void doPhysicalUpdate();
+	void doRenderUpdate();
 	void inputEventCallback(InputEvent inputEvent);
 
 private:

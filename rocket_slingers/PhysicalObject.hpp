@@ -11,6 +11,7 @@
 #include "EventListener.hpp"
 #include "GameState.hpp"
 #include "Utilities.hpp"
+#include "PhysicalMass.hpp"
 
 class InputQueue;
 
@@ -19,27 +20,29 @@ public:
 	PhysicalObject(const std::string& objectType, GameState* gameState);
 	virtual ~PhysicalObject();
 
+	virtual void inputEventCallback(InputEvent inputEvent);
 	std::string objectType;
 	unsigned int glRenderingMode;
 	const unsigned int maxInstanceCount = 1000;
 
 	// rendering
+	bool shouldRender;
+	virtual void updateRenderState();
 	std::vector<glm::vec3>* getModelVertices();
 	std::vector<glm::vec3>* getModelOriginOffsetData();
 	std::vector<glm::vec4>* getColorData();
 	std::vector<glm::mat4>* getTransformData();
 	OglShaderProgram* getShaderProgram();
-	bool shouldRender;
 
 	// physics
-	virtual void updatePhysicalState();
-	virtual void inputEventCallback(InputEvent inputEvent);
+	void updatePhysicalState();
 
 protected:
 
 	GameState* gameState;
 
 	// rendering
+	virtual void doRenderUpdate();
 	virtual void initGeometry();
 	virtual void initShaders();
 	std::vector<glm::vec3> modelVertices;
@@ -49,18 +52,13 @@ protected:
 	OglShaderProgram shaderProg;
 
 	// physics
-	void prepareTimeChangeValues();
-	virtual void resetForce();
-	virtual void applyForce(glm::vec3 force);
-	virtual void applyAcceleration(glm::vec3 acceleration);
-	virtual void updatePhysics();
-	float mass;
-	unsigned int physicsUpdateIterationsRequired;
+	virtual void doPhysicalUpdate();
+	bool shouldDoPhysicalUpdate;
+	void resetForces();
 	float changeInTime;
 	float maxAllowedChangeInTime;
-	glm::vec3 worldPosition;
-	glm::vec3 velocity;
-	glm::vec3 force;
+	PhysicalMass* mainComponentMass;
+	std::vector<PhysicalMass> componentMasses;
 };
 
 #endif

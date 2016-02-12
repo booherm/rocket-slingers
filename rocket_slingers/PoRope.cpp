@@ -6,26 +6,7 @@ PoRope::PoRope(GameState* gameState) : PhysicalObject("PO_ROPE", gameState) {
 
 	maxAllowedChangeInTime = 0.002f;
 	this->glRenderingMode = GL_LINES;
-	shouldRender = false;
-
 	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_1, InputEvent::IEKS_PRESS, this);
-
-	/*
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_Q, InputEvent::IEKS_PRESS, this);
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_W, InputEvent::IEKS_PRESS, this);
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_E, InputEvent::IEKS_PRESS, this);
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_R, InputEvent::IEKS_PRESS, this);
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_T, InputEvent::IEKS_PRESS, this);
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_Y, InputEvent::IEKS_PRESS, this);
-
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_A, InputEvent::IEKS_PRESS, this);
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_S, InputEvent::IEKS_PRESS, this);
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_D, InputEvent::IEKS_PRESS, this);
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_F, InputEvent::IEKS_PRESS, this);
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_G, InputEvent::IEKS_PRESS, this);
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_KEY_H, InputEvent::IEKS_PRESS, this);
-	*/
-
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
@@ -46,23 +27,24 @@ void PoRope::inputEventCallback(InputEvent inputEvent) {
 
 		// Create rope masses.  Each rope mass is a point on the rope joined by a spring segment to it's immediate neighbor
 		// down the rope.  The first and last masses on the rope only have internal spring segments.
-		ropeMasses.resize(ropeMassCount);
+		componentMasses.resize(ropeMassCount);
+		ropeSegmentLengths.resize(ropeMassCount);
 		for (unsigned int massIndex = 0; massIndex < ropeMassCount; massIndex++) {
 
-			RopeMass ropeMass;
-			ropeMass.mass = ropeMassMass;
-			ropeMass.unstretchedLength = ropeSegmentLength;
-			ropeMass.stretchedLength = ropeSegmentLength;
+			PhysicalMass* ropeMass = &componentMasses[massIndex];
+			ropeMass->mass = ropeMassMass;
+			RopeSegmentLength* rsl = &ropeSegmentLengths[massIndex];
+			rsl->unstretchedLength = ropeSegmentLength;
+			rsl->stretchedLength = ropeSegmentLength;
 
 			// determine mass origin position
-			ropeMass.position = glm::vec3(ropeAnchorPoint.x - (positionOffsetX * massIndex),
+			ropeMass->worldPosition = glm::vec3(ropeAnchorPoint.x - (positionOffsetX * massIndex),
 				ropeAnchorPoint.y - (positionOffsetY * massIndex), 0.0f);
 
-			// store rope mass
-			ropeMasses[massIndex] = ropeMass;
 		}
 
 		shouldRender = true;
+		shouldDoPhysicalUpdate = true;
 	}
 	else
 	{
@@ -134,78 +116,71 @@ void PoRope::initGeometry() {
 	}
 }
 
-void PoRope::updatePhysicalState() {
+void PoRope::doPhysicalUpdate() {
 
-	if (!shouldRender)
-		return;
-	
-	transformData.clear();
-	prepareTimeChangeValues();
+	resetForces();
 
-	// perform physical update iterations
-	for (unsigned int updateIteration = 0; updateIteration < physicsUpdateIterationsRequired; updateIteration++) {
+	// iterate over rope masses of this rope, applying fores starting from the top anchor point
+	for (unsigned int massIndex = 0; massIndex < ropeMassCount; massIndex++) {
 
-		// reset forces
-		for (unsigned int massIndex = 0; massIndex < ropeMassCount; massIndex++) {
-			RopeMass* thisMass = &ropeMasses[massIndex];
-			thisMass->force = glm::vec3(0.0f, 0.0f, 0.0f);
+		// get this rope mass and it's immediate neighbor down the rope
+		PhysicalMass* thisMass = &componentMasses[massIndex];
+		RopeSegmentLength* thisMassSegmentLengths = &ropeSegmentLengths[massIndex];
+		PhysicalMass* nextMass = nullptr;
+		if (massIndex != ropeMassCount - 1)   // last segment has no downward neighbor
+			nextMass = &componentMasses[massIndex + 1];
+
+		if (nextMass != nullptr) {
+			// calculate and apply spring force
+			glm::vec3 springVector = thisMass->worldPosition - nextMass->worldPosition;
+			thisMassSegmentLengths->stretchedLength = glm::length(springVector);
+			glm::vec3 springForce;
+			if (thisMassSegmentLengths->stretchedLength != 0) {
+				springForce = -(springVector / thisMassSegmentLengths->stretchedLength)
+					* (thisMassSegmentLengths->stretchedLength - thisMassSegmentLengths->unstretchedLength)
+					* springStiffnessConstant;
+			}
+
+			// apply internal spring friction
+			springForce += -(thisMass->velocity - nextMass->velocity) * internalSpringFrictionConstant;
+
+			// apply spring force to this rope segment
+			thisMass->force += springForce;
+
+			// apply opposite spring force to adjacent mass
+			nextMass->force += -springForce;
 		}
 
-		// iterate over rope masses of this rope, applying fores starting from the top anchor point
-		for (unsigned int massIndex = 0; massIndex < ropeMassCount; massIndex++) {
+		// apply gravitational force
+		thisMass->force += thisMass->mass * glm::vec3(0.0f, -gravitationalConstant, 0.0f);
 
-			// get this rope mass and it's immediate neighbor down the rope
-			RopeMass* thisMass = &ropeMasses[massIndex];
-			RopeMass* nextMass = nullptr;
-			if (massIndex != ropeMassCount - 1)   // last segment has no downward neighbor
-				nextMass = &ropeMasses[massIndex + 1];
+		// apply air friction force
+		thisMass->force += (-thisMass->velocity * airFrictionConstant);
 
-			if (nextMass != nullptr) {
-				// calculate and apply spring force
-				glm::vec3 springVector = thisMass->position - nextMass->position;
-				thisMass->stretchedLength = glm::length(springVector);
-				glm::vec3 springForce;
-				if (thisMass->stretchedLength != 0) {
-					springForce = -(springVector / thisMass->stretchedLength) * (thisMass->stretchedLength - thisMass->unstretchedLength) * springStiffnessConstant;
-				}
-
-				// apply internal spring friction
-				springForce += -(thisMass->velocity - nextMass->velocity) * internalSpringFrictionConstant;
-
-				// apply spring force to this rope segment
-				thisMass->force += springForce;
-
-				// apply opposite spring force to adjacent mass
-				nextMass->force += -springForce;
-			}
-
-			// apply gravitational force
-			thisMass->force += thisMass->mass * glm::vec3(0.0f, -gravitationalConstant, 0.0f);
-
-			// apply air friction force
-			thisMass->force += (-thisMass->velocity * airFrictionConstant);
-
-			if (massIndex > 0) { // do not update velocity or position on the anchor mass
-				thisMass->velocity += ((thisMass->force / thisMass->mass) * changeInTime);
-				thisMass->position += (thisMass->velocity * changeInTime);
-			}
+		if (massIndex > 0) { // do not update velocity or position on the anchor mass
+			thisMass->velocity += ((thisMass->force / thisMass->mass) * changeInTime);
+			thisMass->worldPosition += (thisMass->velocity * changeInTime);
 		}
 	}
 
-	// physical state is updated, prepare rendering data
+}
+
+void PoRope::doRenderUpdate() {
+
+	transformData.clear();
 	for (unsigned int massIndex = 0; massIndex < ropeMassCount - 1; massIndex++) {
-		RopeMass* thisMass = &ropeMasses[massIndex];
-		RopeMass* nextMass = &ropeMasses[massIndex + 1];
+		PhysicalMass* thisMass = &componentMasses[massIndex];
+		PhysicalMass* nextMass = &componentMasses[massIndex + 1];
 
 		// transform
 		glm::mat4 modelTransform;
-		modelTransform = glm::translate(modelTransform, glm::vec3(thisMass->position.x, thisMass->position.y, thisMass->position.z));
+		modelTransform = glm::translate(modelTransform, thisMass->worldPosition);
 
 		// calculate angle between this segment and the next segment
-		float theta = Utilities::xyAngleBetweenVectors(glm::vec3(1.0f, 0.0f, 0.0f), thisMass->position - nextMass->position) - glm::pi<float>();
+		float theta = Utilities::xyAngleBetweenVectors(glm::vec3(1.0f, 0.0f, 0.0f), thisMass->worldPosition - nextMass->worldPosition) - glm::pi<float>();
 
 		// calculate distance between end points of this segment and the next segment
-		float distance = glm::distance(thisMass->position, nextMass->position);
+		float distance = glm::distance(thisMass->worldPosition, nextMass->worldPosition);
 
 		// scale by distance
 		modelTransform = glm::scale(modelTransform, glm::vec3(distance, distance, 1.0f));
@@ -225,6 +200,5 @@ void PoRope::updatePhysicalState() {
 		glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
 
 		transformData.push_back(transform);
-	}	
-
+	}
 }

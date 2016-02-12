@@ -3,7 +3,9 @@
 PoAxes::PoAxes(GameState* gameState) : PhysicalObject("PO_AXES", gameState) {
 	initGeometry();
 	initShaders();
+	initRenderData();
 
+	shouldRender = true;
 	glRenderingMode = GL_LINES;
 	//inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_1, InputEvent::IEKS_PRESS, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
@@ -20,7 +22,14 @@ void PoAxes::initGeometry() {
 	modelVertices.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
 }
 
-void PoAxes::updatePhysicalState() {
+void PoAxes::pushAxisTransform(glm::mat4 model) {
+	glm::mat4 view = gameState->camera->getViewTransform();
+	glm::mat4 projection = gameState->camera->getProjectionTransform();
+	glm::mat4 transform = projection * view * model;
+	transformData.push_back(transform);
+}
+
+void PoAxes::initRenderData() {
 
 	modelOriginOffsetData.clear();
 	colorData.clear();
@@ -51,11 +60,4 @@ void PoAxes::updatePhysicalState() {
 	modelZ = glm::rotate(modelZ, -glm::half_pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
 	modelZ = glm::scale(modelZ, glm::vec3(zMax - zMin, 1.0f, 1.0f));
 	pushAxisTransform(modelZ);
-}
-
-void PoAxes::pushAxisTransform(glm::mat4 model) {
-	glm::mat4 view = gameState->camera->getViewTransform();
-	glm::mat4 projection = gameState->camera->getProjectionTransform();
-	glm::mat4 transform = projection * view * model;
-	transformData.push_back(transform);
 }

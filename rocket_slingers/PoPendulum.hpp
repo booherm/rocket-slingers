@@ -6,7 +6,7 @@
 class PoPendulum : public PhysicalObject {
 public:
 	PoPendulum(GameState* gameState);
-	void updatePhysicalState();
+	void doRenderUpdate();
 	void inputEventCallback(InputEvent inputEvent);
 
 private:

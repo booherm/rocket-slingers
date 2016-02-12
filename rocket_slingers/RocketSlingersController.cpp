@@ -30,6 +30,11 @@ void RocketSlingersController::updateGameState() {
 	poGuy->updatePhysicalState();
 	poPendulum->updatePhysicalState();
 	poRope->updatePhysicalState();
+
+	poAxes->updateRenderState();
+	poGuy->updateRenderState();
+	poPendulum->updateRenderState();
+	poRope->updateRenderState();
 }
 
 RocketSlingersController::~RocketSlingersController() {

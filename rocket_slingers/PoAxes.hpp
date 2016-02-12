@@ -6,7 +6,6 @@
 class PoAxes : public PhysicalObject {
 public:
 	PoAxes(GameState* gameState);
-	void updatePhysicalState();
 	void inputEventCallback(InputEvent inputEvent);
 
 private:
@@ -16,8 +15,10 @@ private:
 	const float yMax = 20.0f;
 	const float zMin = 0.0f;
 	const float zMax = 0.0f;
+	bool initialized = false;
 
 	void initGeometry();
+	void initRenderData();
 	void pushAxisTransform(glm::mat4 model);
 };
 

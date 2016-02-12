@@ -3,14 +3,17 @@
 PoPendulum::PoPendulum(GameState* gameState) : PhysicalObject("PO_PENDULUM", gameState) {
 	initGeometry();
 	initShaders();
-	shouldRender = false;
+
+	componentMasses.resize(1);
+	mainComponentMass = &componentMasses[0];
+	mainComponentMass->mass = 100.00f;
+
 	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_2, InputEvent::IEKS_PRESS, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
 void PoPendulum::inputEventCallback(InputEvent inputEvent){
-	worldPosition.x = inputEvent.xWorldCoordinate;
-	worldPosition.y = inputEvent.yWorldCoordinate;
+	mainComponentMass->worldPosition = glm::vec3(inputEvent.xWorldCoordinate, inputEvent.yWorldCoordinate, 0.0f);
 	shouldRender = true;
 	clickCount++;
 }
@@ -32,7 +35,7 @@ void PoPendulum::initGeometry() {
 	modelVertices.push_back(glm::vec3(0.26666666f, 1.0f, 0.0f));
 }
 
-void PoPendulum::updatePhysicalState() {
+void PoPendulum::doRenderUpdate() {
 
 	// model origin offset
 	modelOriginOffsetData.clear();
@@ -40,7 +43,7 @@ void PoPendulum::updatePhysicalState() {
 
 	// color
 	colorData.clear();
-	if(clickCount % 2 == 0)
+	if (clickCount % 2 == 0)
 		colorData.push_back(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	else
 		colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
@@ -51,17 +54,17 @@ void PoPendulum::updatePhysicalState() {
 
 	// model
 	glm::mat4 modelTransform;
-	modelTransform = glm::translate(modelTransform, glm::vec3(worldPosition));
+	modelTransform = glm::translate(modelTransform, mainComponentMass->worldPosition);
 	modelTransform = glm::scale(modelTransform, glm::vec3(scalerToMeter, scalerToMeter, 1.0f));
-//	float theta = glm::cos( glm::sqrt(9.8f) * elapsedTime) * (1.0f / elapsedTime);
+	//	float theta = glm::cos( glm::sqrt(9.8f) * elapsedTime) * (1.0f / elapsedTime);
 	float theta = glm::half_pi<float>();
 	//glm::quat rotationQuaternion = glm::angleAxis(glm::sin((float) gameState->frameTimeStart), glm::vec3(0.0f, 0.0f, 1.0f));
 	glm::quat rotationQuaternion = glm::angleAxis(theta, glm::vec3(0.0f, 0.0f, 1.0f));
 	modelTransform = modelTransform * glm::toMat4(rotationQuaternion);
- 
+
 	// view
 	glm::mat4 viewTransform = gameState->camera->getViewTransform();
-		
+
 	// projection
 	glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
 

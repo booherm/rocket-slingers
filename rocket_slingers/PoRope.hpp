@@ -6,18 +6,15 @@
 class PoRope : public PhysicalObject {
 public:
 	PoRope(GameState* gameState);
-	void updatePhysicalState();
+	void doPhysicalUpdate();
+	void doRenderUpdate();
 	void inputEventCallback(InputEvent inputEvent);
 
 private:
 
-	struct RopeMass {
-		float mass;
+	struct RopeSegmentLength {
 		float unstretchedLength;
 		float stretchedLength;
-		glm::vec3 force;
-		glm::vec3 position;
-		glm::vec3 velocity;
 	};
 
 	unsigned int ropeMassCount = 15;
@@ -26,8 +23,8 @@ private:
 	float internalSpringFrictionConstant = 0.2f;
 	float airFrictionConstant = 0.02f;
 	float gravitationalConstant = 9.81f;
-	std::vector<RopeMass> ropeMasses;
 
+	std::vector<RopeSegmentLength> ropeSegmentLengths;
 	void initGeometry();
 };
 
