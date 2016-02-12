@@ -2,8 +2,19 @@
 #include <iostream>
 
 RocketSlingersController::RocketSlingersController() {
+	initSdl();
 	gameState = new GameState();
 	initGameObjects();
+}
+
+void RocketSlingersController::initSdl() {
+
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+		std::string sdlError = SDL_GetError();
+		throw "RocketSlingersController::initSdl - SDL initialization failed: " + sdlError;
+	}
+	SDL_DisableScreenSaver();
+
 }
 
 void RocketSlingersController::initGameObjects() {
@@ -17,7 +28,7 @@ void RocketSlingersController::start() {
 	bool running = true;
 	while (running) {
 		gameState->frameStart();
-		running = gameState->renderWindow->processInput();
+		running = gameState->inputQueue->processInput();
 		updateGameState();
 		gameState->physicalObjectRenderer->render();
 		gameState->renderWindow->publishFrame();
@@ -43,4 +54,5 @@ RocketSlingersController::~RocketSlingersController() {
 	delete poPendulum;
 	delete poRope;
 	delete gameState;
+	SDL_Quit();
 }

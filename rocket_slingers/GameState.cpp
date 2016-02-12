@@ -10,17 +10,14 @@ GameState::GameState() {
 }
 
 void GameState::frameStart() {
-	dFrameTimeStart = renderWindow->getTimeSeconds();
+	dFrameTimeStart = SDL_GetTicks() / 1000.0;
 	fFrameTimeStart = (float)dFrameTimeStart;
 }
 
 void GameState::frameEnd() {
-	renderWindow->getCurrentCursorPosition(&dLastFrameMousePosX, &dLastFrameMousePosY);
-	fLastFrameMousePosX = (float) dLastFrameMousePosX;
-	fLastFrameMousePosY = (float) dLastFrameMousePosY;
 
 	// calculate frames per second
-	dLastFrameTotalTimeSeconds = renderWindow->getTimeSeconds() - dFrameTimeStart;
+	dLastFrameTotalTimeSeconds = (SDL_GetTicks() / 1000.0) - dFrameTimeStart;
 	fLastFrameTotalTimeSeconds = (float) dLastFrameTotalTimeSeconds;
 
 	if (fpsIterationCounter == fpsFrameRange) {

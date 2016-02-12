@@ -4,17 +4,23 @@ PoPendulum::PoPendulum(GameState* gameState) : PhysicalObject("PO_PENDULUM", gam
 	initGeometry();
 	initShaders();
 
-	componentMasses.resize(1);
+	componentMasses.resize(2);
 	mainComponentMass = &componentMasses[0];
 	mainComponentMass->mass = 100.00f;
-
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_2, InputEvent::IEKS_PRESS, this);
+	(&componentMasses[1])->mass = 100.0f;
+	
+	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_3, InputEvent::IEKS_KEYDOWN, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
 void PoPendulum::inputEventCallback(InputEvent inputEvent){
-	mainComponentMass->worldPosition = glm::vec3(inputEvent.xWorldCoordinate, inputEvent.yWorldCoordinate, 0.0f);
+	
+	glm::vec3 originPosition = glm::vec3(inputEvent.xWorldCoordinate, inputEvent.yWorldCoordinate, 0.0f);
+	mainComponentMass->worldPosition = originPosition;
+	(&componentMasses[1])->worldPosition = originPosition + glm::vec3(1.0f, 0.0f, 0.0f);
+
 	shouldRender = true;
+	shouldDoPhysicalUpdate = true;
 	clickCount++;
 }
 
@@ -35,6 +41,52 @@ void PoPendulum::initGeometry() {
 	modelVertices.push_back(glm::vec3(0.26666666f, 1.0f, 0.0f));
 }
 
+void PoPendulum::doPhysicalUpdate() {
+
+	/*
+	resetForces();
+	for (unsigned int i = 0; i < 2; i++) {
+
+		PhysicalMass* thisMass = &componentMasses[i];
+		PhysicalMass* nextMass = nullptr;
+		if (i != 1) {
+			nextMass = &componentMasses[i + 1];
+		}
+		
+		if (nextMass != nullptr) {
+			// calculate and apply spring force
+			glm::vec3 springVector = thisMass->worldPosition - nextMass->worldPosition;
+			float distance = glm::length(springVector);
+
+
+			glm::vec3 springForce;
+			if (distance != 0) {
+				springForce = -(springVector / distance);// *springStiffnessConstant;
+			}
+
+			// apply internal spring friction
+			//springForce += -(thisMass->velocity - nextMass->velocity) * internalSpringFrictionConstant;
+
+			// apply spring force to this rope segment
+			thisMass->force += springForce;
+
+			// apply opposite spring force to adjacent mass
+			nextMass->force += -springForce;
+		}
+
+		// apply gravitational force
+		thisMass->force += thisMass->mass * glm::vec3(0.0f, -9.81, 0.0f);
+
+		// apply air friction force
+		if (i != 0) {
+			thisMass->velocity += ((thisMass->force / thisMass->mass) * changeInTime);
+			thisMass->worldPosition += (thisMass->velocity * changeInTime);
+		}
+	}
+	*/
+
+}
+
 void PoPendulum::doRenderUpdate() {
 
 	// model origin offset
@@ -50,15 +102,15 @@ void PoPendulum::doRenderUpdate() {
 
 	// transform
 	transformData.clear();
-	// I want the object in world space to be 2m tall.  Assuming the model to be 1m tall, scaling factor =
 
 	// model
 	glm::mat4 modelTransform;
 	modelTransform = glm::translate(modelTransform, mainComponentMass->worldPosition);
-	modelTransform = glm::scale(modelTransform, glm::vec3(scalerToMeter, scalerToMeter, 1.0f));
-	//	float theta = glm::cos( glm::sqrt(9.8f) * elapsedTime) * (1.0f / elapsedTime);
-	float theta = glm::half_pi<float>();
-	//glm::quat rotationQuaternion = glm::angleAxis(glm::sin((float) gameState->frameTimeStart), glm::vec3(0.0f, 0.0f, 1.0f));
+	//modelTransform = glm::scale(modelTransform, glm::vec3(scalerToMeter, scalerToMeter, 1.0f));
+	
+	
+	//float theta = glm::half_pi<float>();
+	float theta = Utilities::xyAngleBetweenVectors(glm::vec3(1.0f, 0.0f, 0.0f), componentMasses[0].worldPosition - componentMasses[1].worldPosition) - glm::half_pi<float>();
 	glm::quat rotationQuaternion = glm::angleAxis(theta, glm::vec3(0.0f, 0.0f, 1.0f));
 	modelTransform = modelTransform * glm::toMat4(rotationQuaternion);
 

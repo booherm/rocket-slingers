@@ -6,7 +6,7 @@ PoRope::PoRope(GameState* gameState) : PhysicalObject("PO_ROPE", gameState) {
 
 	maxAllowedChangeInTime = 0.002f;
 	this->glRenderingMode = GL_LINES;
-	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_1, InputEvent::IEKS_PRESS, this);
+	gameState->inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_1, InputEvent::IEKS_KEYDOWN, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 

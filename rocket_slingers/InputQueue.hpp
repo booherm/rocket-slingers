@@ -13,8 +13,7 @@ class InputQueue {
 
 public:
 	InputQueue(GameState* gameState);
-	void addEvent(int glfwKey, int glfwKeyState, unsigned char glfwKeyModifier, double xPosition, double yPosition);
-	void addMouseMovementEvent(double xPosition, double yPosition);
+	bool processInput();
 	void subscribeToInputEvent(
 		InputEvent::InputEventKey inputEventKey,
 		InputEvent::InputEventKeyState inputEventKeyState,
@@ -23,6 +22,9 @@ public:
 	~InputQueue();
 
 private:
+
+	void addSdlEvent(const SDL_Event& sdlEvent);
+
 	GameState* gameState;
 	typedef std::pair<InputEvent::InputEventKey, InputEvent::InputEventKeyState> subscriptionKey;
 	const unsigned int inputEventRetention = 10;

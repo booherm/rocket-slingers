@@ -36,24 +36,10 @@ Camera::Camera(GameState* gameState) {
 
 	// add camera as listener for input events
 	InputQueue* iq = gameState->inputQueue;
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_LEFT, InputEvent::IEKS_PRESS, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_RIGHT, InputEvent::IEKS_PRESS, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_UP, InputEvent::IEKS_PRESS, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_DOWN, InputEvent::IEKS_PRESS, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_LEFT, InputEvent::IEKS_REPEAT, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_RIGHT, InputEvent::IEKS_REPEAT, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_UP, InputEvent::IEKS_REPEAT, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_DOWN, InputEvent::IEKS_REPEAT, this);
-	/*	iq->subscribeToInputEvent(InputEvent::IEK_KEY_W, InputEvent::IEKS_PRESS, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_A, InputEvent::IEKS_PRESS, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_S, InputEvent::IEKS_PRESS, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_D, InputEvent::IEKS_PRESS, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_W, InputEvent::IEKS_REPEAT, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_A, InputEvent::IEKS_REPEAT, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_S, InputEvent::IEKS_REPEAT, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_KEY_D, InputEvent::IEKS_REPEAT, this);
-	iq->subscribeToInputEvent(InputEvent::IEK_MOUSE_MOVE, InputEvent::IEKS_NO_STATE, this);
-	*/
+	iq->subscribeToInputEvent(InputEvent::IEK_KEY_LEFT, InputEvent::IEKS_KEYDOWN, this);
+	iq->subscribeToInputEvent(InputEvent::IEK_KEY_RIGHT, InputEvent::IEKS_KEYDOWN, this);
+	iq->subscribeToInputEvent(InputEvent::IEK_KEY_UP, InputEvent::IEKS_KEYDOWN, this);
+	iq->subscribeToInputEvent(InputEvent::IEK_KEY_DOWN, InputEvent::IEKS_KEYDOWN, this);
 }
 
 void Camera::inputEventCallback(InputEvent inputEvent) {

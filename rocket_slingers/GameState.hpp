@@ -31,10 +31,6 @@ public:
 	float fFramesPerSecond;
 	double dLastFrameTotalTimeSeconds;
 	float fLastFrameTotalTimeSeconds;
-	double dLastFrameMousePosX = (double)resolutionWidth / 2;
-	float fLastFrameMousePosX = (float)resolutionWidth / 2;
-	double dLastFrameMousePosY = (double)resolutionHeight / 2;
-	float fLastFrameMousePosY = (float)resolutionHeight / 2;
 
 	const float worldViewportScaler = 20.0f;
 	float aspectRatio = (float) resolutionWidth / resolutionHeight;

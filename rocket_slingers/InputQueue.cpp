@@ -10,41 +10,56 @@ InputQueue::InputQueue(GameState* gameState) {
 	screenToWorldCoordinateScalerY = gameState->worldViewportScaler / gameState->resolutionHeight;
 }
 
-void InputQueue::addEvent(int glfwKey, int glfwKeyState, unsigned char glfwKeyModifier, double xPosition, double yPosition) {
-	const unsigned char binary1 = (unsigned char) 1;
-	const unsigned char binary2 = (unsigned char) 2;
-	const unsigned char binary4 = (unsigned char) 4;
-	const unsigned char binary8 = (unsigned char) 8;
+bool InputQueue::processInput() {
 
-	InputEvent e;
-	e.eventKey = InputEvent::translateGlfwInputEventKey(glfwKey);
-	e.eventKeyState = InputEvent::translateGlfwInputEventKeyState(glfwKeyState);
-	e.modifierShift = (binary1 & glfwKeyModifier) == binary1;
-	e.modifierControl = (binary2 & glfwKeyModifier) == binary2;
-	e.modifierAlt = (binary4 & glfwKeyModifier) == binary4;
-	e.modifierSuper = (binary8 & glfwKeyModifier) == binary8;
-	e.xScreenCoordinate = xPosition;
-	e.yScreenCoordinate = yPosition;
+//	unsigned int eventCount = 0;
 
-	e.xWorldCoordinate = (float)xPosition * screenToWorldCoordinateScalerX;
-	e.yWorldCoordinate = gameState->worldViewportScaler - ((float) yPosition * screenToWorldCoordinateScalerY);
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+		if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
+			return false;
+		}
+		else {
+			addSdlEvent(event);
+	//		eventCount++;
+		}
+	}
 
-	enqueueEvent(e);
+//	if(eventCount > 0)
+	//	std::cout << "processed " << eventCount << " events" << std::endl;
+
+	return true;
 }
 
-void InputQueue::addMouseMovementEvent(double xPosition, double yPosition) {
-	InputEvent e;
-	e.eventKey = InputEvent::IEK_MOUSE_MOVE;
-	e.eventKeyState = InputEvent::IEKS_NO_STATE;
-	e.modifierShift = false;
-	e.modifierControl = false;
-	e.modifierAlt = false;
-	e.modifierSuper = false;
-	e.xScreenCoordinate = xPosition;
-	e.yScreenCoordinate = yPosition;
+void InputQueue::addSdlEvent(const SDL_Event& sdlEvent) {
 
-	e.xWorldCoordinate = (float)xPosition * screenToWorldCoordinateScalerX;
-	e.yWorldCoordinate = gameState->worldViewportScaler - ((float) yPosition * screenToWorldCoordinateScalerY);
+	InputEvent e;
+
+	if (sdlEvent.type == SDL_KEYDOWN || sdlEvent.type == SDL_KEYUP) {
+		e.eventKey = InputEvent::translateSdlInputEventKey(sdlEvent.key.keysym.sym);
+		e.eventKeyState = InputEvent::translateSdlInputEventKeyState(sdlEvent.key.type);
+	}
+	else if (sdlEvent.type == SDL_MOUSEBUTTONDOWN || sdlEvent.type == SDL_MOUSEBUTTONUP) {
+		if(sdlEvent.button.button == 1)
+			e.eventKey = InputEvent::IEK_MOUSE_BUTTON_1;
+		else if(sdlEvent.button.button == 2)
+			e.eventKey = InputEvent::IEK_MOUSE_BUTTON_2;
+		else if (sdlEvent.button.button == 3)
+			e.eventKey = InputEvent::IEK_MOUSE_BUTTON_3;
+
+		if(sdlEvent.type == SDL_MOUSEBUTTONDOWN)
+			e.eventKeyState = InputEvent::IEKS_KEYDOWN;
+		else
+			e.eventKeyState = InputEvent::IEKS_KEYUP;
+	}
+	else if (sdlEvent.type == SDL_MOUSEMOTION) {
+		e.eventKey = InputEvent::IEK_MOUSE_MOVE;
+		e.eventKeyState = InputEvent::IEKS_NO_STATE;
+	}
+	e.xScreenCoordinate = sdlEvent.motion.x;
+	e.yScreenCoordinate = sdlEvent.motion.y;
+	e.xWorldCoordinate = (float) e.xScreenCoordinate * screenToWorldCoordinateScalerX;
+	e.yWorldCoordinate = gameState->worldViewportScaler - ((float)e.yScreenCoordinate * screenToWorldCoordinateScalerY);
 
 	enqueueEvent(e);
 }

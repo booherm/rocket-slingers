@@ -14,6 +14,7 @@ public:
 	~RocketSlingersController();
 
 private:
+	void initSdl();
 	void initGameObjects();
 	void updateGameState();
 	GameState* gameState;

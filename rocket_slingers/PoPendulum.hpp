@@ -10,8 +10,8 @@ public:
 	void inputEventCallback(InputEvent inputEvent);
 
 private:
+	void doPhysicalUpdate();
 	void initGeometry();
-	const float scalerToMeter = 3.0f;
 	unsigned int clickCount = 0;
 };
 
