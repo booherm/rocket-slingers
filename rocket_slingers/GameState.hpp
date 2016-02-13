@@ -5,6 +5,7 @@
 #include "InputQueue.hpp"
 #include "Camera.hpp"
 #include "PhysicalObjectRenderer.hpp"
+#include "AudioManager.hpp"
 
 class InputQueue;
 class RenderWindow;
@@ -22,6 +23,7 @@ public:
 	RenderWindow* renderWindow;
 	Camera* camera;
 	PhysicalObjectRenderer* physicalObjectRenderer;
+	AudioManager* audioManager;
 
 	const unsigned int resolutionWidth = 1920;  // debug hardcode
 	const unsigned int resolutionHeight = 1080;
@@ -34,6 +36,8 @@ public:
 
 	const float worldViewportScaler = 20.0f;
 	float aspectRatio = (float) resolutionWidth / resolutionHeight;
+
+	glm::vec3 gravitationalAcceleration;
 
 private:
 	const unsigned int fpsFrameRange = 10;

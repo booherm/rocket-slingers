@@ -4,10 +4,10 @@ PoPendulum::PoPendulum(GameState* gameState) : PhysicalObject("PO_PENDULUM", gam
 	initGeometry();
 	initShaders();
 
+	maxAllowedChangeInTime = 0.002f;
 	componentMasses.resize(2);
 	mainComponentMass = &componentMasses[0];
-	mainComponentMass->mass = 100.00f;
-	(&componentMasses[1])->mass = 100.0f;
+	(&componentMasses[1])->mass = 10.0f;
 	
 	gameState->inputQueue->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_RIGHT, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
@@ -24,6 +24,10 @@ void PoPendulum::inputEventCallback(const SDL_Event& inputEvent){
 	shouldRender = true;
 	shouldDoPhysicalUpdate = true;
 	clickCount++;
+
+	if (clickCount == 1) {
+		gameState->audioManager->playSoundEffect(AudioManager::SoundEffectId::RUSTY_SWING, -1);
+	}
 
 }
 
@@ -46,48 +50,27 @@ void PoPendulum::initGeometry() {
 
 void PoPendulum::doPhysicalUpdate() {
 
-	/*
-	resetForces();
-	for (unsigned int i = 0; i < 2; i++) {
+	PhysicalMass* originMass = &componentMasses[0];
+	PhysicalMass* bobMass = &componentMasses[1];
+	bobMass->resetForce();
 
-		PhysicalMass* thisMass = &componentMasses[i];
-		PhysicalMass* nextMass = nullptr;
-		if (i != 1) {
-			nextMass = &componentMasses[i + 1];
-		}
-		
-		if (nextMass != nullptr) {
-			// calculate and apply spring force
-			glm::vec3 springVector = thisMass->worldPosition - nextMass->worldPosition;
-			float distance = glm::length(springVector);
+//	float opposite = glm::abs(bobMass->worldPosition.y - originMass->worldPosition.y);
+	//float hypotenuse = glm::distance(originMass->worldPosition, bobMass->worldPosition);
+	//float theta = glm::asin(opposite / hypotenuse) + glm::half_pi<float>();
 
-
-			glm::vec3 springForce;
-			if (distance != 0) {
-				springForce = -(springVector / distance);// *springStiffnessConstant;
-			}
-
-			// apply internal spring friction
-			//springForce += -(thisMass->velocity - nextMass->velocity) * internalSpringFrictionConstant;
-
-			// apply spring force to this rope segment
-			thisMass->force += springForce;
-
-			// apply opposite spring force to adjacent mass
-			nextMass->force += -springForce;
-		}
-
-		// apply gravitational force
-		thisMass->force += thisMass->mass * glm::vec3(0.0f, -9.81, 0.0f);
-
-		// apply air friction force
-		if (i != 0) {
-			thisMass->velocity += ((thisMass->force / thisMass->mass) * changeInTime);
-			thisMass->worldPosition += (thisMass->velocity * changeInTime);
-		}
+	glm::vec3 connectionVector = originMass->worldPosition - bobMass->worldPosition;
+	float stretchedLength = glm::length(connectionVector);
+	glm::vec3 springForce;
+	if (stretchedLength != 0) {
+		springForce = -(connectionVector / stretchedLength)
+			* (stretchedLength - 1.0f)
+			* 10000.00f; // springStiffnessConstant;
 	}
-	*/
 
+	bobMass->force += -springForce;
+	bobMass->force += bobMass->mass * glm::vec3(0.0f, -9.81f, 0.0f);
+
+	bobMass->updatePhysics(changeInTime);
 }
 
 void PoPendulum::doRenderUpdate() {
@@ -98,10 +81,9 @@ void PoPendulum::doRenderUpdate() {
 
 	// color
 	colorData.clear();
-	if (clickCount % 2 == 0)
-		colorData.push_back(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-	else
-		colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	glm::vec4 modelColor = (clickCount % 2 == 0) ? glm::vec4(1.0f, 0.0f, 0.0f, 1.0f) : glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+	for (unsigned int i = 0; i < modelVertices.size(); i++)
+		colorData.push_back(modelColor);
 
 	// transform
 	transformData.clear();
@@ -109,10 +91,6 @@ void PoPendulum::doRenderUpdate() {
 	// model
 	glm::mat4 modelTransform;
 	modelTransform = glm::translate(modelTransform, mainComponentMass->worldPosition);
-	//modelTransform = glm::scale(modelTransform, glm::vec3(scalerToMeter, scalerToMeter, 1.0f));
-	
-	
-	//float theta = glm::half_pi<float>();
 	float theta = Utilities::xyAngleBetweenVectors(glm::vec3(1.0f, 0.0f, 0.0f), componentMasses[0].worldPosition - componentMasses[1].worldPosition) - glm::half_pi<float>();
 	glm::quat rotationQuaternion = glm::angleAxis(theta, glm::vec3(0.0f, 0.0f, 1.0f));
 	modelTransform = modelTransform * glm::toMat4(rotationQuaternion);

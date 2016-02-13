@@ -5,11 +5,12 @@ RocketSlingersController::RocketSlingersController() {
 	initSdl();
 	gameState = new GameState();
 	initGameObjects();
+	gameState->audioManager->playTest();
 }
 
 void RocketSlingersController::initSdl() {
 
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
 		std::string sdlError = SDL_GetError();
 		throw "RocketSlingersController::initSdl - SDL initialization failed: " + sdlError;
 	}
@@ -18,6 +19,7 @@ void RocketSlingersController::initSdl() {
 }
 
 void RocketSlingersController::initGameObjects() {
+	poBackground = new PoBackground(gameState);
 	poAxes = new PoAxes(gameState);
 	poGuy = new PoGuy(gameState);
 	poPendulum = new PoPendulum(gameState);
@@ -37,11 +39,13 @@ void RocketSlingersController::start() {
 }
 
 void RocketSlingersController::updateGameState() {
+	poBackground->updatePhysicalState();
 	poAxes->updatePhysicalState();
 	poGuy->updatePhysicalState();
 	poPendulum->updatePhysicalState();
 	poRope->updatePhysicalState();
 
+	poBackground->updateRenderState();
 	poAxes->updateRenderState();
 	poGuy->updateRenderState();
 	poPendulum->updateRenderState();
@@ -49,6 +53,7 @@ void RocketSlingersController::updateGameState() {
 }
 
 RocketSlingersController::~RocketSlingersController() {
+	delete poBackground;
 	delete poAxes;
 	delete poGuy;
 	delete poPendulum;

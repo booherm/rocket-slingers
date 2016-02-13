@@ -16,6 +16,7 @@ private:
 	bool rocketOn = false;
 	void initGeometry();
 	const float airFrictionConstant = 0.1f;
+	unsigned int soundEffectInstanceId;
 };
 
 #endif

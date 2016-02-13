@@ -66,6 +66,12 @@
     <ClCompile Include="PhysicalMass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PoBackground.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputQueue.hpp">
@@ -114,6 +120,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PhysicalMass.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PoBackground.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

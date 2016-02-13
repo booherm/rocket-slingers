@@ -14,6 +14,7 @@ unsigned int PhysicalObjectRenderer::addPhysicalObject(PhysicalObject* renderabl
 		rs->objectInstances.push_back(renderableObject);
 		rs->shaderProgram = renderableObject->getShaderProgram();
 		rs->glRenderingMode = renderableObject->glRenderingMode;
+		rs->textures = renderableObject->getTextures();
 			
 		// create vao, vbos
 		glGenVertexArrays(1, &rs->masterVao);
@@ -21,6 +22,7 @@ unsigned int PhysicalObjectRenderer::addPhysicalObject(PhysicalObject* renderabl
 		glGenBuffers(1, &rs->modelOriginOffsetVbo);
 		glGenBuffers(1, &rs->colorVbo);
 		glGenBuffers(1, &rs->transformVbo);
+		glGenBuffers(1, &rs->textureCoordinateVbo);
 
 		// buffer model
 		std::vector<glm::vec3>* modelVertices = renderableObject->getModelVertices();
@@ -34,42 +36,56 @@ unsigned int PhysicalObjectRenderer::addPhysicalObject(PhysicalObject* renderabl
 
 		// initialize color buffer
 		glBindBuffer(GL_ARRAY_BUFFER, rs->colorVbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4) * renderableObject->maxInstanceCount, NULL, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4) * renderableObject->maxInstanceCount * rs->modelVerticesCount, NULL, GL_STATIC_DRAW);
 
 		// initialize transform buffer
 		glBindBuffer(GL_ARRAY_BUFFER, rs->transformVbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * renderableObject->maxInstanceCount, NULL, GL_STATIC_DRAW);
 
+		// initialize texture coordinate buffer
+		glBindBuffer(GL_ARRAY_BUFFER, rs->textureCoordinateVbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * renderableObject->maxInstanceCount * rs->modelVerticesCount, NULL, GL_STATIC_DRAW);
+
 		// start vertex array object setup
 		glBindVertexArray(rs->masterVao);
 
-		// define position attribute (model)
+		// define vertex attribute pointers
+		unsigned int vertexAttribIndex = 0;
+
+		// define model position attribute - per vertex
 		glBindBuffer(GL_ARRAY_BUFFER, rs->modelVbo);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid*) 0);
-		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(vertexAttribIndex, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid*) 0);
+		glEnableVertexAttribArray(vertexAttribIndex++);
 
-		// define model origin offset attribute (instanced)
+		// define model origin offset attribute - per instance
 		glBindBuffer(GL_ARRAY_BUFFER, rs->modelOriginOffsetVbo);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid*)0);
-		glVertexAttribDivisor(1, 1);
-		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(vertexAttribIndex, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid*)0);
+		glVertexAttribDivisor(vertexAttribIndex, 1);
+		glEnableVertexAttribArray(vertexAttribIndex++);
 
-		// define color attribute (instanced)
+		// define color attribute - per vertex
 		glBindBuffer(GL_ARRAY_BUFFER, rs->colorVbo);
-		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (GLvoid*)0);
-		glVertexAttribDivisor(2, 1);
-		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(vertexAttribIndex, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (GLvoid*)0);
+		glEnableVertexAttribArray(vertexAttribIndex++);
 
-		// define transform attribute (instanced)
+		// define transform attribute - per instance
 		glBindBuffer(GL_ARRAY_BUFFER, rs->transformVbo);
-		for (unsigned int i = 3; i <= 6; i++) {
+		for (unsigned int i = vertexAttribIndex; i <= vertexAttribIndex + 3; i++) {
 			glVertexAttribPointer(i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)((i - 3) * sizeof(glm::vec4)));
 			glVertexAttribDivisor(i, 1);
 			glEnableVertexAttribArray(i);
 		}
+		vertexAttribIndex += 4;
+
+		// define texture coordinates attribute - per vertex
+		glBindBuffer(GL_ARRAY_BUFFER, rs->textureCoordinateVbo);
+		glVertexAttribPointer(vertexAttribIndex, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (GLvoid*)0);
+		glVertexAttribDivisor(vertexAttribIndex, 1);
+		glEnableVertexAttribArray(vertexAttribIndex);
 
 		// end vertex array object setup
 		glBindVertexArray(0);
+
 	}
 	else {
 		// object type has been added before, just add new instance 
@@ -86,6 +102,7 @@ unsigned int PhysicalObjectRenderer::addPhysicalObject(PhysicalObject* renderabl
 void PhysicalObjectRenderer::render() {
 
 	glClear(GL_COLOR_BUFFER_BIT);
+//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	std::map<std::string, RenderingStructure>::iterator objectTypeIterator = renderableMapping.begin();
 	std::map<std::string, RenderingStructure>::iterator objectTypeIteratorEnd = renderableMapping.end();
@@ -99,6 +116,7 @@ void PhysicalObjectRenderer::render() {
 		unsigned int modelOriginOffsetBufferOffset = 0;
 		unsigned int colorBufferOffset = 0;
 		unsigned int transformBufferOffset = 0;
+		unsigned int textureCoordinateBufferOffset = 0;
 
 		// iterate over object instances and buffer all rendering data for this object type
 		unsigned int componentsToRenderCount = 0;
@@ -130,11 +148,26 @@ void PhysicalObjectRenderer::render() {
 				glBindBuffer(GL_ARRAY_BUFFER, objectRenderingStructure->transformVbo);
 				glBufferSubData(GL_ARRAY_BUFFER, transformBufferOffset, transformDataSize, transformData->data());
 				transformBufferOffset += transformDataSize;
+
+				// buffer texture coordinate data
+				std::vector<glm::vec2>* textureCoordinateData = po->getTextureCoordinateData();
+				unsigned int tectureCoordinateDataSize = sizeof(glm::vec2) * textureCoordinateData->size();
+				glBindBuffer(GL_ARRAY_BUFFER, objectRenderingStructure->textureCoordinateVbo);
+				glBufferSubData(GL_ARRAY_BUFFER, textureCoordinateBufferOffset, tectureCoordinateDataSize, textureCoordinateData->data());
+				textureCoordinateBufferOffset += tectureCoordinateDataSize;
 			}
 		}
-		
+
 		// render the buffered data
 		objectRenderingStructure->shaderProgram->use();
+		std::vector<unsigned int>* textures = objectRenderingStructure->textures;
+		unsigned int textureCount = textures->size();
+		for (unsigned int i = 0; i < textureCount; ++i) {
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, textures->at(i));
+//			glUniform1i(glGetUniformLocation(objectRenderingStructure->shaderProgram->getProgramId(), "texture" + i), i);
+			glUniform1i(glGetUniformLocation(objectRenderingStructure->shaderProgram->getProgramId(), "texture0"), i);
+		}
 		glBindVertexArray(objectRenderingStructure->masterVao);
 		glDrawArraysInstanced(objectRenderingStructure->glRenderingMode, 0, objectRenderingStructure->modelVerticesCount, componentsToRenderCount);
 
@@ -157,6 +190,7 @@ PhysicalObjectRenderer::~PhysicalObjectRenderer() {
 		glDeleteBuffers(1, &objectRenderingStructure->modelOriginOffsetVbo);
 		glDeleteBuffers(1, &objectRenderingStructure->colorVbo);
 		glDeleteBuffers(1, &objectRenderingStructure->transformVbo);
+		glDeleteBuffers(1, &objectRenderingStructure->textureCoordinateVbo);
 		glDeleteVertexArrays(1, &objectRenderingStructure->masterVao);
 		objectTypeIterator++;
 	}

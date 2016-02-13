@@ -32,6 +32,8 @@ public:
 	std::vector<glm::vec3>* getModelOriginOffsetData();
 	std::vector<glm::vec4>* getColorData();
 	std::vector<glm::mat4>* getTransformData();
+	std::vector<glm::vec2>* getTextureCoordinateData();
+	std::vector<unsigned int>* getTextures();
 	OglShaderProgram* getShaderProgram();
 
 	// physics
@@ -49,6 +51,8 @@ protected:
 	std::vector<glm::vec3> modelOriginOffsetData;
 	std::vector<glm::vec4> colorData;
 	std::vector<glm::mat4> transformData;
+	std::vector<glm::vec2> textureCoordinateData;
+	std::vector<unsigned int> textures;
 	OglShaderProgram shaderProg;
 
 	// physics

@@ -23,6 +23,12 @@ void PoGuy::inputEventCallback(const SDL_Event& inputEvent) {
 	if (inputEvent.key.keysym.sym == SDLK_SPACE) {
 
 		rocketOn = inputEvent.key.state == SDL_PRESSED;
+		if (rocketOn) {
+			soundEffectInstanceId = gameState->audioManager->playSoundEffect(AudioManager::SoundEffectId::ROCKET_RUMBLE, -1);
+		}
+		else
+			gameState->audioManager->stopSoundEffect(soundEffectInstanceId);
+
 		std::cout << "rocket " << (rocketOn ? "on" : "off") << std::endl;
 	}
 	else
@@ -179,7 +185,8 @@ void PoGuy::doRenderUpdate() {
 	modelOriginOffsetData.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// color
-	colorData.push_back(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+	for (unsigned int i = 0; i < modelVertices.size(); i++)
+		colorData.push_back(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 
 	// model transform: translate, scale, rotate
 	glm::mat4 modelTransform;

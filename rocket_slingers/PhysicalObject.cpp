@@ -35,6 +35,14 @@ std::vector<glm::mat4>* PhysicalObject::getTransformData() {
 	return &transformData;
 }
 
+std::vector<glm::vec2>* PhysicalObject::getTextureCoordinateData() {
+	return &textureCoordinateData;
+}
+
+std::vector<unsigned int>* PhysicalObject::getTextures() {
+	return &textures;
+}
+
 OglShaderProgram* PhysicalObject::getShaderProgram() {
 	return &shaderProg;
 }
@@ -51,7 +59,7 @@ void PhysicalObject::updatePhysicalState() {
 			changeInTime = changeInTime / physicsUpdateIterationsRequired;
 		}
 
-		for (unsigned int i = 0; i < physicsUpdateIterationsRequired; i++) {
+		for (unsigned int i = 0; i < physicsUpdateIterationsRequired; ++i) {
 			doPhysicalUpdate();
 		}
 	}
@@ -80,7 +88,7 @@ void PhysicalObject::initShaders() {
 		"    gl_Position = transformMatrix * vec4(position + modelOriginOffset, 1.0f);\n"
 		"    fragShaderColor = inColor;\n"
 		"}\n";
-	
+
 	// fragment shader
 	std::string fragmentShaderSource =
 		"#version 330 core\n"
@@ -91,7 +99,7 @@ void PhysicalObject::initShaders() {
 		"void main()\n"
 		"{\n"
 		"    color = fragShaderColor;\n"
-		"}\n\0";
+		"}\n";
 
 	shaderProg = OglShaderProgram();
 	shaderProg.createVertexShaderFromSourceString(vertexShaderSource);

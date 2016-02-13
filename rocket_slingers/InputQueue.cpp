@@ -63,6 +63,7 @@ void InputQueue::callSubscribers(const SDL_Event& inputEvent) {
 			eventWorldCoordinateX = (float) xScreenCoordinate * screenToWorldCoordinateScalerX;
 			eventWorldCoordinateY = gameState->worldViewportScaler - ((float) yScreenCoordinate * screenToWorldCoordinateScalerY);
 
+			std::cout << "xScreenCoordinate = " << xScreenCoordinate << ", yScreenCoordinate = " << yScreenCoordinate << std::endl;
 			MouseButtonSubscriptionKey subscriptionKey(inputEvent.button.state, inputEvent.button.button);
 			std::pair<std::multimap<MouseButtonSubscriptionKey, EventListener*>::iterator,
 				std::multimap<MouseButtonSubscriptionKey, EventListener*>::iterator> subscribersRange;

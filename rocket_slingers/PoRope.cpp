@@ -47,6 +47,7 @@ void PoRope::inputEventCallback(const SDL_Event& inputEvent) {
 	shouldRender = true;
 	shouldDoPhysicalUpdate = true;
 
+	gameState->audioManager->playSoundEffect(AudioManager::SoundEffectId::WHIP, 0);
 }
 
 void PoRope::initGeometry() {
@@ -55,6 +56,7 @@ void PoRope::initGeometry() {
 	this->modelVertices.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
 
 	for (unsigned int massIndex = 0; massIndex < ropeMassCount - 1; massIndex++) {
+		colorData.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 		colorData.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 }
@@ -101,8 +103,7 @@ void PoRope::doPhysicalUpdate() {
 		thisMass->force += (-thisMass->velocity * airFrictionConstant);
 
 		if (massIndex > 0) { // do not update velocity or position on the anchor mass
-			thisMass->velocity += ((thisMass->force / thisMass->mass) * changeInTime);
-			thisMass->worldPosition += (thisMass->velocity * changeInTime);
+			thisMass->updatePhysics(changeInTime);
 		}
 	}
 

@@ -12,6 +12,7 @@ public:
 	void createFragmentShaderFromSourceString(const std::string& shaderSource);
 	void build();
 	void use();
+	GLuint getProgramId();
 
 private:
 	bool built;
@@ -22,7 +23,6 @@ private:
 
 	GLuint buildShader(GLuint shaderType, const std::string& shaderSource);
 	GLuint programId;
-	GLuint getProgramId();
 };
 
 #endif

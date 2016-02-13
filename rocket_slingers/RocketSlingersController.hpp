@@ -2,6 +2,7 @@
 #define ROCKETSLINGERSCONTROLLER_HPP
 
 #include "GameState.hpp"
+#include "PoBackground.hpp"
 #include "PoAxes.hpp"
 #include "PoGuy.hpp"
 #include "PoPendulum.hpp"
@@ -18,6 +19,7 @@ private:
 	void initGameObjects();
 	void updateGameState();
 	GameState* gameState;
+	PhysicalObject* poBackground;
 	PhysicalObject* poAxes;
 	PhysicalObject* poGuy;
 	PhysicalObject* poPendulum;

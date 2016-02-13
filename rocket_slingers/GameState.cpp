@@ -5,8 +5,11 @@ GameState::GameState() {
 	renderWindow = new RenderWindow(this);
 	camera = new Camera(this);
 	physicalObjectRenderer = new PhysicalObjectRenderer();
+	audioManager = new AudioManager();
 
 	frameTimes.resize(fpsFrameRange);
+
+	gravitationalAcceleration = glm::vec3(0.0f, -9.80665f, 0.0f);
 }
 
 void GameState::frameStart() {
@@ -36,6 +39,7 @@ void GameState::frameEnd() {
 }
 
 GameState::~GameState() {
+	delete audioManager;
 	delete physicalObjectRenderer;
 	delete camera;
 	delete renderWindow;
