@@ -7,15 +7,15 @@ PoRope::PoRope(GameState* gameState) : PhysicalObject("PO_ROPE", gameState) {
 	maxAllowedChangeInTime = 0.002f;
 	this->glRenderingMode = GL_LINES;
 
-	gameState->inputQueue->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_LEFT, this);
+	gameState->eventBus->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_LEFT, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
 void PoRope::inputEventCallback(const SDL_Event& inputEvent) {
 	
 	// determine rope anchor and termination coordinates
-	float worldX = gameState->inputQueue->eventWorldCoordinateX;
-	float worldY = gameState->inputQueue->eventWorldCoordinateY;
+	float worldX = gameState->eventBus->eventWorldCoordinateX;
+	float worldY = gameState->eventBus->eventWorldCoordinateY;
 	glm::vec3 ropeAnchorPoint(worldX, worldY, 0.0f);
 	glm::vec3 ropeTerminationPoint(10.0f, 15.0f, 0.0f);  // this is a temporary hard-coded point, would get from player position
 

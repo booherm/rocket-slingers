@@ -13,7 +13,7 @@
 #include "Utilities.hpp"
 #include "PhysicalMass.hpp"
 
-class InputQueue;
+class EventBus;
 
 class PhysicalObject : public EventListener {
 public:

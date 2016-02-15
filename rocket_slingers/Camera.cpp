@@ -35,11 +35,11 @@ Camera::Camera(GameState* gameState) {
 //projectionTransform = glm::ortho(-gameState->aspectRatio - (-gameState->aspectRatio, 2.0f * gameState->aspectRatio, -1.0f, 1.0f);
 
 	// add camera as listener for input events
-	InputQueue* iq = gameState->inputQueue;
-	iq->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_LEFT, this);
-	iq->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_RIGHT, this);
-	iq->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_UP, this);
-	iq->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_DOWN, this);
+	EventBus* eb = gameState->eventBus;
+	eb->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_LEFT, this);
+	eb->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_RIGHT, this);
+	eb->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_UP, this);
+	eb->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_DOWN, this);
 }
 
 void Camera::inputEventCallback(const SDL_Event& inputEvent) {

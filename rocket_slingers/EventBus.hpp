@@ -1,5 +1,5 @@
-#ifndef INPUTQUEUE_HPP
-#define INPUTQUEUE_HPP
+#ifndef EVENTBUS_HPP
+#define EVENTBUS_HPP
 
 #include <map>
 #include <vector>
@@ -8,10 +8,10 @@
 
 class GameState;
 
-class InputQueue {
+class EventBus {
 
 public:
-	InputQueue(GameState* gameState);
+	EventBus(GameState* gameState);
 	void subscribeToKeyboardEvent(unsigned int keyState, unsigned int key, EventListener* subscribingObject);
 	void subscribeToMouseButtonEvent(unsigned int buttonState, unsigned int buttonNumber, EventListener* subscribingObject);
 	bool processInput();

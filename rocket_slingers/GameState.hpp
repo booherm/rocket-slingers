@@ -2,12 +2,12 @@
 #define GAMESTATE_HPP
 
 #include "RenderWindow.hpp"
-#include "InputQueue.hpp"
+#include "EventBus.hpp"
 #include "Camera.hpp"
 #include "PhysicalObjectRenderer.hpp"
 #include "AudioManager.hpp"
 
-class InputQueue;
+class EventBus;
 class RenderWindow;
 class Camera;
 class PhysicalObjectManager;
@@ -21,7 +21,7 @@ public:
 	void frameEnd();
 	~GameState();
 
-	InputQueue* inputQueue;
+	EventBus* eventBus;
 	RenderWindow* renderWindow;
 	Camera* camera;
 	PhysicalObjectRenderer* physicalObjectRenderer;

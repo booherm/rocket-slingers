@@ -157,7 +157,7 @@
     <ClCompile Include="EventListener.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="GuiConsole.cpp" />
-    <ClCompile Include="InputQueue.cpp" />
+    <ClCompile Include="EventBus.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OglShaderProgram.cpp" />
     <ClCompile Include="PhysicalMass.cpp" />
@@ -179,7 +179,7 @@
     <ClInclude Include="EventListener.hpp" />
     <ClInclude Include="GameState.hpp" />
     <ClInclude Include="GuiConsole.hpp" />
-    <ClInclude Include="InputQueue.hpp" />
+    <ClInclude Include="EventBus.hpp" />
     <ClInclude Include="OglShaderProgram.hpp" />
     <ClInclude Include="PhysicalMass.hpp" />
     <ClInclude Include="PhysicalObject.hpp" />

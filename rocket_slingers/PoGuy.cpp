@@ -19,15 +19,15 @@ PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
 	mainComponentMass->mass = 62.00f;
 	mainComponentMass->worldPosition = glm::vec3(0.25f, 0.75f, 0.0f);
 
-	gameState->inputQueue->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_g, this);
-	gameState->inputQueue->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_w, this);
-	gameState->inputQueue->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_s, this);
-	gameState->inputQueue->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_a, this);
-	gameState->inputQueue->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_d, this);
-	gameState->inputQueue->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_w, this);
-	gameState->inputQueue->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_s, this);
-	gameState->inputQueue->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_a, this);
-	gameState->inputQueue->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_d, this);
+	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_g, this);
+	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_w, this);
+	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_s, this);
+	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_a, this);
+	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_d, this);
+	gameState->eventBus->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_w, this);
+	gameState->eventBus->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_s, this);
+	gameState->eventBus->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_a, this);
+	gameState->eventBus->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_d, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 

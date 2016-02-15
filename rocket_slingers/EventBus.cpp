@@ -1,24 +1,24 @@
-#include "InputQueue.hpp"
+#include "EventBus.hpp"
 #include <iostream>
 
-InputQueue::InputQueue(GameState* gameState) {
+EventBus::EventBus(GameState* gameState) {
 	this->gameState = gameState;
 
 	screenToWorldCoordinateScalerX = (gameState->worldViewportScaler * gameState->aspectRatio) / gameState->resolutionWidth;
 	screenToWorldCoordinateScalerY = gameState->worldViewportScaler / gameState->resolutionHeight;
 }
 
-void InputQueue::subscribeToKeyboardEvent(unsigned int keyState, unsigned int key, EventListener* subscribingObject) {
+void EventBus::subscribeToKeyboardEvent(unsigned int keyState, unsigned int key, EventListener* subscribingObject) {
 	KeyboardSubscriptionKey subscriptionKey(keyState, key);
 	keyboardSubscriptions.insert(std::pair<KeyboardSubscriptionKey, EventListener*>(subscriptionKey, subscribingObject));
 }
 
-void InputQueue::subscribeToMouseButtonEvent(unsigned int buttonState, unsigned int buttonNumber, EventListener* subscribingObject) {
+void EventBus::subscribeToMouseButtonEvent(unsigned int buttonState, unsigned int buttonNumber, EventListener* subscribingObject) {
 	MouseButtonSubscriptionKey subscriptionKey(buttonState, buttonNumber);
 	mouseButtonSubscriptions.insert(std::pair<MouseButtonSubscriptionKey, EventListener*>(subscriptionKey, subscribingObject));
 }
 
-bool InputQueue::processInput() {
+bool EventBus::processInput() {
 
 	SDL_Event inputEvent;
 	while (SDL_PollEvent(&inputEvent)) {
@@ -34,7 +34,7 @@ bool InputQueue::processInput() {
 }
 
 // call subscribers to this event
-void InputQueue::callSubscribers(const SDL_Event& inputEvent) {
+void EventBus::callSubscribers(const SDL_Event& inputEvent) {
 	switch (inputEvent.type) {
 
 		// keyboard
@@ -76,8 +76,3 @@ void InputQueue::callSubscribers(const SDL_Event& inputEvent) {
 		}
 	}
 }
-
-
-/*
-
-*/

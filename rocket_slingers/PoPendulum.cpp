@@ -9,14 +9,14 @@ PoPendulum::PoPendulum(GameState* gameState) : PhysicalObject("PO_PENDULUM", gam
 	mainComponentMass = &componentMasses[0];
 	(&componentMasses[1])->mass = 10.0f;
 	
-	gameState->inputQueue->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_RIGHT, this);
+	gameState->eventBus->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_RIGHT, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
 void PoPendulum::inputEventCallback(const SDL_Event& inputEvent){
 	
-	float worldX = gameState->inputQueue->eventWorldCoordinateX;
-	float worldY = gameState->inputQueue->eventWorldCoordinateY;
+	float worldX = gameState->eventBus->eventWorldCoordinateX;
+	float worldY = gameState->eventBus->eventWorldCoordinateY;
 	glm::vec3 originPosition = glm::vec3(worldX, worldY, 0.0f);
 	mainComponentMass->worldPosition = originPosition;
 	(&componentMasses[1])->worldPosition = originPosition + glm::vec3(1.0f, 0.0f, 0.0f);

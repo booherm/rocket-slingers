@@ -2,7 +2,7 @@
 #include "Stage.hpp"
 
 GameState::GameState() {
-	inputQueue = new InputQueue(this);
+	eventBus = new EventBus(this);
 	renderWindow = new RenderWindow(this);
 	camera = new Camera(this);
 	physicalObjectRenderer = new PhysicalObjectRenderer();
@@ -46,5 +46,5 @@ GameState::~GameState() {
 	delete physicalObjectRenderer;
 	delete camera;
 	delete renderWindow;
-	delete inputQueue;
+	delete eventBus;
 }

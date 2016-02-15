@@ -22,7 +22,7 @@ void RocketSlingersController::start() {
 	bool running = true;
 	while (running) {
 		gameState->frameStart();
-		running = gameState->inputQueue->processInput();
+		running = gameState->eventBus->processInput();
 		gameState->activeStage->update();
 		gameState->physicalObjectRenderer->render();
 		gameState->renderWindow->publishFrame();
