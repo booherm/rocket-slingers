@@ -18,7 +18,7 @@ private:
 		float stretchedLength;
 	};
 
-	unsigned int ropeMassCount = 15;
+	unsigned int ropeMassCount = 30;// 15;
 	float ropeMassMass = 0.05f;
 	float springStiffnessConstant = 10000.0f;
 	float internalSpringFrictionConstant = 0.2f;

@@ -38,8 +38,8 @@ public:
 	OglShaderProgram* getShaderProgram();
 
 	// physics
+	PhysicalMass* getMainComponentMass();
 	void updatePhysicalState();
-	PhysicalMass* mainComponentMass;
 
 protected:
 
@@ -63,6 +63,7 @@ protected:
 	void resetForces();
 	float changeInTime;
 	float maxAllowedChangeInTime;
+	PhysicalMass* mainComponentMass;
 	std::vector<PhysicalMass> componentMasses;
 };
 

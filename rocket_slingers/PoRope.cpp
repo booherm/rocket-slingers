@@ -14,15 +14,15 @@ PoRope::PoRope(GameState* gameState) : PhysicalObject("PO_ROPE", gameState) {
 
 void PoRope::gameEventCallback(const Event& eventObj) {
 
-	std::cout << "rope throw requeted" << std::endl;
 	// determine rope anchor and termination coordinates
 	float worldX = eventObj.eventWorldCoordinateX;
 	float worldY = eventObj.eventWorldCoordinateY;
 	glm::vec3 ropeAnchorPoint(worldX, worldY, 0.0f);
 	PhysicalObject* poster = (PhysicalObject*) eventObj.eventPoster;
-	glm::vec3 ropeTerminationPoint = poster->mainComponentMass->worldPosition;//  (10.0f, 15.0f, 0.0f);  // this is a temporary hard-coded point, would get from player position
+	PhysicalMass* guyMainComponentMass = poster->getMainComponentMass();
+	glm::vec3 ropeTerminationPoint = guyMainComponentMass->worldPosition;
 
-														 // calculate attributes that will apply to all rope masses
+	// calculate attributes that will apply to all rope masses
 	float overallRopeLength = glm::distance(ropeAnchorPoint, ropeTerminationPoint);
 	float ropeSegmentLength = overallRopeLength / (ropeMassCount - 1);
 	float theta = Utilities::xyAngleBetweenVectors(glm::vec3(1.0f, 0.0f, 0.0f), ropeAnchorPoint - ropeTerminationPoint);
@@ -46,6 +46,9 @@ void PoRope::gameEventCallback(const Event& eventObj) {
 			ropeAnchorPoint.y - (positionOffsetY * massIndex), 0.0f);
 
 	}
+
+	// bind the guy main component mass to the last mass on the rope
+	componentMasses[ropeMassCount - 1].connectMasses(guyMainComponentMass);
 
 	shouldRender = true;
 	shouldDoPhysicalUpdate = true;
@@ -146,6 +149,29 @@ void PoRope::doPhysicalUpdate() {
 
 		// apply air friction force
 		thisMass->force += (-thisMass->velocity * airFrictionConstant);
+
+		glm::vec3 forceSoFar = thisMass->force;
+
+		// apply attached forces
+		if (nextMass == nullptr) {
+
+			PhysicalMass* connectedMass = thisMass->connectedPhysicalMasses[0];
+			glm::vec3 connectionVector = thisMass->worldPosition - connectedMass->worldPosition;
+			float stretchedLength = glm::length(connectionVector);
+			glm::vec3 springForce;
+			if (stretchedLength != 0) {
+				springForce = -(connectionVector / stretchedLength)
+					* (stretchedLength - thisMassSegmentLengths->unstretchedLength)
+					* 10000.00f; // springStiffnessConstant;
+			}
+
+			thisMass->force += springForce;
+			connectedMass->force += -springForce;
+
+
+//			thisMass->force += thisMass->connectedPhysicalMasses[0]->force;
+			//thisMass->connectedPhysicalMasses[0]->force -= forceSoFar;
+		}
 
 		if (massIndex > 0) { // do not update velocity or position on the anchor mass
 			thisMass->updatePhysics(changeInTime);

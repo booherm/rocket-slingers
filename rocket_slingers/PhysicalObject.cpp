@@ -117,5 +117,9 @@ void PhysicalObject::resetForces() {
 
 }
 
+PhysicalMass* PhysicalObject::getMainComponentMass() {
+	return mainComponentMass;
+}
+
 void PhysicalObject::doPhysicalUpdate() {}
 void PhysicalObject::doRenderUpdate() {}

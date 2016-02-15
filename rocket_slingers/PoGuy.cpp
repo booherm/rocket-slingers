@@ -17,7 +17,7 @@ PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
 	rocketOn = false;
 
 	mainComponentMass->mass = 62.00f;
-	mainComponentMass->worldPosition = glm::vec3(0.25f, 0.75f, 0.0f);
+	mainComponentMass->worldPosition = glm::vec3(0.75f, 1.50f, 0.0f);
 
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_g, this);
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_w, this);
@@ -35,7 +35,7 @@ PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
 void PoGuy::sdlInputEventCallback(const Event& eventObj) {
 
 	if (eventObj.sdlInputEvent->key.keysym.sym == SDLK_g) {
-		((PhysicalMass*)&componentMasses[0])->worldPosition = glm::vec3(10.0f, 10.0f, 0.0f);
+		((PhysicalMass*)&componentMasses[0])->worldPosition = glm::vec3(0.75f, 1.50f, 0.0f);
 	}
 	else if (eventObj.eventType == Event::EventType::SDL_MOUSE_BUTTON) {
 
@@ -200,6 +200,8 @@ void PoGuy::initGeometry() {
 	for (unsigned int i = 0; i < modelVertices.size(); i++) {
 		colorData.push_back(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 	}
+
+	modelOriginOffsetData.push_back(glm::vec3(-18.0f, -35.0f, 0.0f));
 }
 
 void PoGuy::doPhysicalUpdate() {
