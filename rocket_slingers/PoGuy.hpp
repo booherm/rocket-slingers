@@ -16,11 +16,11 @@ private:
 	const float scalerToMeter = 0.03936f;
 	bool rocketOn = false;
 	void initGeometry();
-	const float airFrictionConstant = 0.1f;
+	const float airFrictionConstant = 0.5f;
 	unsigned int soundEffectInstanceId;
 	
+	unsigned int keyDownCount;
 	std::map<int, bool> keyStates;
-
 };
 
 #endif

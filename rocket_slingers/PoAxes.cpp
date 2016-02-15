@@ -7,12 +7,7 @@ PoAxes::PoAxes(GameState* gameState) : PhysicalObject("PO_AXES", gameState) {
 
 	shouldRender = true;
 	glRenderingMode = GL_LINES;
-	//inputQueue->subscribeToInputEvent(InputEvent::IEK_MOUSE_BUTTON_1, InputEvent::IEKS_PRESS, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
-}
-
-void PoAxes::inputEventCallback(const SDL_Event& inputEvent) {
-	std::cout << "PoAxes callback.  InputEvent = " << std::endl;
 }
 
 void PoAxes::initGeometry() {
@@ -30,12 +25,9 @@ void PoAxes::pushAxisTransform(glm::mat4 model) {
 
 void PoAxes::initRenderData() {
 
-	modelOriginOffsetData.clear();
-	colorData.clear();
-	transformData.clear();
-
 	for (unsigned int i = 0; i < 3; i++) {
 		modelOriginOffsetData.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+		colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 		colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 	}
 

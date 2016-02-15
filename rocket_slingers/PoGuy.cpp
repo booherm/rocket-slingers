@@ -9,6 +9,7 @@ PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
 	componentMasses.resize(1);
 	mainComponentMass = &componentMasses[0];
 	
+	keyDownCount = 0;
 	keyStates[SDLK_w] = false;
 	keyStates[SDLK_s] = false;
 	keyStates[SDLK_a] = false;
@@ -39,6 +40,7 @@ void PoGuy::inputEventCallback(const SDL_Event& inputEvent) {
 		if (inputEvent.key.state == SDL_PRESSED) {
 
 			keyStates[inputEvent.key.keysym.sym] = true;
+			keyDownCount++;
 
 			if (!rocketOn) {
 				rocketOn = true;
@@ -48,14 +50,12 @@ void PoGuy::inputEventCallback(const SDL_Event& inputEvent) {
 		else {
 			
 			keyStates[inputEvent.key.keysym.sym] = false;
-			bool someKeyDown = keyStates[SDLK_a] || keyStates[SDLK_d] || keyStates[SDLK_w] || keyStates[SDLK_s];
-			if (!someKeyDown) {
+			keyDownCount--;
+			if (keyDownCount == 0) {
 				gameState->audioManager->stopSoundEffect(soundEffectInstanceId);
 				rocketOn = false;
 			}
 		}
-		
-
 	}
 }
 
@@ -184,6 +184,10 @@ void PoGuy::initGeometry() {
 			modelVertices.push_back(glm::vec3(guyModelVerticesSet[guyModelTriangleVertexIds[t][v]][0], guyModelVerticesSet[guyModelTriangleVertexIds[t][v]][1], 0.0f));
 		}
 	}
+
+	for (unsigned int i = 0; i < modelVertices.size(); i++) {
+		colorData.push_back(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+	}
 }
 
 void PoGuy::doPhysicalUpdate() {
@@ -210,16 +214,7 @@ void PoGuy::doPhysicalUpdate() {
 
 void PoGuy::doRenderUpdate() {
 
-	modelOriginOffsetData.clear();
-	colorData.clear();
 	transformData.clear();
-
-	modelOriginOffsetData.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-
-	// color
-	for (unsigned int i = 0; i < modelVertices.size(); i++){
-		colorData.push_back(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-	}
 
 	// model transform: translate, scale, rotate
 	glm::mat4 modelTransform;

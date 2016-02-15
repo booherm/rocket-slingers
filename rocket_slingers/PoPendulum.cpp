@@ -46,6 +46,9 @@ void PoPendulum::initGeometry() {
 	modelVertices.push_back(glm::vec3(0.26666666f, 0.2f, 0.0f));
 	modelVertices.push_back(glm::vec3(0.33333333f, 1.0f, 0.0f));
 	modelVertices.push_back(glm::vec3(0.26666666f, 1.0f, 0.0f));
+
+	// model origin offset
+	modelOriginOffsetData.push_back(glm::vec3(-0.3f, -1.0f, 0.0f));
 }
 
 void PoPendulum::doPhysicalUpdate() {
@@ -74,10 +77,6 @@ void PoPendulum::doPhysicalUpdate() {
 }
 
 void PoPendulum::doRenderUpdate() {
-
-	// model origin offset
-	modelOriginOffsetData.clear();
-	modelOriginOffsetData.push_back(glm::vec3(-0.3f, -1.0f, 0.0f));
 
 	// color
 	colorData.clear();

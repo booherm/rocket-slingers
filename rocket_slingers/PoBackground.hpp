@@ -6,13 +6,11 @@
 class PoBackground : public PhysicalObject {
 public:
 	PoBackground(GameState* gameState);
-	//void doRenderUpdate();
-	void doCustomRender();
-
+	void doRenderUpdate();
+	
 private:
 	GLuint texture1;
 	GLuint VAO;
-
 
 	void initShaders();
 	void initGeometry();
