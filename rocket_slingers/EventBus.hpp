@@ -14,10 +14,10 @@ public:
 	EventBus(GameState* gameState);
 	void subscribeToKeyboardEvent(unsigned int keyState, unsigned int key, EventListener* subscribingObject);
 	void subscribeToMouseButtonEvent(unsigned int buttonState, unsigned int buttonNumber, EventListener* subscribingObject);
-	bool processInput();
+	void subscribeToGameEvent(Event::GameEvent gameEvent, EventListener* subscribingObject);
+	void postEvent(const Event& eventObj);
 
-	float eventWorldCoordinateX;
-	float eventWorldCoordinateY;
+	bool processInput();
 
 private:
 
@@ -25,15 +25,17 @@ private:
 	typedef std::pair<unsigned int, unsigned int> MouseButtonSubscriptionKey;
 
 	GameState* gameState;
+	std::map<unsigned int, Event::EventType> sdlEventTypeMapping;
 	float screenToWorldCoordinateScalerX;
 	float screenToWorldCoordinateScalerY;
 
 	std::multimap<KeyboardSubscriptionKey, EventListener*> keyboardSubscriptions;
 	std::multimap<MouseButtonSubscriptionKey, EventListener*> mouseButtonSubscriptions;
+	std::multimap<Event::GameEvent, EventListener*> gameEventSubscriptions;
 	//std::multimap<MouseMotionSubscriptionKey, EventListener*> mouseMotionSubscriptions;
 	//std::multimap<MouseWheelSubscriptionKey, EventListener*> mouseWheelSubscriptions;
 
-	void callSubscribers(const SDL_Event& inputEvent);
+	void callSubscribers(const Event& eventObj);
 };
 
 #endif

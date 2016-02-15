@@ -7,15 +7,58 @@ PoRope::PoRope(GameState* gameState) : PhysicalObject("PO_ROPE", gameState) {
 	maxAllowedChangeInTime = 0.002f;
 	this->glRenderingMode = GL_LINES;
 
-	gameState->eventBus->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_LEFT, this);
+	//gameState->eventBus->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_LEFT, this);
+	gameState->eventBus->subscribeToGameEvent(Event::GameEvent::THROW_ROPE, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
-void PoRope::inputEventCallback(const SDL_Event& inputEvent) {
+void PoRope::gameEventCallback(const Event& eventObj) {
+
+	std::cout << "rope throw requeted" << std::endl;
+	// determine rope anchor and termination coordinates
+	float worldX = eventObj.eventWorldCoordinateX;
+	float worldY = eventObj.eventWorldCoordinateY;
+	glm::vec3 ropeAnchorPoint(worldX, worldY, 0.0f);
+	PhysicalObject* poster = (PhysicalObject*) eventObj.eventPoster;
+	glm::vec3 ropeTerminationPoint = poster->mainComponentMass->worldPosition;//  (10.0f, 15.0f, 0.0f);  // this is a temporary hard-coded point, would get from player position
+
+														 // calculate attributes that will apply to all rope masses
+	float overallRopeLength = glm::distance(ropeAnchorPoint, ropeTerminationPoint);
+	float ropeSegmentLength = overallRopeLength / (ropeMassCount - 1);
+	float theta = Utilities::xyAngleBetweenVectors(glm::vec3(1.0f, 0.0f, 0.0f), ropeAnchorPoint - ropeTerminationPoint);
+	float positionOffsetX = glm::cos(theta) * ropeSegmentLength;
+	float positionOffsetY = glm::sin(theta) * ropeSegmentLength;
+
+	// Create rope masses.  Each rope mass is a point on the rope joined by a spring segment to it's immediate neighbor
+	// down the rope.  The first and last masses on the rope only have internal spring segments.
+	componentMasses.resize(ropeMassCount);
+	ropeSegmentLengths.resize(ropeMassCount);
+	for (unsigned int massIndex = 0; massIndex < ropeMassCount; massIndex++) {
+
+		PhysicalMass* ropeMass = &componentMasses[massIndex];
+		ropeMass->mass = ropeMassMass;
+		RopeSegmentLength* rsl = &ropeSegmentLengths[massIndex];
+		rsl->unstretchedLength = ropeSegmentLength;
+		rsl->stretchedLength = ropeSegmentLength;
+
+		// determine mass origin position
+		ropeMass->worldPosition = glm::vec3(ropeAnchorPoint.x - (positionOffsetX * massIndex),
+			ropeAnchorPoint.y - (positionOffsetY * massIndex), 0.0f);
+
+	}
+
+	shouldRender = true;
+	shouldDoPhysicalUpdate = true;
+
+	gameState->audioManager->playSoundEffect(AudioManager::SoundEffectId::WHIP, 0);
+
+}
+
+void PoRope::sdlInputEventCallback(const Event& eventObj){
 	
 	// determine rope anchor and termination coordinates
-	float worldX = gameState->eventBus->eventWorldCoordinateX;
-	float worldY = gameState->eventBus->eventWorldCoordinateY;
+	float worldX = eventObj.eventWorldCoordinateX;
+	float worldY = eventObj.eventWorldCoordinateY;
 	glm::vec3 ropeAnchorPoint(worldX, worldY, 0.0f);
 	glm::vec3 ropeTerminationPoint(10.0f, 15.0f, 0.0f);  // this is a temporary hard-coded point, would get from player position
 

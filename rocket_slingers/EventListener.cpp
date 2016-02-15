@@ -1,3 +1,6 @@
 #include "EventListener.hpp"
 
-void EventListener::inputEventCallback(const SDL_Event& inputEvent) {}
+void EventListener::sdlInputEventCallback(const Event& eventObj) {}
+
+void EventListener::gameEventCallback(const Event& eventObj) {}
+

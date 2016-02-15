@@ -66,7 +66,9 @@ void PhysicalObject::updatePhysicalState() {
 
 }
 
-void PhysicalObject::inputEventCallback(const SDL_Event& inputEvent) {}
+void PhysicalObject::sdlInputEventCallback(const Event& eventObj) {}
+
+void PhysicalObject::gameEventCallback(const Event& eventObj) {}
 
 void PhysicalObject::initGeometry() {}
 

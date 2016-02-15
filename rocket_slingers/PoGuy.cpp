@@ -28,18 +28,30 @@ PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_s, this);
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_a, this);
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_d, this);
+	gameState->eventBus->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_LEFT, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
-void PoGuy::inputEventCallback(const SDL_Event& inputEvent) {
+void PoGuy::sdlInputEventCallback(const Event& eventObj) {
 
-	if (inputEvent.key.keysym.sym == SDLK_g) {
+	if (eventObj.sdlInputEvent->key.keysym.sym == SDLK_g) {
 		((PhysicalMass*)&componentMasses[0])->worldPosition = glm::vec3(10.0f, 10.0f, 0.0f);
 	}
-	else {
-		if (inputEvent.key.state == SDL_PRESSED) {
+	else if (eventObj.eventType == Event::EventType::SDL_MOUSE_BUTTON) {
 
-			keyStates[inputEvent.key.keysym.sym] = true;
+		Event myEvent;
+		myEvent.eventPoster = this;
+		myEvent.eventType = Event::EventType::GAME_EVENT;
+		myEvent.gameEvent = Event::GameEvent::THROW_ROPE;
+		myEvent.eventWorldCoordinateX = eventObj.eventWorldCoordinateX;
+		myEvent.eventWorldCoordinateY = eventObj.eventWorldCoordinateY;
+		gameState->eventBus->postEvent(myEvent);
+
+	}
+	else {
+		if (eventObj.sdlInputEvent->key.state == SDL_PRESSED) {
+
+			keyStates[eventObj.sdlInputEvent->key.keysym.sym] = true;
 			keyDownCount++;
 
 			if (!rocketOn) {
@@ -49,7 +61,7 @@ void PoGuy::inputEventCallback(const SDL_Event& inputEvent) {
 		}
 		else {
 			
-			keyStates[inputEvent.key.keysym.sym] = false;
+			keyStates[eventObj.sdlInputEvent->key.keysym.sym] = false;
 			keyDownCount--;
 			if (keyDownCount == 0) {
 				gameState->audioManager->stopSoundEffect(soundEffectInstanceId);

@@ -134,5 +134,8 @@
     <ClInclude Include="EventBus.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Event.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

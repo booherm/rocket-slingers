@@ -70,7 +70,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>
+    </LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -96,6 +97,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>opengl32.lib;glew32.lib;SOIL.lib;SDL2.lib;SDL2_mixer.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>external\SDL2_mixer-2.0.1\lib\x86;external\glew-1.13.0\lib\Release\Win32;external\SDL2-2.0.4\lib\x86;external\soil-1.16\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -176,6 +178,7 @@
   <ItemGroup>
     <ClInclude Include="AudioManager.hpp" />
     <ClInclude Include="Camera.hpp" />
+    <ClInclude Include="Event.hpp" />
     <ClInclude Include="EventListener.hpp" />
     <ClInclude Include="GameState.hpp" />
     <ClInclude Include="GuiConsole.hpp" />

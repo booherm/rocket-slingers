@@ -8,7 +8,8 @@ public:
 	PoRope(GameState* gameState);
 	void doPhysicalUpdate();
 	void doRenderUpdate();
-	void inputEventCallback(const SDL_Event& inputEvent);
+	void gameEventCallback(const Event& eventObj);
+	void sdlInputEventCallback(const Event& eventObj);
 
 private:
 

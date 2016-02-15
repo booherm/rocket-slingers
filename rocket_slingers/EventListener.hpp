@@ -1,12 +1,13 @@
 #ifndef EVENTLISTENER_HPP
 #define EVENTLISTENER_HPP
 
-#include <SDL.h>
+#include "Event.hpp"
 
 class EventListener
 {
 public:
-	virtual void inputEventCallback(const SDL_Event& inputEvent);
+	virtual void sdlInputEventCallback(const Event& eventObj);
+	virtual void gameEventCallback(const Event& eventObj);
 };
 
 #endif

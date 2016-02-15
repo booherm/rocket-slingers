@@ -9,7 +9,7 @@ public:
 	PoGuy(GameState* gameState);
 	void doPhysicalUpdate();
 	void doRenderUpdate();
-	void inputEventCallback(const SDL_Event& inputEvent);
+	void sdlInputEventCallback(const Event& eventObj);
 
 private:
 

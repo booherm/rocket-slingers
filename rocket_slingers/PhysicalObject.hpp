@@ -20,7 +20,8 @@ public:
 	PhysicalObject(const std::string& objectType, GameState* gameState);
 	virtual ~PhysicalObject();
 
-	virtual void inputEventCallback(const SDL_Event& inputEvent);
+	virtual void sdlInputEventCallback(const Event& eventObj);
+	virtual void gameEventCallback(const Event& eventObj);
 	std::string objectType;
 	unsigned int glRenderingMode;
 	const unsigned int maxInstanceCount = 1000;
@@ -38,6 +39,7 @@ public:
 
 	// physics
 	void updatePhysicalState();
+	PhysicalMass* mainComponentMass;
 
 protected:
 
@@ -61,7 +63,6 @@ protected:
 	void resetForces();
 	float changeInTime;
 	float maxAllowedChangeInTime;
-	PhysicalMass* mainComponentMass;
 	std::vector<PhysicalMass> componentMasses;
 };
 
