@@ -10,7 +10,9 @@
 class InputQueue;
 class RenderWindow;
 class Camera;
+class PhysicalObjectManager;
 class PhysicalObjectRenderer;
+class Stage;
 
 class GameState {
 public:
@@ -24,6 +26,7 @@ public:
 	Camera* camera;
 	PhysicalObjectRenderer* physicalObjectRenderer;
 	AudioManager* audioManager;
+	Stage* activeStage;
 
 	const unsigned int resolutionWidth = 1920;  // debug hardcode
 	const unsigned int resolutionHeight = 1080;

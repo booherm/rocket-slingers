@@ -1,11 +1,11 @@
 #include "RocketSlingersController.hpp"
 #include <iostream>
+#include "Stage.hpp"
 
 RocketSlingersController::RocketSlingersController() {
 	initSdl();
 	gameState = new GameState();
-	initGameObjects();
-	gameState->audioManager->playTest();
+	//gameState->audioManager->playTest();
 }
 
 void RocketSlingersController::initSdl() {
@@ -18,46 +18,19 @@ void RocketSlingersController::initSdl() {
 
 }
 
-void RocketSlingersController::initGameObjects() {
-	poBackground = new PoBackground(gameState);
-	poAxes = new PoAxes(gameState);
-	poGuy = new PoGuy(gameState);
-	poPendulum = new PoPendulum(gameState);
-	poRope = new PoRope(gameState);
-}
-
 void RocketSlingersController::start() {
 	bool running = true;
 	while (running) {
 		gameState->frameStart();
 		running = gameState->inputQueue->processInput();
-		updateGameState();
+		gameState->activeStage->update();
 		gameState->physicalObjectRenderer->render();
 		gameState->renderWindow->publishFrame();
 		gameState->frameEnd();
 	}
 }
 
-void RocketSlingersController::updateGameState() {
-	poBackground->updatePhysicalState();
-	poAxes->updatePhysicalState();
-	poGuy->updatePhysicalState();
-	poPendulum->updatePhysicalState();
-	poRope->updatePhysicalState();
-
-	poBackground->updateRenderState();
-	poAxes->updateRenderState();
-	poGuy->updateRenderState();
-	poPendulum->updateRenderState();
-	poRope->updateRenderState();
-}
-
 RocketSlingersController::~RocketSlingersController() {
-	delete poBackground;
-	delete poAxes;
-	delete poGuy;
-	delete poPendulum;
-	delete poRope;
 	delete gameState;
 	SDL_Quit();
 }

@@ -52,8 +52,10 @@ void PoRope::inputEventCallback(const SDL_Event& inputEvent) {
 
 void PoRope::initGeometry() {
 	// model data
-	this->modelVertices.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-	this->modelVertices.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+	modelVertices.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	modelVertices.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+
+	modelOriginOffsetData.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	for (unsigned int massIndex = 0; massIndex < ropeMassCount - 1; massIndex++) {
 		colorData.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));

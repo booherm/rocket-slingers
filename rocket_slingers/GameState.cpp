@@ -1,4 +1,5 @@
 #include "GameState.hpp"
+#include "Stage.hpp"
 
 GameState::GameState() {
 	inputQueue = new InputQueue(this);
@@ -6,6 +7,7 @@ GameState::GameState() {
 	camera = new Camera(this);
 	physicalObjectRenderer = new PhysicalObjectRenderer();
 	audioManager = new AudioManager();
+	activeStage = new Stage(this);
 
 	frameTimes.resize(fpsFrameRange);
 
@@ -39,6 +41,7 @@ void GameState::frameEnd() {
 }
 
 GameState::~GameState() {
+	delete activeStage;
 	delete audioManager;
 	delete physicalObjectRenderer;
 	delete camera;

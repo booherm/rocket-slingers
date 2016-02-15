@@ -8,31 +8,55 @@ PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
 	shouldDoPhysicalUpdate = true;
 	componentMasses.resize(1);
 	mainComponentMass = &componentMasses[0];
+	
+	keyStates[SDLK_w] = false;
+	keyStates[SDLK_s] = false;
+	keyStates[SDLK_a] = false;
+	keyStates[SDLK_d] = false;
+	rocketOn = false;
 
 	mainComponentMass->mass = 62.00f;
 	mainComponentMass->worldPosition = glm::vec3(0.25f, 0.75f, 0.0f);
 
-	gameState->inputQueue->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_SPACE, this);
-	gameState->inputQueue->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_SPACE, this);
 	gameState->inputQueue->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_g, this);
+	gameState->inputQueue->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_w, this);
+	gameState->inputQueue->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_s, this);
+	gameState->inputQueue->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_a, this);
+	gameState->inputQueue->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_d, this);
+	gameState->inputQueue->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_w, this);
+	gameState->inputQueue->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_s, this);
+	gameState->inputQueue->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_a, this);
+	gameState->inputQueue->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_d, this);
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
 void PoGuy::inputEventCallback(const SDL_Event& inputEvent) {
 
-	if (inputEvent.key.keysym.sym == SDLK_SPACE) {
-
-		rocketOn = inputEvent.key.state == SDL_PRESSED;
-		if (rocketOn) {
-			soundEffectInstanceId = gameState->audioManager->playSoundEffect(AudioManager::SoundEffectId::ROCKET_RUMBLE, -1);
-		}
-		else
-			gameState->audioManager->stopSoundEffect(soundEffectInstanceId);
-
-		std::cout << "rocket " << (rocketOn ? "on" : "off") << std::endl;
+	if (inputEvent.key.keysym.sym == SDLK_g) {
+		((PhysicalMass*)&componentMasses[0])->worldPosition = glm::vec3(10.0f, 10.0f, 0.0f);
 	}
-	else
-		((PhysicalMass*) &componentMasses[0])->worldPosition = glm::vec3(0.25f, 0.75f, 0.0f);
+	else {
+		if (inputEvent.key.state == SDL_PRESSED) {
+
+			keyStates[inputEvent.key.keysym.sym] = true;
+
+			if (!rocketOn) {
+				rocketOn = true;
+				soundEffectInstanceId = gameState->audioManager->playSoundEffect(AudioManager::SoundEffectId::ROCKET_RUMBLE, -1);
+			}
+		}
+		else {
+			
+			keyStates[inputEvent.key.keysym.sym] = false;
+			bool someKeyDown = keyStates[SDLK_a] || keyStates[SDLK_d] || keyStates[SDLK_w] || keyStates[SDLK_s];
+			if (!someKeyDown) {
+				gameState->audioManager->stopSoundEffect(soundEffectInstanceId);
+				rocketOn = false;
+			}
+		}
+		
+
+	}
 }
 
 void PoGuy::initGeometry() {
@@ -167,8 +191,16 @@ void PoGuy::doPhysicalUpdate() {
 	mainComponentMass->resetForce();
 
 	// rocket force
-	if (rocketOn)
-		mainComponentMass->force += glm::vec3(100.0f, 0.0f, 0.0f);
+	if (rocketOn) {
+		if(keyStates[SDLK_d])
+			mainComponentMass->force += glm::vec3(900.0f, 0.0f, 0.0f);
+		if (keyStates[SDLK_a])
+			mainComponentMass->force += glm::vec3(-900.0f, 0.0f, 0.0f);
+		if (keyStates[SDLK_w])
+			mainComponentMass->force += glm::vec3(0.0f, 900.0f, 0.0f);
+		if (keyStates[SDLK_s])
+			mainComponentMass->force += glm::vec3(0.0f, -900.0f, 0.0f);
+	}
 
 	// air friction
 	mainComponentMass->force += (mainComponentMass->velocity * -airFrictionConstant);
@@ -185,8 +217,9 @@ void PoGuy::doRenderUpdate() {
 	modelOriginOffsetData.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// color
-	for (unsigned int i = 0; i < modelVertices.size(); i++)
+	for (unsigned int i = 0; i < modelVertices.size(); i++){
 		colorData.push_back(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+	}
 
 	// model transform: translate, scale, rotate
 	glm::mat4 modelTransform;

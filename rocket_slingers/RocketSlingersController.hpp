@@ -2,11 +2,6 @@
 #define ROCKETSLINGERSCONTROLLER_HPP
 
 #include "GameState.hpp"
-#include "PoBackground.hpp"
-#include "PoAxes.hpp"
-#include "PoGuy.hpp"
-#include "PoPendulum.hpp"
-#include "PoRope.hpp"
 
 class RocketSlingersController {
 public:
@@ -16,14 +11,7 @@ public:
 
 private:
 	void initSdl();
-	void initGameObjects();
-	void updateGameState();
 	GameState* gameState;
-	PhysicalObject* poBackground;
-	PhysicalObject* poAxes;
-	PhysicalObject* poGuy;
-	PhysicalObject* poPendulum;
-	PhysicalObject* poRope;
 };
 
 #endif
