@@ -6,10 +6,9 @@
 #include "PoGuy.hpp"
 #include "PoPendulum.hpp"
 #include "PoRope.hpp"
-//#include "GameState.hpp"
+#include "PoPhysicsRenderer.hpp"
 
 class GameState;
-//class PhysicalObject;
 
 class Stage
 {

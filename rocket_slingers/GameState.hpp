@@ -6,6 +6,7 @@
 #include "Camera.hpp"
 #include "PhysicalObjectRenderer.hpp"
 #include "AudioManager.hpp"
+#include "PhysicsManager.hpp"
 
 class EventBus;
 class RenderWindow;
@@ -27,6 +28,7 @@ public:
 	PhysicalObjectRenderer* physicalObjectRenderer;
 	AudioManager* audioManager;
 	Stage* activeStage;
+	PhysicsManager* physicsManager;
 
 	const unsigned int resolutionWidth = 1920;  // debug hardcode
 	const unsigned int resolutionHeight = 1080;

@@ -1,13 +1,12 @@
 #include "PoGuy.hpp"
 
 PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
-	initGeometry();
 	initShaders();
+	initGeometry();
+	initPhysics();
+	initEventSubsriptions();
 
 	shouldRender = true;
-	shouldDoPhysicalUpdate = true;
-	componentMasses.resize(1);
-	mainComponentMass = &componentMasses[0];
 	
 	keyDownCount = 0;
 	keyStates[SDLK_w] = false;
@@ -15,10 +14,9 @@ PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
 	keyStates[SDLK_a] = false;
 	keyStates[SDLK_d] = false;
 	rocketOn = false;
+}
 
-	mainComponentMass->mass = 62.00f;
-	mainComponentMass->worldPosition = glm::vec3(0.75f, 1.50f, 0.0f);
-
+void PoGuy::initEventSubsriptions() {
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_g, this);
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_w, this);
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_s, this);
@@ -29,13 +27,12 @@ PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_a, this);
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_d, this);
 	gameState->eventBus->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_LEFT, this);
-	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }
 
 void PoGuy::sdlInputEventCallback(const Event& eventObj) {
 
 	if (eventObj.sdlInputEvent->key.keysym.sym == SDLK_g) {
-		((PhysicalMass*)&componentMasses[0])->worldPosition = glm::vec3(0.75f, 1.50f, 0.0f);
+		//((PhysicalMass*) &componentMasses[0])->worldPosition = glm::vec3(10.0f, 10.0f, 0.0f);
 	}
 	else if (eventObj.eventType == Event::EventType::SDL_MOUSE_BUTTON) {
 
@@ -202,28 +199,35 @@ void PoGuy::initGeometry() {
 	}
 
 	modelOriginOffsetData.push_back(glm::vec3(-18.0f, -35.0f, 0.0f));
+
+	gameState->physicalObjectRenderer->addPhysicalObject(this);
+
+}
+
+void PoGuy::initPhysics() {
+
+	componentMasses.resize(1);
+	componentMasses[0].init(gameState, 62.0f, glm::vec3(10.0f, 10.0f, 0.0f), 1.0f);
+	mainComponentMass = &componentMasses[0];
+	shouldDoPhysicalUpdate = true;
+
 }
 
 void PoGuy::doPhysicalUpdate() {
 
-	mainComponentMass->resetForce();
-
 	// rocket force
 	if (rocketOn) {
-		if(keyStates[SDLK_d])
-			mainComponentMass->force += glm::vec3(900.0f, 0.0f, 0.0f);
+		mainComponentMass->rigidBody->activate();
+		if (keyStates[SDLK_d])
+			mainComponentMass->rigidBody->applyCentralForce(btVector3(900.0f, 0.0f, 0.0f));
 		if (keyStates[SDLK_a])
-			mainComponentMass->force += glm::vec3(-900.0f, 0.0f, 0.0f);
+			mainComponentMass->rigidBody->applyCentralForce(btVector3(-900.0f, 0.0f, 0.0f));
 		if (keyStates[SDLK_w])
-			mainComponentMass->force += glm::vec3(0.0f, 900.0f, 0.0f);
+			mainComponentMass->rigidBody->applyCentralForce(btVector3(0.0f, 900.0f, 0.0f));
 		if (keyStates[SDLK_s])
-			mainComponentMass->force += glm::vec3(0.0f, -900.0f, 0.0f);
+			mainComponentMass->rigidBody->applyCentralForce(btVector3(0.0f, -900.0f, 0.0f));
 	}
 
-	// air friction
-	mainComponentMass->force += (mainComponentMass->velocity * -airFrictionConstant);
-
-	mainComponentMass->updatePhysics(changeInTime);
 }
 
 void PoGuy::doRenderUpdate() {
@@ -231,8 +235,7 @@ void PoGuy::doRenderUpdate() {
 	transformData.clear();
 
 	// model transform: translate, scale, rotate
-	glm::mat4 modelTransform;
-	modelTransform = glm::translate(modelTransform, mainComponentMass->worldPosition);
+	glm::mat4 modelTransform = mainComponentMass->worldTransform;
 	modelTransform = glm::scale(modelTransform, glm::vec3(scalerToMeter, scalerToMeter, 1.0f));
 
 	// view
@@ -245,4 +248,8 @@ void PoGuy::doRenderUpdate() {
 	glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
 	transformData.push_back(transform);
 
+}
+
+PoGuy::~PoGuy() {
+		
 }

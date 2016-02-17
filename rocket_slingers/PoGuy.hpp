@@ -10,12 +10,15 @@ public:
 	void doPhysicalUpdate();
 	void doRenderUpdate();
 	void sdlInputEventCallback(const Event& eventObj);
+	~PoGuy();
 
 private:
 
 	const float scalerToMeter = 0.03936f;
 	bool rocketOn = false;
 	void initGeometry();
+	void initPhysics();
+	void initEventSubsriptions();
 	const float airFrictionConstant = 0.5f;
 	unsigned int soundEffectInstanceId;
 	

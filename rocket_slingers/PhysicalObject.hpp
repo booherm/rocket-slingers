@@ -14,6 +14,7 @@
 #include "PhysicalMass.hpp"
 
 class EventBus;
+class PhysicalMass;
 
 class PhysicalObject : public EventListener {
 public:
@@ -36,6 +37,7 @@ public:
 	std::vector<glm::vec2>* getTextureCoordinateData();
 	std::vector<unsigned int>* getTextures();
 	OglShaderProgram* getShaderProgram();
+	virtual void afterRender();
 
 	// physics
 	PhysicalMass* getMainComponentMass();

@@ -19,6 +19,8 @@ void PhysicalObject::updateRenderState() {
 		doRenderUpdate();
 }
 
+void PhysicalObject::afterRender() {}
+
 std::vector<glm::vec3>* PhysicalObject::getModelVertices() {
 	return &modelVertices;
 }
@@ -112,7 +114,7 @@ void PhysicalObject::initShaders() {
 void PhysicalObject::resetForces() {
 
 	for (auto &mass : componentMasses) {
-		mass.force = glm::vec3();
+		//mass.force = glm::vec3();
 	}
 
 }

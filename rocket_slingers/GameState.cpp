@@ -7,6 +7,7 @@ GameState::GameState() {
 	camera = new Camera(this);
 	physicalObjectRenderer = new PhysicalObjectRenderer();
 	audioManager = new AudioManager();
+	physicsManager = new PhysicsManager();
 	activeStage = new Stage(this);
 
 	frameTimes.resize(fpsFrameRange);
@@ -42,6 +43,7 @@ void GameState::frameEnd() {
 
 GameState::~GameState() {
 	delete activeStage;
+	delete physicsManager;
 	delete audioManager;
 	delete physicalObjectRenderer;
 	delete camera;

@@ -148,6 +148,8 @@ void PhysicalObjectRenderer::render() {
 				glBindBuffer(GL_ARRAY_BUFFER, objectRenderingStructure->transformVbo);
 				glBufferSubData(GL_ARRAY_BUFFER, transformBufferOffset, transformDataSize, transformData->data());
 				transformBufferOffset += transformDataSize;
+
+				po->afterRender();
 			}
 		}
 

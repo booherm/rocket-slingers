@@ -53,7 +53,7 @@ void PoPendulum::initGeometry() {
 }
 
 void PoPendulum::doPhysicalUpdate() {
-
+	/*
 	PhysicalMass* originMass = &componentMasses[0];
 	PhysicalMass* bobMass = &componentMasses[1];
 	bobMass->resetForce();
@@ -75,6 +75,7 @@ void PoPendulum::doPhysicalUpdate() {
 	bobMass->force += bobMass->mass * glm::vec3(0.0f, -9.81f, 0.0f);
 
 	bobMass->updatePhysics(changeInTime);
+	*/
 }
 
 void PoPendulum::doRenderUpdate() {

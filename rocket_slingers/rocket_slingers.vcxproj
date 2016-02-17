@@ -164,6 +164,9 @@
     <ClCompile Include="OglShaderProgram.cpp" />
     <ClCompile Include="PhysicalMass.cpp" />
     <ClCompile Include="PhysicalObject.cpp" />
+    <ClCompile Include="PhysicsManager.cpp" />
+    <ClCompile Include="PoBetterRope.cpp" />
+    <ClCompile Include="PoPhysicsRenderer.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="PhysicalObjectRenderer.cpp" />
     <ClCompile Include="PoAxes.cpp" />
@@ -186,6 +189,9 @@
     <ClInclude Include="OglShaderProgram.hpp" />
     <ClInclude Include="PhysicalMass.hpp" />
     <ClInclude Include="PhysicalObject.hpp" />
+    <ClInclude Include="PhysicsManager.hpp" />
+    <ClInclude Include="PoBetterRope.hpp" />
+    <ClInclude Include="PoPhysicsRenderer.hpp" />
     <ClInclude Include="Stage.hpp" />
     <ClInclude Include="PhysicalObjectRenderer.hpp" />
     <ClInclude Include="PoAxes.hpp" />

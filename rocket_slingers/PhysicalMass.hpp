@@ -3,18 +3,29 @@
 
 #include <glm.hpp>
 #include <vector>
+#include "PhysicsManager.hpp"
+#include "GameState.hpp"
 
-class PhysicalMass {
+class PhysicalMass : public btMotionState {
 public:
-	void connectMasses(PhysicalMass* massToConnectWith);
-	void updatePhysics(float changeInTime);
-	void resetForce();
+
+	void init(GameState* gameState, float mass, const glm::vec3& initialWorldPosition, float collisionShpereRadius);
+	void setWorldTransform(const btTransform& worldTrans); 
+	void getWorldTransform(btTransform& worldTrans) const;
 
 	float mass;
-	glm::vec3 force;
-	glm::vec3 velocity;
+	btRigidBody* rigidBody = nullptr;
+	glm::vec3 initialWorldPosition;
 	glm::vec3 worldPosition;
-	std::vector<PhysicalMass*> connectedPhysicalMasses;
+	glm::mat4 worldTransform;
+
+	~PhysicalMass();
+
+private:
+
+	PhysicsManager* physicsManager;
+	btCollisionShape* collisionShape = nullptr;
+
 };
 
 #endif
