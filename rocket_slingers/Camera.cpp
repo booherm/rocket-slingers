@@ -14,7 +14,7 @@ Camera::Camera(GameState* gameState) {
 	yaw = -glm::half_pi<float>();
 	pitch = 0.0f;
 	front = glm::vec3(0.0f, 0.0f, -1.0f);
-	movementSpeed = 1.0f;
+	movementSpeed = 100.0f;
 	mouseSensitivity = 0.0005f;
 	zoom = 45.0f;   // debug, need radians?
 	updateCameraVectors();
@@ -42,10 +42,10 @@ Camera::Camera(GameState* gameState) {
 	eb->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_DOWN, this);
 }
 
-void Camera::inputEventCallback(const SDL_Event& inputEvent) {
+void Camera::sdlInputEventCallback(const Event& eventObject) {
 
 	// debug - constant time map
-	switch (inputEvent.key.keysym.sym) {
+	switch (eventObject.sdlInputEvent->key.keysym.sym) {
 		case SDLK_LEFT:
 			translateCamera(CT_LEFT);
 			break;

@@ -2,6 +2,9 @@
 #define PHYSICSMANAGER_HPP
 
 #include <btBulletDynamicsCommon.h>
+#include <BulletDynamics/Featherstone/btMultiBodyDynamicsWorld.h>
+#include <BulletDynamics/Featherstone/btMultiBodyConstraintSolver.h>
+#include <BulletDynamics/Featherstone/btMultiBodyLinkCollider.h>
 #include <glm.hpp>
 #include <gtc/type_ptr.hpp>
 
@@ -12,10 +15,12 @@ public:
 	void updatePhysics();
 	~PhysicsManager();
 
-	btDiscreteDynamicsWorld* dynamicsWorld;
+	//btDiscreteDynamicsWorld* dynamicsWorld;
+	btMultiBodyDynamicsWorld*  dynamicsWorld;
 
 	static void glmVec3ToBtVec3(const glm::vec3& glmVector, btVector3& btVector);
 	static void btVec3ToGlmVec3(const btVector3& btVector, glm::vec3& glmVector);
+	static void glmTransformToBtTransform(const glm::mat4& glmTrans, btTransform& btTrans);
 	static void btTransformToGlmTransform(const btTransform& btTrans, glm::mat4& glmTrans);
 
 private:
@@ -23,7 +28,8 @@ private:
 	btBroadphaseInterface* collisionBroadphase;
 	btDefaultCollisionConfiguration* collisionConfiguration;
 	btCollisionDispatcher* collisionDispatcher;
-	btSequentialImpulseConstraintSolver* collisionSolver;
+	//btSequentialImpulseConstraintSolver* constraintSolver;
+	btMultiBodyConstraintSolver* constraintSolver;
 
 
 

@@ -8,8 +8,6 @@ PhysicalObject::PhysicalObject(const std::string& objectType, GameState* gameSta
 	glRenderingMode = GL_TRIANGLES;
 
 	shouldDoPhysicalUpdate = false;
-	changeInTime = 0.0f;
-	maxAllowedChangeInTime = 1.0f;
 }
 
 PhysicalObject::~PhysicalObject() {}
@@ -50,22 +48,9 @@ OglShaderProgram* PhysicalObject::getShaderProgram() {
 }
 
 void PhysicalObject::updatePhysicalState() {
-
 	if (shouldDoPhysicalUpdate) {
-		// Calculate the number of physics iterations required.  Change in time must be sufficiently
-		// small enough not to cause excessive accelerations.  Each physical object can specify its
-		// own maxAllowedChangeInTime value.
-		changeInTime = gameState->fLastFrameTotalTimeSeconds;
-		unsigned int physicsUpdateIterationsRequired = (unsigned int)(changeInTime / maxAllowedChangeInTime) + 1;
-		if (physicsUpdateIterationsRequired != 0) {
-			changeInTime = changeInTime / physicsUpdateIterationsRequired;
-		}
-
-		for (unsigned int i = 0; i < physicsUpdateIterationsRequired; ++i) {
-			doPhysicalUpdate();
-		}
+		doPhysicalUpdate();
 	}
-
 }
 
 void PhysicalObject::sdlInputEventCallback(const Event& eventObj) {}
@@ -109,14 +94,6 @@ void PhysicalObject::initShaders() {
 	shaderProg.createVertexShaderFromSourceString(vertexShaderSource);
 	shaderProg.createFragmentShaderFromSourceString(fragmentShaderSource);
 	shaderProg.build();
-}
-
-void PhysicalObject::resetForces() {
-
-	for (auto &mass : componentMasses) {
-		//mass.force = glm::vec3();
-	}
-
 }
 
 PhysicalMass* PhysicalObject::getMainComponentMass() {

@@ -2,17 +2,25 @@
 #define POPENDULUM_HPP
 
 #include "PhysicalObject.hpp"
+#include "PhysicalMassMultiBody.hpp"
 
 class PoPendulum : public PhysicalObject {
 public:
 	PoPendulum(GameState* gameState);
 	void doRenderUpdate();
 	void sdlInputEventCallback(const Event& eventObj);
+	~PoPendulum();
 
 private:
+
+	float sizeScaler = 5.0f;
+
+	glm::vec3 initialPosition;
 	void doPhysicalUpdate();
 	void initGeometry();
-	unsigned int clickCount = 0;
+	void initPhysics();
+
+	PhysicalMassMultiBody* multiBody;
 };
 
 #endif

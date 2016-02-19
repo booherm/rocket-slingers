@@ -5,6 +5,7 @@
 #include "PoAxes.hpp"
 #include "PoGuy.hpp"
 #include "PoPendulum.hpp"
+#include "PoPendulum2.hpp"
 #include "PoRope.hpp"
 #include "PoPhysicsRenderer.hpp"
 

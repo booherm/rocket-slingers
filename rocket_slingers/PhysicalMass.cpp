@@ -1,42 +1,78 @@
 #include "PhysicalMass.hpp"
 //#include <iostream>
 
-void PhysicalMass::init(GameState* gameState, float mass, const glm::vec3& initialWorldPosition, float collisionShpereRadius) {
-	this->mass = mass;
-	this->initialWorldPosition = initialWorldPosition;
+void PhysicalMass::init(GameState* gameState, float mass, const glm::mat4& worldTransform) {
 	this->physicsManager = gameState->physicsManager;
+	this->mass = mass;
+	this->worldTransform = worldTransform;
 
-	collisionShape = new btSphereShape(collisionShpereRadius);
+	collisionShape = new btCompoundShape();
+}
+
+void PhysicalMass::addCollisionShapeSphere(const glm::mat4& worldTransform, float collisionShpereRadius) {
+
+	btCollisionShape* sphereCollisionShape = new btSphereShape(collisionShpereRadius);
+	addCollisionShape(worldTransform, sphereCollisionShape);
+	
+}
+
+void PhysicalMass::addCollisionShapeBox(const glm::mat4& worldTransform, const glm::vec3& boxExtents) {
+
+	btVector3 boxHalfExtents;
+	PhysicsManager::glmVec3ToBtVec3(boxExtents * 0.5f, boxHalfExtents);
+	btCollisionShape* boxCollisionShape = new btBoxShape(boxHalfExtents);
+	addCollisionShape(worldTransform, boxCollisionShape);
+
+}
+
+void PhysicalMass::addCollisionShape(const glm::mat4& worldTransform, btCollisionShape* collisionShape) {
+
+	collisionShapeComponents.push_back(collisionShape);
+	//this->collisionShape->addChildShape(btTransform::getIdentity(), collisionShape);
+	
+	btTransform worldTransformBt;
+	PhysicsManager::glmTransformToBtTransform(worldTransform, worldTransformBt);
+	this->collisionShape->addChildShape(worldTransformBt, collisionShape);
+
+}
+
+void PhysicalMass::addToDynamicsWorld() {
+
 	btVector3 inertia(0.0f, 0.0f, 0.0f);
 	collisionShape->calculateLocalInertia(mass, inertia);
-	
+//	collisionShape->calculateLocalInertia(0.0f, inertia);
+
 	btRigidBody::btRigidBodyConstructionInfo rigidBodyConstructionInfo(mass, this, collisionShape, inertia);
 	rigidBody = new btRigidBody(rigidBodyConstructionInfo);
-
 	physicsManager->dynamicsWorld->addRigidBody(rigidBody);
+
 }
 
 // called by dynamics world after update only for objects that moved
 void PhysicalMass::setWorldTransform(const btTransform& worldTrans) {
 
-	PhysicsManager::btVec3ToGlmVec3(worldTrans.getOrigin(), worldPosition);
 	PhysicsManager::btTransformToGlmTransform(worldTrans, worldTransform);
 
 }
 
 void PhysicalMass::getWorldTransform(btTransform& worldTrans) const {
 
-	btVector3 initialPosition;
-	PhysicsManager::glmVec3ToBtVec3(initialWorldPosition, initialPosition);
-	worldTrans = btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), initialPosition);
+	PhysicsManager::glmTransformToBtTransform(worldTransform, worldTrans);
 
 }
 
 PhysicalMass::~PhysicalMass() {
 
+	for (unsigned int i = 0; i < collisionShapeComponents.size(); ++i) {
+		delete collisionShapeComponents[i];
+	}
+
 	if (rigidBody != nullptr) {
 		physicsManager->dynamicsWorld->removeRigidBody(rigidBody);
 		delete rigidBody;
+	}
+
+	if (collisionShape != nullptr) {
 		delete collisionShape;
 	}
 

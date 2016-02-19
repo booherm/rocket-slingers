@@ -15,11 +15,13 @@ public:
 private:
 
 	const float scalerToMeter = 0.03936f;
+	glm::vec3 initialPosition;
+	PhysicalMass* physicalMass;
+
 	bool rocketOn = false;
 	void initGeometry();
 	void initPhysics();
 	void initEventSubsriptions();
-	const float airFrictionConstant = 0.5f;
 	unsigned int soundEffectInstanceId;
 	
 	unsigned int keyDownCount;

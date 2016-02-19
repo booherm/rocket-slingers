@@ -13,7 +13,7 @@ public:
 	Camera(GameState* gameState);
 	glm::mat4 getViewTransform();
 	glm::mat4 getProjectionTransform();
-	void inputEventCallback(const SDL_Event& inputEvent);
+	void Camera::sdlInputEventCallback(const Event& eventObject);
 
 private:
 	enum CameraTranslation {

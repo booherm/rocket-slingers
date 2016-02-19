@@ -8,6 +8,7 @@ PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
 
 	shouldRender = true;
 	
+
 	keyDownCount = 0;
 	keyStates[SDLK_w] = false;
 	keyStates[SDLK_s] = false;
@@ -206,15 +207,35 @@ void PoGuy::initGeometry() {
 
 void PoGuy::initPhysics() {
 
-	componentMasses.resize(1);
-	componentMasses[0].init(gameState, 62.0f, glm::vec3(10.0f, 10.0f, 0.0f), 1.0f);
-	mainComponentMass = &componentMasses[0];
+	initialPosition = glm::vec3(5.0f, 15.0f, 0.0f);
+	glm::mat4 worldTransform;
+	worldTransform = glm::translate(worldTransform, initialPosition);
+
+	glm::mat4 localTransform;
+	//armLocalTransform = glm::translate(armLocalTransform, glm::vec3(0.0f, -0.4f * sizeScaler, 0.0f));
+
+
+	physicalMass = new PhysicalMass();
+	physicalMass->init(gameState, 62.0f, worldTransform);
+	physicalMass->addCollisionShapeSphere(localTransform, 1.0f);
+	physicalMass->addToDynamicsWorld();
+
 	shouldDoPhysicalUpdate = true;
+
+
+	/*
+	componentMasses.resize(1);
+	mainComponentMass = &componentMasses[0];
+	mainComponentMass->init(gameState, 62.0f, glm::vec3(10.0f, 10.0f, 0.0f), 1.0f);
+	shouldDoPhysicalUpdate = true;
+	*/
+
 
 }
 
 void PoGuy::doPhysicalUpdate() {
 
+	/*
 	// rocket force
 	if (rocketOn) {
 		mainComponentMass->rigidBody->activate();
@@ -227,6 +248,20 @@ void PoGuy::doPhysicalUpdate() {
 		if (keyStates[SDLK_s])
 			mainComponentMass->rigidBody->applyCentralForce(btVector3(0.0f, -900.0f, 0.0f));
 	}
+	*/
+
+	// rocket force
+	if (rocketOn) {
+		physicalMass->rigidBody->activate();
+		if (keyStates[SDLK_d])
+			physicalMass->rigidBody->applyCentralForce(btVector3(900.0f, 0.0f, 0.0f));
+		if (keyStates[SDLK_a])
+			physicalMass->rigidBody->applyCentralForce(btVector3(-900.0f, 0.0f, 0.0f));
+		if (keyStates[SDLK_w])
+			physicalMass->rigidBody->applyCentralForce(btVector3(0.0f, 900.0f, 0.0f));
+		if (keyStates[SDLK_s])
+			physicalMass->rigidBody->applyCentralForce(btVector3(0.0f, -900.0f, 0.0f));
+	}
 
 }
 
@@ -235,7 +270,7 @@ void PoGuy::doRenderUpdate() {
 	transformData.clear();
 
 	// model transform: translate, scale, rotate
-	glm::mat4 modelTransform = mainComponentMass->worldTransform;
+	glm::mat4 modelTransform = physicalMass->worldTransform;
 	modelTransform = glm::scale(modelTransform, glm::vec3(scalerToMeter, scalerToMeter, 1.0f));
 
 	// view
@@ -250,6 +285,7 @@ void PoGuy::doRenderUpdate() {
 
 }
 
+
 PoGuy::~PoGuy() {
-		
+	delete physicalMass;
 }

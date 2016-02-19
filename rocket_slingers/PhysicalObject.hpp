@@ -62,9 +62,6 @@ protected:
 	// physics
 	virtual void doPhysicalUpdate();
 	bool shouldDoPhysicalUpdate;
-	void resetForces();
-	float changeInTime;
-	float maxAllowedChangeInTime;
 	PhysicalMass* mainComponentMass;
 	std::vector<PhysicalMass> componentMasses;
 };

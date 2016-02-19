@@ -3,8 +3,8 @@
 #include <gtc/type_ptr.hpp>
 
 PoBackground::PoBackground(GameState* gameState) : PhysicalObject("PO_BACKGROUND", gameState) {
-	initGeometry();
 	initShaders();
+	initGeometry();
 	shouldRender = true;
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
 }

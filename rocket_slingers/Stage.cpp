@@ -6,6 +6,7 @@ Stage::Stage(GameState* gameState) {
 	stageObjects.push_back(new PoAxes(gameState));
 	stageObjects.push_back(new PoGuy(gameState));
 	stageObjects.push_back(new PoPendulum(gameState));
+	//stageObjects.push_back(new PoPendulum2(gameState));
 	stageObjects.push_back(new PoRope(gameState));
 
 	stageObjects.push_back(new PoPhysicsRenderer(gameState));

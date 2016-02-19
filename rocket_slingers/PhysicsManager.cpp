@@ -6,10 +6,13 @@ PhysicsManager::PhysicsManager(){
 	collisionBroadphase = new btDbvtBroadphase();
 	collisionConfiguration = new btDefaultCollisionConfiguration();
 	collisionDispatcher = new btCollisionDispatcher(collisionConfiguration);
-	collisionSolver = new btSequentialImpulseConstraintSolver;
+	//constraintSolver = new btSequentialImpulseConstraintSolver;
+	constraintSolver = new btMultiBodyConstraintSolver;
 
-	dynamicsWorld = new btDiscreteDynamicsWorld(collisionDispatcher, collisionBroadphase, collisionSolver, collisionConfiguration);
+	//dynamicsWorld = new btDiscreteDynamicsWorld(collisionDispatcher, collisionBroadphase, constraintSolver, collisionConfiguration);
+	dynamicsWorld = new btMultiBodyDynamicsWorld(collisionDispatcher, collisionBroadphase, constraintSolver, collisionConfiguration);
 	dynamicsWorld->setGravity(btVector3(0.0f, -9.81f, 0.0f));
+//	dynamicsWorld->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 
 
 	// for test
@@ -41,7 +44,14 @@ PhysicsManager::PhysicsManager(){
 
 void PhysicsManager::setDebugRenderer(btIDebugDraw* debugRenderer) {
 	dynamicsWorld->setDebugDrawer(debugRenderer);
-	dynamicsWorld->getDebugDrawer()->setDebugMode(1);
+//	dynamicsWorld->getDebugDrawer()->setDebugMode(1);
+
+	dynamicsWorld->getDebugDrawer()->setDebugMode(
+		btIDebugDraw::DBG_DrawConstraints
+		+ btIDebugDraw::DBG_DrawWireframe
+		+ btIDebugDraw::DBG_DrawContactPoints
+		+ btIDebugDraw::DBG_DrawAabb
+		+ btIDebugDraw::DBG_DrawConstraintLimits);
 }
 
 void PhysicsManager::updatePhysics() {
@@ -73,7 +83,7 @@ PhysicsManager::~PhysicsManager() {
 	delete ceilingShape;
 
 	delete dynamicsWorld;
-	delete collisionSolver;
+	delete constraintSolver;
 	delete collisionConfiguration;
 	delete collisionDispatcher;
 	delete collisionBroadphase;
@@ -88,6 +98,10 @@ void PhysicsManager::btVec3ToGlmVec3(const btVector3& btVector, glm::vec3& glmVe
 	glmVector.x = btVector.x();
 	glmVector.y = btVector.y();
 	glmVector.z = btVector.z();
+}
+
+void PhysicsManager::glmTransformToBtTransform(const glm::mat4& glmTrans, btTransform& btTrans) {
+	btTrans.setFromOpenGLMatrix(glm::value_ptr(glmTrans));
 }
 
 void PhysicsManager::btTransformToGlmTransform(const btTransform& btTrans, glm::mat4& glmTrans) {

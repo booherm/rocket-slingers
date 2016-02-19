@@ -4,7 +4,7 @@ PoRope::PoRope(GameState* gameState) : PhysicalObject("PO_ROPE", gameState) {
 	initGeometry();
 	initShaders();
 
-	maxAllowedChangeInTime = 0.002f;
+//	maxAllowedChangeInTime = 0.002f;
 	this->glRenderingMode = GL_LINES;
 
 	//gameState->eventBus->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_LEFT, this);
@@ -13,7 +13,7 @@ PoRope::PoRope(GameState* gameState) : PhysicalObject("PO_ROPE", gameState) {
 }
 
 void PoRope::gameEventCallback(const Event& eventObj) {
-
+	/*
 	// determine rope anchor and termination coordinates
 	float worldX = eventObj.eventWorldCoordinateX;
 	float worldY = eventObj.eventWorldCoordinateY;
@@ -54,11 +54,13 @@ void PoRope::gameEventCallback(const Event& eventObj) {
 	shouldDoPhysicalUpdate = true;
 
 	gameState->audioManager->playSoundEffect(AudioManager::SoundEffectId::WHIP, 0);
+	*/
 
 }
 
 void PoRope::sdlInputEventCallback(const Event& eventObj){
 	
+	/*
 	// determine rope anchor and termination coordinates
 	float worldX = eventObj.eventWorldCoordinateX;
 	float worldY = eventObj.eventWorldCoordinateY;
@@ -94,6 +96,8 @@ void PoRope::sdlInputEventCallback(const Event& eventObj){
 	shouldDoPhysicalUpdate = true;
 
 	gameState->audioManager->playSoundEffect(AudioManager::SoundEffectId::WHIP, 0);
+	*/
+
 }
 
 void PoRope::initGeometry() {
@@ -184,7 +188,7 @@ void PoRope::doPhysicalUpdate() {
 }
 
 void PoRope::doRenderUpdate() {
-
+	/*
 	transformData.clear();
 	for (unsigned int massIndex = 0; massIndex < ropeMassCount - 1; massIndex++) {
 		PhysicalMass* thisMass = &componentMasses[massIndex];
@@ -219,4 +223,6 @@ void PoRope::doRenderUpdate() {
 
 		transformData.push_back(transform);
 	}
+	*/
+
 }

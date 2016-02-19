@@ -1,8 +1,8 @@
 #include "PoAxes.hpp"
 
 PoAxes::PoAxes(GameState* gameState) : PhysicalObject("PO_AXES", gameState) {
-	initGeometry();
 	initShaders();
+	initGeometry();
 	initRenderData();
 
 	shouldRender = true;
