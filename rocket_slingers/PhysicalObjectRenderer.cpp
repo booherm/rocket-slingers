@@ -126,12 +126,14 @@ void PhysicalObjectRenderer::render() {
 			PhysicalObject* po = objectTypeIterator->second.objectInstances[instanceIndex];
 
 			if (po->shouldRender) {
+
 				// buffer model origin offset data
 				std::vector<glm::vec3>* modelOriginOffsetData = po->getModelOriginOffsetData();
 				unsigned int modelOriginOffsetDataSize = sizeof(glm::vec3) * modelOriginOffsetData->size();
 				glBindBuffer(GL_ARRAY_BUFFER, objectRenderingStructure->modelOriginOffsetVbo);
 				glBufferSubData(GL_ARRAY_BUFFER, modelOriginOffsetBufferOffset, modelOriginOffsetDataSize, modelOriginOffsetData->data());
 				modelOriginOffsetBufferOffset += modelOriginOffsetDataSize;
+				abortOnOpenGlError();
 
 				// buffer color data
 				std::vector<glm::vec4>* colorData = po->getColorData();
@@ -139,6 +141,7 @@ void PhysicalObjectRenderer::render() {
 				glBindBuffer(GL_ARRAY_BUFFER, objectRenderingStructure->colorVbo);
 				glBufferSubData(GL_ARRAY_BUFFER, colorBufferOffset, colorDataSize, colorData->data());
 				colorBufferOffset += colorDataSize;
+				abortOnOpenGlError();
 
 				// buffer transform data
 				std::vector<glm::mat4>* transformData = po->getTransformData();
@@ -148,6 +151,7 @@ void PhysicalObjectRenderer::render() {
 				glBindBuffer(GL_ARRAY_BUFFER, objectRenderingStructure->transformVbo);
 				glBufferSubData(GL_ARRAY_BUFFER, transformBufferOffset, transformDataSize, transformData->data());
 				transformBufferOffset += transformDataSize;
+				abortOnOpenGlError();
 
 				po->afterRender();
 			}
@@ -165,12 +169,25 @@ void PhysicalObjectRenderer::render() {
 		glBindVertexArray(objectRenderingStructure->masterVao);
 		glDrawArraysInstanced(objectRenderingStructure->glRenderingMode, 0, objectRenderingStructure->modelVerticesCount, componentsToRenderCount);
 
+		abortOnOpenGlError();
+
+
 		objectTypeIterator++;
 	}
 
 	GLenum openGlErrorCode = glGetError();
-	if (openGlErrorCode != GL_NO_ERROR)
+	if (openGlErrorCode != GL_NO_ERROR) {
+		std::cout << "opengl error: " << openGlErrorCode << std::endl;
 		throw "PhysicalObjectRenderer::render - OpenGL error: " + openGlErrorCode;
+	}
+}
+
+void PhysicalObjectRenderer::abortOnOpenGlError() {
+	GLenum openGlErrorCode = glGetError();
+	if (openGlErrorCode != GL_NO_ERROR) {
+		std::cout << "opengl error: " << openGlErrorCode << std::endl;
+		throw "PhysicalObjectRenderer::render - OpenGL error: " + openGlErrorCode;
+	}
 }
 
 PhysicalObjectRenderer::~PhysicalObjectRenderer() {

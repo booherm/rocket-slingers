@@ -13,7 +13,9 @@ public:
 	Camera(GameState* gameState);
 	glm::mat4 getViewTransform();
 	glm::mat4 getProjectionTransform();
-	void Camera::sdlInputEventCallback(const Event& eventObject);
+	void sdlInputEventCallback(const Event& eventObject);
+	void updatePosition(const glm::vec3& position);
+	void getPosition(glm::vec3& position);
 
 private:
 	enum CameraTranslation {

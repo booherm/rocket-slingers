@@ -96,9 +96,5 @@ void PhysicalObject::initShaders() {
 	shaderProg.build();
 }
 
-PhysicalMass* PhysicalObject::getMainComponentMass() {
-	return mainComponentMass;
-}
-
 void PhysicalObject::doPhysicalUpdate() {}
 void PhysicalObject::doRenderUpdate() {}

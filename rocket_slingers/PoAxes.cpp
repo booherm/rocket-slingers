@@ -51,4 +51,20 @@ void PoAxes::initRenderData() {
 	modelZ = glm::rotate(modelZ, -glm::half_pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
 	modelZ = glm::scale(modelZ, glm::vec3(zMax - zMin, 1.0f, 1.0f));
 	pushAxisTransform(modelZ);
+
+	// x minor ticks
+	float xTotal = abs(xMin) + abs(xMax);
+	unsigned int xMinorTickCount = (unsigned int) (xTotal / xMinorTickInterval);
+	unsigned int xMajorTickCount = (unsigned int) (xTotal / xMajorTickInterval);
+	float tickLocation = 0.25f;// xMin;
+	for (unsigned int i = 0; i < xMinorTickCount; ++i) {
+		glm::mat4 tick;
+		tick = glm::translate(tick, glm::vec3(tickLocation, yMin, 0.0f));
+		tick = glm::rotate(tick, -glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
+		tick = glm::scale(tick, glm::vec3(yMax - yMin, 1.0f, 1.0f));
+		tickLocation += xMinorTickInterval;
+		colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 0.25f));
+		colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 0.25f));
+		pushAxisTransform(tick);
+	}
 }

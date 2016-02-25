@@ -15,6 +15,13 @@ private:
 	const float zMin = 0.0f;
 	const float zMax = 0.0f;
 
+	const float xMinorTickInterval = 1.0f;
+	const float xMajorTickInterval = 5.0f;
+	const float yMinorTickInterval = 1.0f;
+	const float yMajorTickInterval = 5.0f;
+	const float zMinorTickInterval = 1.0f;
+	const float zMajorTickInterval = 5.0f;
+
 	void initGeometry();
 	void initRenderData();
 	void pushAxisTransform(glm::mat4 model);

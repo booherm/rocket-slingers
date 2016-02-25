@@ -7,12 +7,22 @@
 #include <BulletDynamics/Featherstone/btMultiBodyLinkCollider.h>
 #include <glm.hpp>
 #include <gtc/type_ptr.hpp>
+#include <map>
 
 class PhysicsManager {
 public:
+
+	enum CollisionGroup {
+		NO_COLLISION = 0,
+		ROPE_MASS    = 1,
+		PLAYER       = 2,
+		BOUNDARY     = 4
+	};
+
 	PhysicsManager();
 	void setDebugRenderer(btIDebugDraw* debugRenderer);
 	void updatePhysics();
+	unsigned int getCollisionGroupInteractions(CollisionGroup collisionGroup);
 	~PhysicsManager();
 
 	//btDiscreteDynamicsWorld* dynamicsWorld;
@@ -24,6 +34,8 @@ public:
 	static void btTransformToGlmTransform(const btTransform& btTrans, glm::mat4& glmTrans);
 
 private:
+
+	std::map<CollisionGroup, unsigned int> collisionGroupInteractions;
 
 	btBroadphaseInterface* collisionBroadphase;
 	btDefaultCollisionConfiguration* collisionConfiguration;

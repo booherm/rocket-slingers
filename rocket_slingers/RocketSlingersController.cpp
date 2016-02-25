@@ -5,7 +5,6 @@
 RocketSlingersController::RocketSlingersController() {
 	initSdl();
 	gameState = new GameState();
-//	gameState->audioManager->playTest();
 }
 
 void RocketSlingersController::initSdl() {

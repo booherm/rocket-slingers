@@ -11,12 +11,13 @@ int WINAPI WinMain(HINSTANCE hInstance,	HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		RocketSlingersController rsc;
 		rsc.start();
+
 		std::cout << "Exiting Rocket Slingers" << std::endl;
 	}
 	catch (std::string e) {
 		std::cout << "Exception: " << e << std::endl;
+		system("pause");
 	}
 
-	system("pause");
 	return 0;
 }

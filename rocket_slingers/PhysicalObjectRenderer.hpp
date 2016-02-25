@@ -32,6 +32,7 @@ private:
 
 	std::map<std::string, RenderingStructure> renderableMapping;
 	unsigned int objectIdCounter;
+	void abortOnOpenGlError();
 };
 
 #endif

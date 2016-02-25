@@ -12,11 +12,11 @@ PoBackground::PoBackground(GameState* gameState) : PhysicalObject("PO_BACKGROUND
 void PoBackground::initGeometry() {
 
 	modelVertices.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-	modelVertices.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
-	modelVertices.push_back(glm::vec3(1.0f, 1.0f, 0.0f));
+	modelVertices.push_back(glm::vec3(5.0f, 0.0f, 0.0f));
+	modelVertices.push_back(glm::vec3(5.0f, 5.0f, 0.0f));
 	modelVertices.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-	modelVertices.push_back(glm::vec3(1.0f, 1.0f, 0.0f));
-	modelVertices.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+	modelVertices.push_back(glm::vec3(5.0f, 5.0f, 0.0f));
+	modelVertices.push_back(glm::vec3(0.0f, 5.0f, 0.0f));
 
 	colorData.push_back(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
@@ -25,13 +25,16 @@ void PoBackground::initGeometry() {
 	colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 	colorData.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
+	
 	textureCoordinateData.push_back(glm::vec2(0.0f, 0.0f));
 	textureCoordinateData.push_back(glm::vec2(1.0f, 0.0f));
 	textureCoordinateData.push_back(glm::vec2(1.0f, 1.0f));
 	textureCoordinateData.push_back(glm::vec2(0.0f, 0.0f));
 	textureCoordinateData.push_back(glm::vec2(1.0f, 1.0f));
 	textureCoordinateData.push_back(glm::vec2(0.0f, 1.0f));
+	
 
+	
 
 	glGenTextures(1, &texture1);
 	glBindTexture(GL_TEXTURE_2D, texture1); // All upcoming GL_TEXTURE_2D operations now have effect on our texture object
@@ -50,6 +53,26 @@ void PoBackground::initGeometry() {
 	glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done, so we won't accidentily mess up our texture.
 
 	textures.push_back(texture1);
+
+
+
+
+
+	transformData.clear();
+
+	// transform
+	glm::mat4 modelTransform;
+	//modelTransform = glm::scale(modelTransform, glm::vec3(gameState->worldViewportScaler * gameState->aspectRatio, gameState->worldViewportScaler, 1.0f));
+
+	// view
+	glm::mat4 viewTransform = gameState->camera->getViewTransform();
+
+	// projection
+	glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
+
+	// combine transform
+	glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
+	transformData.push_back(transform);
 
 	std::cout << "background init geometry" << std::endl;
 

@@ -95,7 +95,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;SOIL.lib;SDL2.lib;SDL2_mixer.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;LinearMath_Debug.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;SOIL.lib;SDL2.lib;SDL2_mixer.lib;BulletDynamics.lib;BulletCollision.lib;LinearMath.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>external\bullet3-2.83.7\lib\Debug;external\SDL2_mixer-2.0.1\lib\x86;external\glew-1.13.0\lib\Release\Win32;external\SDL2-2.0.4\lib\x86;external\soil-1.16\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -170,6 +170,8 @@
     <ClCompile Include="PoBetterRope.cpp" />
     <ClCompile Include="PoPendulum2.cpp" />
     <ClCompile Include="PoPhysicsRenderer.cpp" />
+    <ClCompile Include="PoReticule.cpp" />
+    <ClCompile Include="PoRigidBodyRope.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="PhysicalObjectRenderer.cpp" />
     <ClCompile Include="PoAxes.cpp" />
@@ -197,6 +199,8 @@
     <ClInclude Include="PoPendulum2.hpp" />
     <ClInclude Include="PoPendulum.hpp" />
     <ClInclude Include="PoPhysicsRenderer.hpp" />
+    <ClInclude Include="PoReticule.hpp" />
+    <ClInclude Include="PoRigidBodyRope.hpp" />
     <ClInclude Include="Stage.hpp" />
     <ClInclude Include="PhysicalObjectRenderer.hpp" />
     <ClInclude Include="PoAxes.hpp" />

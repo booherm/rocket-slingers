@@ -8,6 +8,10 @@ AudioManager::AudioManager() {
 
 	channels.resize(maxChannels, 0);
 
+
+	musicTracks.resize(MUSIC_TRACK_LAST);
+	musicTracks[DRIPPY_EYE] = "c:\\1\\drippy_eye.mp3";
+
 	soundEffects.resize(SOUND_EFFECT_LAST);
 	soundEffects[BIG_ROPE_CREEK] = { "c:\\1\\big_rope_creek.wav" };
 	soundEffects[ROPE_PULL]      = { "c:\\1\\rope_pull.wav" };
@@ -21,9 +25,9 @@ AudioManager::AudioManager() {
 	}
 }
 
-void AudioManager::playTest() {
+void AudioManager::playMusicTrack(MusicTrackId musicTrackId) {
 	Mix_VolumeMusic(32);
-	Mix_Music *music = Mix_LoadMUS("c:\\1\\drippy_eye.mp3");
+	Mix_Music *music = Mix_LoadMUS(musicTracks[musicTrackId].c_str());
 	Mix_PlayMusic(music, -1);
 }
 

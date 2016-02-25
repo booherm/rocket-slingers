@@ -24,7 +24,7 @@ void PoPendulum2::initPhysics() {
 	baseLocaltransform = glm::translate(baseLocaltransform, glm::vec3(0.0f, -0.9f * sizeScaler, 0.0f));
 
 	physicalMass = new PhysicalMass();
-	physicalMass->init(gameState, 500.0f, worldTransform);
+	physicalMass->init(gameState, 500.0f, worldTransform, PhysicsManager::CollisionGroup::NO_COLLISION);
 	physicalMass->addCollisionShapeBox(armLocalTransform, glm::vec3(0.06666666f, 0.8f, 0.0f) * sizeScaler);
 	physicalMass->addCollisionShapeBox(baseLocaltransform, glm::vec3(0.6f, 0.2f, 0.0f) * sizeScaler);
 	physicalMass->addToDynamicsWorld();

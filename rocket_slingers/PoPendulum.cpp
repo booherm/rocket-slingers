@@ -1,6 +1,6 @@
 #include "PoPendulum.hpp"
 
-PoPendulum::PoPendulum(GameState* gameState) : PhysicalObject("PO_PENDULUM3", gameState) {
+PoPendulum::PoPendulum(GameState* gameState) : PhysicalObject("PO_PENDULUM", gameState) {
 	initShaders();
 	initGeometry();
 	initPhysics();
@@ -13,14 +13,14 @@ void PoPendulum::sdlInputEventCallback(const Event& eventObj) {
 
 void PoPendulum::initPhysics() {
 
-	initialPosition = glm::vec3(25.0f, 15.0f, 0.0f);
+	initialPosition = glm::vec3(31.0f, 15.0f, 0.0f);
 	glm::mat4 worldTransform;
 	worldTransform = glm::translate(worldTransform, initialPosition);
 
 	multiBody = new PhysicalMassMultiBody;
 	multiBody->init(gameState, 0.0f, worldTransform);
-	multiBody->pushMass(5.0f, glm::vec3(0.0f, -5.0f, 0.0f));
-//	multiBody->pushMass(5.0f, glm::vec3(0.0f, -5.0f, 0.0f));
+	multiBody->pushMass(5.0f, glm::vec3(0.0f, -5.0f, 0.0f), true, 0.05f, 1, 4);
+	multiBody->pushMass(0.00000001f, glm::vec3(0.0f, -5.0f, 0.0f), false, 0.05f, 1, 4);
 	multiBody->addToDynamicsWorld();
 
 }
@@ -66,7 +66,7 @@ void PoPendulum::doRenderUpdate() {
 	modelTransform = glm::translate(modelTransform, initialPosition);
 	modelTransform = glm::scale(modelTransform, glm::vec3(sizeScaler, sizeScaler, 1.0f));
 
-	glm::quat rotationQuaternion = glm::angleAxis(multiBody->getPivotPosition(0), glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::quat rotationQuaternion = glm::angleAxis(multiBody->getPivotAngle(0), glm::vec3(0.0f, 0.0f, 1.0f));
 	modelTransform = modelTransform * glm::toMat4(rotationQuaternion);
 
 	// view
@@ -78,6 +78,10 @@ void PoPendulum::doRenderUpdate() {
 	// combine transform
 	glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
 	transformData.push_back(transform);
+
+
+	
+
 }
 
 PoPendulum::~PoPendulum() {

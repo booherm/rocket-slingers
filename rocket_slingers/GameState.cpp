@@ -34,7 +34,7 @@ void GameState::frameEnd() {
 		dFramesPerSecond = fpsFrameRange / totalTime;
 		fFramesPerSecond = (float) dFramesPerSecond;
 		fpsIterationCounter = 0;
-		//cout << "fps = " << framesPerSecond << endl;
+		//std::cout << "fps = " << fFramesPerSecond << std::endl;
 	}
 	else {
 		frameTimes[fpsIterationCounter++] = dLastFrameTotalTimeSeconds;

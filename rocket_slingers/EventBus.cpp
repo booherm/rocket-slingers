@@ -72,26 +72,54 @@ void EventBus::subscribeToGameEvent(Event::GameEvent gameEvent, EventListener* s
 
 bool EventBus::processInput() {
 
+	unsigned int i = 0;
+
 	SDL_Event inputEvent;
-	while (SDL_PollEvent(&inputEvent)) {
-		if (inputEvent.type == SDL_KEYDOWN && inputEvent.key.keysym.sym == SDLK_ESCAPE) {
+	while (SDL_PollEvent(&inputEvent) == 1) {
+		if (inputEvent.type == SDL_KEYDOWN && inputEvent.key.keysym.sym == SDLK_ESCAPE) { // debug, change this to a shutdown event listener
 			return false;
 		}
 		else
 		{
-			Event e;
-			e.eventType = sdlEventTypeMapping[inputEvent.type];
-			if (e.eventType == Event::EventType::NULL_EVENT || inputEvent.key.repeat != 0)  // some input we don't care about, exit
-				return true;
+			Event::EventType eventType = sdlEventTypeMapping[inputEvent.type];
+			if (eventType == Event::EventType::NULL_EVENT)
+				break;
 
+			if (inputEvent.key.repeat != 0)  // some input we don't care about, exit
+				break;
+
+			Event e;
+			e.eventType = eventType;
+
+
+//			if (inputEvent.key.keysym.sym != SDLK_w && inputEvent.type == SDL_KEYDOWN && inputEvent.key.repeat != 0) {
+//				std::cout << "key repeat" << std::endl;
+//			}
+
+			//if (e.eventType == Event::EventType::NULL_EVENT || (inputEvent.type == SDL_KEYDOWN && inputEvent.key.repeat != 0))  // some input we don't care about, exit
+
+
+			glm::vec3 cameraPosition;
+			gameState->camera->getPosition(cameraPosition);
 			e.sdlInputEvent = &inputEvent;
 			e.eventPoster = nullptr;
-			e.eventWorldCoordinateX = (float) inputEvent.button.x * screenToWorldCoordinateScalerX;
-			e.eventWorldCoordinateY = gameState->worldViewportScaler - ((float) inputEvent.button.y * screenToWorldCoordinateScalerY);
+			e.eventWorldCoordinateX = ((float) inputEvent.button.x * screenToWorldCoordinateScalerX) + cameraPosition.x;
+			e.eventWorldCoordinateY = (gameState->worldViewportScaler - ((float) inputEvent.button.y * screenToWorldCoordinateScalerY)) + cameraPosition.y;
+
+//			if (e.eventType == Event::EventType::SDL_MOUSE_BUTTON) {
+	//			std::cout << "got mouse button" << std::endl;
+				//std::cout << "calling subsribers to event type: " << e.eventType << " " << e.sdlInputEvent->button.button << std::endl;
+		//	}
 
 			callSubscribers(e);
+			i++;
+
 		}
+
 	}
+
+	if(i != 0)
+		std::cout << "Processed inputs: " << i << std::endl;
 
 	return true;
 }

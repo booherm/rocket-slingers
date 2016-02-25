@@ -1,10 +1,11 @@
 #include "PhysicalMass.hpp"
 //#include <iostream>
 
-void PhysicalMass::init(GameState* gameState, float mass, const glm::mat4& worldTransform) {
+void PhysicalMass::init(GameState* gameState, float mass, const glm::mat4& worldTransform, PhysicsManager::CollisionGroup collisionGroup) {
 	this->physicsManager = gameState->physicsManager;
 	this->mass = mass;
 	this->worldTransform = worldTransform;
+	this->collisionGroup = collisionGroup;
 
 	collisionShape = new btCompoundShape();
 }
@@ -40,12 +41,17 @@ void PhysicalMass::addToDynamicsWorld() {
 
 	btVector3 inertia(0.0f, 0.0f, 0.0f);
 	collisionShape->calculateLocalInertia(mass, inertia);
-//	collisionShape->calculateLocalInertia(0.0f, inertia);
 
 	btRigidBody::btRigidBodyConstructionInfo rigidBodyConstructionInfo(mass, this, collisionShape, inertia);
 	rigidBody = new btRigidBody(rigidBodyConstructionInfo);
-	physicsManager->dynamicsWorld->addRigidBody(rigidBody);
+//	physicsManager->dynamicsWorld->addRigidBody(rigidBody);
+	physicsManager->dynamicsWorld->addRigidBody(rigidBody, collisionGroup, physicsManager->getCollisionGroupInteractions(collisionGroup));
+	
+}
 
+void PhysicalMass::getCenterOfMassPosition(glm::vec3& position) {
+	btVector3 something = rigidBody->getWorldTransform().getOrigin();
+	PhysicsManager::btVec3ToGlmVec3(something, position);
 }
 
 // called by dynamics world after update only for objects that moved

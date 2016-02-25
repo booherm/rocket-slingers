@@ -6,9 +6,6 @@ PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
 	initPhysics();
 	initEventSubsriptions();
 
-	shouldRender = true;
-	
-
 	keyDownCount = 0;
 	keyStates[SDLK_w] = false;
 	keyStates[SDLK_s] = false;
@@ -18,7 +15,6 @@ PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
 }
 
 void PoGuy::initEventSubsriptions() {
-	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_g, this);
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_w, this);
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_s, this);
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_a, this);
@@ -28,43 +24,65 @@ void PoGuy::initEventSubsriptions() {
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_a, this);
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_d, this);
 	gameState->eventBus->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_LEFT, this);
+	gameState->eventBus->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_RIGHT, this);
 }
 
 void PoGuy::sdlInputEventCallback(const Event& eventObj) {
 
-	if (eventObj.sdlInputEvent->key.keysym.sym == SDLK_g) {
-		//((PhysicalMass*) &componentMasses[0])->worldPosition = glm::vec3(10.0f, 10.0f, 0.0f);
-	}
-	else if (eventObj.eventType == Event::EventType::SDL_MOUSE_BUTTON) {
+	if (eventObj.eventType == Event::EventType::SDL_MOUSE_BUTTON) {
 
-		Event myEvent;
-		myEvent.eventPoster = this;
-		myEvent.eventType = Event::EventType::GAME_EVENT;
-		myEvent.gameEvent = Event::GameEvent::THROW_ROPE;
-		myEvent.eventWorldCoordinateX = eventObj.eventWorldCoordinateX;
-		myEvent.eventWorldCoordinateY = eventObj.eventWorldCoordinateY;
-		gameState->eventBus->postEvent(myEvent);
+		if (eventObj.sdlInputEvent->button.button == SDL_BUTTON_LEFT) {
+	
+			// throw rope
+			Event deployRopeEvent;
+			deployRopeEvent.eventPoster = this;
+			deployRopeEvent.eventType = Event::EventType::GAME_EVENT;
+			deployRopeEvent.gameEvent = Event::GameEvent::THROW_ROPE;
+			deployRopeEvent.eventWorldCoordinateX = eventObj.eventWorldCoordinateX;
+			deployRopeEvent.eventWorldCoordinateY = eventObj.eventWorldCoordinateY;
+			gameState->eventBus->postEvent(deployRopeEvent);
+			ropeThrown = true;
 
+		} else {
+
+			// right mouse button - release rope
+			Event releaseRopeEvent;
+			releaseRopeEvent.eventPoster = this;
+			releaseRopeEvent.eventType = Event::EventType::GAME_EVENT;
+			releaseRopeEvent.gameEvent = Event::GameEvent::RELEASE_ROPE;
+			releaseRopeEvent.eventWorldCoordinateX = eventObj.eventWorldCoordinateX;
+			releaseRopeEvent.eventWorldCoordinateY = eventObj.eventWorldCoordinateY;
+			gameState->eventBus->postEvent(releaseRopeEvent);
+			ropeThrown = false;
+
+		}
 	}
 	else {
 		if (eventObj.sdlInputEvent->key.state == SDL_PRESSED) {
 
+			// log key down state
 			keyStates[eventObj.sdlInputEvent->key.keysym.sym] = true;
 			keyDownCount++;
 
+			// turn on rocket and play sound effect if it is not alreay on
 			if (!rocketOn) {
 				rocketOn = true;
 				soundEffectInstanceId = gameState->audioManager->playSoundEffect(AudioManager::SoundEffectId::ROCKET_RUMBLE, -1);
 			}
+
 		}
 		else {
-			
+
+			// log key up state
 			keyStates[eventObj.sdlInputEvent->key.keysym.sym] = false;
 			keyDownCount--;
+
+			// if no keys are down, stop rocket
 			if (keyDownCount == 0) {
 				gameState->audioManager->stopSoundEffect(soundEffectInstanceId);
 				rocketOn = false;
 			}
+
 		}
 	}
 }
@@ -133,61 +151,62 @@ void PoGuy::initGeometry() {
 	};
 
 	unsigned int guyModelTriangleVertexIds[53][3] = {
-		{ 0,41,1 },
-		{ 41,2,1 },
-		{ 41,4,2 },
-		{ 2,4,3 },
-		{ 40,39,41 },
-		{ 41,39,4 },
-		{ 39,36,4 },
-		{ 39,38,36 },
-		{ 38,37,36 },
-		{ 5,42,43 },
-		{ 5,43,44 },
-		{ 5,44,6 },
-		{ 6,44,7 },
-		{ 44,45,7 },
-		{ 7,45,8 },
-		{ 45,46,8 },
-		{ 8,46,9 },
-		{ 9,46,10 },
-		{ 46,47,10 },
-		{ 10,47,11 },
-		{ 11,47,48 },
-		{ 11,48,12 },
-		{ 48,49,12 },
-		{ 49,32,12 },
-		{ 32,31,12 },
-		{ 12,31,13 },
-		{ 13,31,30 },
-		{ 13,30,14 },
-		{ 14,30,15 },
-		{ 30,29,15 },
-		{ 15,29,16 },
-		{ 16,29,17 },
-		{ 29,28,17 },
-		{ 17,28,18 },
-		{ 28,27,18 },
-		{ 18,27,19 },
-		{ 27,26,19 },
-		{ 19,26,20 },
-		{ 20,26,25 },
-		{ 20,25,21 },
-		{ 21,25,24 },
-		{ 21,24,22 },
-		{ 22,24,23 },
-		{ 50,32,49 },
-		{ 51,32,50 },
-		{ 52,32,51 },
-		{ 53,32,52 },
-		{ 54,32,53 },
-		{ 33,32,54 },
-		{ 55,33,54 },
-		{ 56,33,55 },
-		{ 56,34,33 },
-		{ 56,35,34 }
+		{ 0, 41, 1 },
+		{ 41, 2, 1 },
+		{ 41, 4, 2 },
+		{ 2, 4, 3 },
+		{ 40, 39, 41 },
+		{ 41, 39, 4 },
+		{ 39, 36, 4 },
+		{ 39, 38, 36 },
+		{ 38, 37, 36 },
+		{ 5, 42, 43 },
+		{ 5, 43, 44 },
+		{ 5, 44, 6 },
+		{ 6, 44, 7 },
+		{ 44, 45, 7 },
+		{ 7, 45, 8 },
+		{ 45, 46, 8 },
+		{ 8, 46, 9 },
+		{ 9, 46, 10 },
+		{ 46, 47, 10 },
+		{ 10, 47, 11 },
+		{ 11, 47, 48 },
+		{ 11, 48, 12 },
+		{ 48, 49, 12 },
+		{ 49, 32, 12 },
+		{ 32, 31, 12 },
+		{ 12, 31, 13 },
+		{ 13, 31, 30 },
+		{ 13, 30, 14 },
+		{ 14, 30, 15 },
+		{ 30, 29, 15 },
+		{ 15, 29, 16 },
+		{ 16, 29, 17 },
+		{ 29, 28, 17 },
+		{ 17, 28, 18 },
+		{ 28, 27, 18 },
+		{ 18, 27, 19 },
+		{ 27, 26, 19 },
+		{ 19, 26, 20 },
+		{ 20, 26, 25 },
+		{ 20, 25, 21 },
+		{ 21, 25, 24 },
+		{ 21, 24, 22 },
+		{ 22, 24, 23 },
+		{ 50, 32, 49 },
+		{ 51, 32, 50 },
+		{ 52, 32, 51 },
+		{ 53, 32, 52 },
+		{ 54, 32, 53 },
+		{ 33, 32, 54 },
+		{ 55, 33, 54 },
+		{ 56, 33, 55 },
+		{ 56, 34, 33 },
+		{ 56, 35, 34 }
 	};
 
+	// push triangle vertices
 	unsigned int guyModelVertexIndex = 0;
 	for (unsigned int t = 0; t < 53; t++) {
 		for (unsigned int v = 0; v < 3; v++) {
@@ -195,14 +214,16 @@ void PoGuy::initGeometry() {
 		}
 	}
 
+	// push color data
 	for (unsigned int i = 0; i < modelVertices.size(); i++) {
 		colorData.push_back(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 	}
 
+	// set model origin
 	modelOriginOffsetData.push_back(glm::vec3(-18.0f, -35.0f, 0.0f));
 
 	gameState->physicalObjectRenderer->addPhysicalObject(this);
-
+	shouldRender = true;
 }
 
 void PoGuy::initPhysics() {
@@ -211,58 +232,121 @@ void PoGuy::initPhysics() {
 	glm::mat4 worldTransform;
 	worldTransform = glm::translate(worldTransform, initialPosition);
 
-	glm::mat4 localTransform;
-	//armLocalTransform = glm::translate(armLocalTransform, glm::vec3(0.0f, -0.4f * sizeScaler, 0.0f));
-
-
 	physicalMass = new PhysicalMass();
-	physicalMass->init(gameState, 62.0f, worldTransform);
-	physicalMass->addCollisionShapeSphere(localTransform, 1.0f);
+	physicalMass->init(gameState, 62.0f, worldTransform, PhysicsManager::CollisionGroup::PLAYER);
+	physicalMass->addCollisionShapeSphere(glm::mat4(), 1.0f);
 	physicalMass->addToDynamicsWorld();
+	//physicalMass->rigidBody->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+
+	glm::mat4 cameraFocalPointTransform;
+	cameraFocalPointTransform = glm::translate(cameraFocalPointTransform, glm::vec3(5.0f, 10.0f, 0.0f));
+
+
+	cameraFocalPointPhysicalMass = new PhysicalMass();
+	cameraFocalPointPhysicalMass->init(gameState, 1.0f, cameraFocalPointTransform, PhysicsManager::CollisionGroup::NO_COLLISION);
+	cameraFocalPointPhysicalMass->addToDynamicsWorld();
+	cameraFocalPointPhysicalMass->rigidBody->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+	cameraFocalPointPhysicalMass->rigidBody->setActivationState(DISABLE_DEACTIVATION);
+
+
+	// 6dof constraint
+	btTransform constraintTransform = btTransform::getIdentity();
+	cameraSpringConstraint = new btGeneric6DofSpring2Constraint(*(physicalMass->rigidBody), *(cameraFocalPointPhysicalMass->rigidBody), constraintTransform, constraintTransform);
+	cameraSpringConstraint->setLimit(0, 10.0f, -100.0f);
+	cameraSpringConstraint->setLimit(1, 10.0f, -100.0f);
+	cameraSpringConstraint->setLimit(2, 0.0f, 0.0f);
+	cameraSpringConstraint->setLimit(3, 0.0f, 0.0f);
+	cameraSpringConstraint->setLimit(4, 0.0f, 0.0f);
+	cameraSpringConstraint->setLimit(5, 0.0f, 0.0f);
+	cameraSpringConstraint->enableSpring(0, true);
+	cameraSpringConstraint->setStiffness(0, 50.0f);
+	cameraSpringConstraint->setEquilibriumPoint(0, 0);
+	cameraSpringConstraint->setDamping(0, 10.0f);
+
+	cameraSpringConstraint->enableSpring(1, true);
+	cameraSpringConstraint->setStiffness(1, 50.0f);
+	cameraSpringConstraint->setEquilibriumPoint(1, 0);
+	cameraSpringConstraint->setDamping(1, 10.0f);
+
+	//cameraSpringConstraint->setBounce(0, 0.0f);
+	//cameraSpringConstraint->setLinearLowerLimit(btVector3(-3.0f, 0.0f, 0.0f));
+	//cameraSpringConstraint->setLinearUpperLimit(btVector3(3.0f, 0.0f, 0.0f));
+
+	gameState->physicsManager->dynamicsWorld->addConstraint(cameraSpringConstraint);
 
 	shouldDoPhysicalUpdate = true;
 
-
-	/*
-	componentMasses.resize(1);
-	mainComponentMass = &componentMasses[0];
-	mainComponentMass->init(gameState, 62.0f, glm::vec3(10.0f, 10.0f, 0.0f), 1.0f);
-	shouldDoPhysicalUpdate = true;
-	*/
 
 
 }
 
 void PoGuy::doPhysicalUpdate() {
-
-	/*
-	// rocket force
+	
+	// setup rocket force based on key state
+	rocketForce = glm::vec3();
 	if (rocketOn) {
-		mainComponentMass->rigidBody->activate();
-		if (keyStates[SDLK_d])
-			mainComponentMass->rigidBody->applyCentralForce(btVector3(900.0f, 0.0f, 0.0f));
-		if (keyStates[SDLK_a])
-			mainComponentMass->rigidBody->applyCentralForce(btVector3(-900.0f, 0.0f, 0.0f));
-		if (keyStates[SDLK_w])
-			mainComponentMass->rigidBody->applyCentralForce(btVector3(0.0f, 900.0f, 0.0f));
-		if (keyStates[SDLK_s])
-			mainComponentMass->rigidBody->applyCentralForce(btVector3(0.0f, -900.0f, 0.0f));
-	}
-	*/
+		if (keyStates[SDLK_d]) {
+			rocketForce.x += rocketForceMagnitude;
+		}
+		if (keyStates[SDLK_a]) {
+			rocketForce.x -= rocketForceMagnitude;
+		}
+		if (keyStates[SDLK_w]) {
+			rocketForce.y += rocketForceMagnitude;
+		}
+		if (keyStates[SDLK_s]) {
+			rocketForce.y -= rocketForceMagnitude;
+			
+		}
 
-	// rocket force
-	if (rocketOn) {
-		physicalMass->rigidBody->activate();
-		if (keyStates[SDLK_d])
-			physicalMass->rigidBody->applyCentralForce(btVector3(900.0f, 0.0f, 0.0f));
-		if (keyStates[SDLK_a])
-			physicalMass->rigidBody->applyCentralForce(btVector3(-900.0f, 0.0f, 0.0f));
-		if (keyStates[SDLK_w])
-			physicalMass->rigidBody->applyCentralForce(btVector3(0.0f, 900.0f, 0.0f));
-		if (keyStates[SDLK_s])
-			physicalMass->rigidBody->applyCentralForce(btVector3(0.0f, -900.0f, 0.0f));
+		// Only apply the force to the rigid body if the rope is not thrown.  If it is,
+		// the rope will have a mass to represnt the player.
+		if (!ropeThrown) {
+			btVector3 rocketForceBt;
+			PhysicsManager::glmVec3ToBtVec3(rocketForce, rocketForceBt);  // debug - isolate?
+			physicalMass->rigidBody->applyCentralForce(rocketForceBt);
+		}
+
 	}
 
+	// update camera focal point based on current player position
+	glm::vec3 cameraFocalPointPosition;
+	cameraFocalPointPhysicalMass->getCenterOfMassPosition(cameraFocalPointPosition);
+
+	// debug - this displays a reticule at the camera focal point for debugging
+	Event e;
+	e.eventPoster = this;
+	e.eventType = Event::EventType::GAME_EVENT;
+	e.gameEvent = Event::GameEvent::MOVE_RETICULE;
+	e.eventWorldCoordinateX = cameraFocalPointPosition.x;
+	e.eventWorldCoordinateY = cameraFocalPointPosition.y;
+	gameState->eventBus->postEvent(e);
+
+	gameState->camera->updatePosition(glm::vec3(cameraFocalPointPosition.x -7.5f, cameraFocalPointPosition.y - 7.5f, 0.0f));
+}
+
+void PoGuy::getRocketForce(glm::vec3& rocketForce) {
+	// provide rocket force to rope
+	rocketForce = this->rocketForce;
+}
+
+void PoGuy::updateTransformFromRope(const btTransform& transform) {
+	// updating the position based on rope position
+	physicalMass->rigidBody->setCenterOfMassTransform(transform);
+}
+
+/*
+void PoGuy::addForceFromRope(const glm::vec3& ropeForce) {
+	btVector3 ropeForceBt;
+	PhysicsManager::glmVec3ToBtVec3(ropeForce, ropeForceBt);
+	physicalMass->rigidBody->applyCentralForce(ropeForceBt);
+	//physicalMass->rigidBody->setLinearVelocity(ropeForceBt);
+
+}
+*/
+
+btRigidBody* PoGuy::getRigidBody() {
+	return physicalMass->rigidBody;
 }
 
 void PoGuy::doRenderUpdate() {
@@ -285,7 +369,16 @@ void PoGuy::doRenderUpdate() {
 
 }
 
+void PoGuy::getArmLocation(glm::vec3& armLocation) {
+	// provide center of mass of rigid body as arm location (rope connection point)
+	physicalMass->getCenterOfMassPosition(armLocation);
+}
 
 PoGuy::~PoGuy() {
+	// remove camera connection constraint
+	gameState->physicsManager->dynamicsWorld->removeConstraint(cameraSpringConstraint);
+
+	delete cameraSpringConstraint;
 	delete physicalMass;
+	delete cameraFocalPointPhysicalMass;
 }

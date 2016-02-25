@@ -2,30 +2,26 @@
 #define POBETTERROPE_HPP
 
 #include "PhysicalObject.hpp"
+#include "PoGuy.hpp"
 
 class PoBetterRope : public PhysicalObject {
 public:
+
 	PoBetterRope(GameState* gameState);
 	void doPhysicalUpdate();
 	void doRenderUpdate();
 	void gameEventCallback(const Event& eventObj);
 	void sdlInputEventCallback(const Event& eventObj);
+	~PoBetterRope();
 
 private:
 
-	struct RopeSegmentLength {
-		float unstretchedLength;
-		float stretchedLength;
-	};
+	float ropeSegmentLength;
+	unsigned int ropeSegmentCount;
+	PhysicalMassMultiBody* rope = nullptr;
+	PoGuy* player = nullptr;
+	glm::vec3 currentPlayerMassForce;
 
-	unsigned int ropeMassCount = 30;// 15;
-	float ropeMassMass = 0.05f;
-	float springStiffnessConstant = 10000.0f;
-	float internalSpringFrictionConstant = 0.2f;
-	float airFrictionConstant = 0.02f;
-	float gravitationalConstant = 9.81f;
-
-	std::vector<RopeSegmentLength> ropeSegmentLengths;
 	void initGeometry();
 };
 

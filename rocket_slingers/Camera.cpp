@@ -139,3 +139,16 @@ void Camera::updateCameraVectors() {
 	right = glm::normalize(glm::cross(front, worldUp));
 	up = glm::normalize(glm::cross(right, front));
 }
+
+
+void Camera::updatePosition(const glm::vec3& position) {
+//	std::cout << "camera position: (" << position.x << ", " << position.y << ", " << position.z << ")" << std::endl;
+//	std::cout << "         target: (" << target.x << ", " << target.y << ", " << target.z << ")" << std::endl;
+
+	this->position = position;
+	viewTransform = glm::lookAt(position, position + front, up);
+}
+
+void Camera::getPosition(glm::vec3& position) {
+	position = this->position;
+}

@@ -2,7 +2,6 @@
 #define POPENDULUM_HPP
 
 #include "PhysicalObject.hpp"
-#include "PhysicalMassMultiBody.hpp"
 
 class PoPendulum : public PhysicalObject {
 public:

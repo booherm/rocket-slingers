@@ -11,6 +11,11 @@ class AudioManager
 {
 public:
 
+	enum MusicTrackId {
+		DRIPPY_EYE,
+		MUSIC_TRACK_LAST
+	};
+
 	enum SoundEffectId {
 		BIG_ROPE_CREEK,
 		ROPE_PULL,
@@ -22,7 +27,7 @@ public:
 	};
 
 	AudioManager();
-	void playTest();
+	void playMusicTrack(MusicTrackId musicTrackId);
 	unsigned int playSoundEffect(SoundEffectId effectId, int repetition);
 	void stopSoundEffect(unsigned int soundEffectInstanceId);
 
@@ -39,6 +44,7 @@ private:
 
 	const unsigned int maxChannels = 256;
 	std::vector<SoundEffect> soundEffects;
+	std::vector<std::string> musicTracks;
 	std::vector<unsigned int> channels;
 	std::map<unsigned int, unsigned int> effectInstanceChannels;
 	unsigned int effectCounter = 1;

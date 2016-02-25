@@ -12,9 +12,9 @@
 #include "GameState.hpp"
 #include "Utilities.hpp"
 #include "PhysicalMass.hpp"
+#include "PhysicalMassMultiBody.hpp"
 
 class EventBus;
-class PhysicalMass;
 
 class PhysicalObject : public EventListener {
 public:
@@ -25,7 +25,7 @@ public:
 	virtual void gameEventCallback(const Event& eventObj);
 	std::string objectType;
 	unsigned int glRenderingMode;
-	const unsigned int maxInstanceCount = 1000;
+	const unsigned int maxInstanceCount = 10000;
 
 	// rendering
 	bool shouldRender;
@@ -40,7 +40,6 @@ public:
 	virtual void afterRender();
 
 	// physics
-	PhysicalMass* getMainComponentMass();
 	void updatePhysicalState();
 
 protected:
@@ -62,8 +61,6 @@ protected:
 	// physics
 	virtual void doPhysicalUpdate();
 	bool shouldDoPhysicalUpdate;
-	PhysicalMass* mainComponentMass;
-	std::vector<PhysicalMass> componentMasses;
 };
 
 #endif

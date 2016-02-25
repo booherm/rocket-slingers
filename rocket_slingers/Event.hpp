@@ -17,7 +17,9 @@ public:
 	};
 
 	enum GameEvent {
-		THROW_ROPE
+		THROW_ROPE,
+		RELEASE_ROPE,
+		MOVE_RETICULE
 	};
 
 	EventType eventType;

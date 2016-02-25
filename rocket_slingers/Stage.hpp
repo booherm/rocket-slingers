@@ -6,8 +6,11 @@
 #include "PoGuy.hpp"
 #include "PoPendulum.hpp"
 #include "PoPendulum2.hpp"
-#include "PoRope.hpp"
+//#include "PoRope.hpp"
+//#include "PoBetterRope.hpp"
+#include "PoRigidBodyRope.hpp"
 #include "PoPhysicsRenderer.hpp"
+#include "PoReticule.hpp"
 
 class GameState;
 
