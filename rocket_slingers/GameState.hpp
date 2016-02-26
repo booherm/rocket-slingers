@@ -30,6 +30,7 @@ public:
 	Stage* activeStage;
 	PhysicsManager* physicsManager;
 
+	const std::string version = "0.1.0";
 	const unsigned int resolutionWidth = 1920;  // debug hardcode
 	const unsigned int resolutionHeight = 1080;
 	double dFrameTimeStart;

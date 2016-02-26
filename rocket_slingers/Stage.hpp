@@ -11,6 +11,7 @@
 #include "PoRigidBodyRope.hpp"
 #include "PoPhysicsRenderer.hpp"
 #include "PoReticule.hpp"
+#include "PoTextLabel.hpp"
 
 class GameState;
 

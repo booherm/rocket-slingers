@@ -13,6 +13,7 @@ public:
 
 	enum MusicTrackId {
 		DRIPPY_EYE,
+		MOTORLICKER,
 		MUSIC_TRACK_LAST
 	};
 

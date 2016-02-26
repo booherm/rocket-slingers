@@ -1,21 +1,22 @@
 #include "PhysicalObjectRenderer.hpp"
 
 PhysicalObjectRenderer::PhysicalObjectRenderer() {
-	objectIdCounter = 0;
 }
 
-unsigned int PhysicalObjectRenderer::addPhysicalObject(PhysicalObject* renderableObject) {
+void PhysicalObjectRenderer::addPhysicalObject(PhysicalObject* renderableObject) {
 
 	if (renderableMapping.count(renderableObject->objectType) == 0) {
 
 		// first time seeing an object of this type, setup renderable structure
 		renderableMapping[renderableObject->objectType] = RenderingStructure{};
 		RenderingStructure* rs = &(renderableMapping[renderableObject->objectType]);
+		rs->useCustomRenderer = renderableObject->useCustomRenderer;
 		rs->objectInstances.push_back(renderableObject);
 		rs->shaderProgram = renderableObject->getShaderProgram();
 		rs->glRenderingMode = renderableObject->glRenderingMode;
 		rs->textures = renderableObject->getTextures();
-			
+		renderableObject->renderingStructure = rs;
+
 		// create vao, vbos
 		glGenVertexArrays(1, &rs->masterVao);
 		glGenBuffers(1, &rs->modelVbo);
@@ -55,7 +56,7 @@ unsigned int PhysicalObjectRenderer::addPhysicalObject(PhysicalObject* renderabl
 
 		// define model attribute - per vertex
 		glBindBuffer(GL_ARRAY_BUFFER, rs->modelVbo);
-		glVertexAttribPointer(vertexAttribIndex, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid*) 0);
+		glVertexAttribPointer(vertexAttribIndex, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid*)0);
 		glEnableVertexAttribArray(vertexAttribIndex++);
 
 		// define model origin offset attribute - per instance
@@ -89,14 +90,15 @@ unsigned int PhysicalObjectRenderer::addPhysicalObject(PhysicalObject* renderabl
 	}
 	else {
 		// object type has been added before, just add new instance 
-		renderableMapping[renderableObject->objectType].objectInstances.push_back(renderableObject);
+		RenderingStructure* rs = &renderableMapping[renderableObject->objectType];
+		rs->objectInstances.push_back(renderableObject);
+		renderableObject->renderingStructure = rs;
 	}
 
 	GLenum openGlErrorCode = glGetError();
 	if (openGlErrorCode != GL_NO_ERROR)
 		throw "PhysicalObjectRenderer::addPhysicalObject - OpenGL error: " + openGlErrorCode;
 
-	return objectIdCounter++;
 }
 
 void PhysicalObjectRenderer::render() {
@@ -111,6 +113,13 @@ void PhysicalObjectRenderer::render() {
 
 		// get the rendering structure for this object type
 		RenderingStructure* objectRenderingStructure = &objectTypeIterator->second;
+
+		// perform custom render
+		if (objectRenderingStructure->useCustomRenderer) {
+			callInstancesCustomerRenderer(objectRenderingStructure);
+			objectTypeIterator++;
+			continue;
+		}
 
 		// reset buffer offsets
 		unsigned int modelOriginOffsetBufferOffset = 0;
@@ -171,7 +180,6 @@ void PhysicalObjectRenderer::render() {
 
 		abortOnOpenGlError();
 
-
 		objectTypeIterator++;
 	}
 
@@ -188,6 +196,20 @@ void PhysicalObjectRenderer::abortOnOpenGlError() {
 		std::cout << "opengl error: " << openGlErrorCode << std::endl;
 		throw "PhysicalObjectRenderer::render - OpenGL error: " + openGlErrorCode;
 	}
+}
+
+void PhysicalObjectRenderer::callInstancesCustomerRenderer(RenderingStructure* objectRenderingStructure) {
+
+	// iterate over object instances and call custom renderer on each
+	unsigned int instanceCount = objectRenderingStructure->objectInstances.size();
+	for (unsigned int instanceIndex = 0; instanceIndex < instanceCount; instanceIndex++) {
+		PhysicalObject* po = objectRenderingStructure->objectInstances[instanceIndex];
+		if (po->shouldRender) {
+			po->customRender();
+			po->afterRender();
+		}
+	}
+
 }
 
 PhysicalObjectRenderer::~PhysicalObjectRenderer() {

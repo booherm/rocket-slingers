@@ -96,6 +96,9 @@
     <ClCompile Include="PoRigidBodyRope.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PoTextLabel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OglShaderProgram.hpp">
@@ -177,6 +180,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PoRigidBodyRope.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PoTextLabel.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderingStructure.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

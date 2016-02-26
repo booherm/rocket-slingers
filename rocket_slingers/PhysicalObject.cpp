@@ -5,6 +5,7 @@ PhysicalObject::PhysicalObject(const std::string& objectType, GameState* gameSta
 	this->gameState = gameState;
 
 	shouldRender = false;
+	useCustomRenderer = false;
 	glRenderingMode = GL_TRIANGLES;
 
 	shouldDoPhysicalUpdate = false;
@@ -18,6 +19,8 @@ void PhysicalObject::updateRenderState() {
 }
 
 void PhysicalObject::afterRender() {}
+
+void PhysicalObject::customRender() {}
 
 std::vector<glm::vec3>* PhysicalObject::getModelVertices() {
 	return &modelVertices;

@@ -13,6 +13,7 @@
 #include "Utilities.hpp"
 #include "PhysicalMass.hpp"
 #include "PhysicalMassMultiBody.hpp"
+#include "RenderingStructure.hpp"
 
 class EventBus;
 
@@ -29,6 +30,7 @@ public:
 
 	// rendering
 	bool shouldRender;
+	bool useCustomRenderer;
 	virtual void updateRenderState();
 	std::vector<glm::vec3>* getModelVertices();
 	std::vector<glm::vec3>* getModelOriginOffsetData();
@@ -37,7 +39,9 @@ public:
 	std::vector<glm::vec2>* getTextureCoordinateData();
 	std::vector<unsigned int>* getTextures();
 	OglShaderProgram* getShaderProgram();
+	RenderingStructure* renderingStructure;
 	virtual void afterRender();
+	virtual void customRender();
 
 	// physics
 	void updatePhysicalState();

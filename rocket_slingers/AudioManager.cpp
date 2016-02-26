@@ -11,6 +11,7 @@ AudioManager::AudioManager() {
 
 	musicTracks.resize(MUSIC_TRACK_LAST);
 	musicTracks[DRIPPY_EYE] = "c:\\1\\drippy_eye.mp3";
+	musicTracks[MOTORLICKER] = "c:\\1\\motorlicker.mp3";
 
 	soundEffects.resize(SOUND_EFFECT_LAST);
 	soundEffects[BIG_ROPE_CREEK] = { "c:\\1\\big_rope_creek.wav" };
