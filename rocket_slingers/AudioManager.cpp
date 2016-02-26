@@ -5,21 +5,19 @@ AudioManager::AudioManager() {
 	Mix_Init(MIX_INIT_MP3);
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 	Mix_AllocateChannels(maxChannels);
-
 	channels.resize(maxChannels, 0);
 
-
 	musicTracks.resize(MUSIC_TRACK_LAST);
-	musicTracks[DRIPPY_EYE] = "c:\\1\\drippy_eye.mp3";
-	musicTracks[MOTORLICKER] = "c:\\1\\motorlicker.mp3";
+	musicTracks[DRIPPY_EYE] = "./resources/drippy_eye.mp3";
+	musicTracks[MOTORLICKER] = "./resources/motorlicker.mp3";
 
 	soundEffects.resize(SOUND_EFFECT_LAST);
-	soundEffects[BIG_ROPE_CREEK] = { "c:\\1\\big_rope_creek.wav" };
-	soundEffects[ROPE_PULL]      = { "c:\\1\\rope_pull.wav" };
-	soundEffects[ROPE_RETRACT]   = { "c:\\1\\rope_retract.wav" };
-	soundEffects[RUSTY_SWING]    = { "c:\\1\\rusty_swing.wav" };
-	soundEffects[WHIP]           = { "c:\\1\\whip.wav" };
-	soundEffects[ROCKET_RUMBLE]  = { "c:\\1\\rocket_rumble.wav" };
+	soundEffects[BIG_ROPE_CREEK] = { "./resources/big_rope_creek.wav" };
+	soundEffects[ROPE_PULL]      = { "./resources/rope_pull.wav" };
+	soundEffects[ROPE_RETRACT]   = { "./resources/rope_retract.wav" };
+	soundEffects[RUSTY_SWING]    = { "./resources/rusty_swing.wav" };
+	soundEffects[WHIP]           = { "./resources/whip.wav" };
+	soundEffects[ROCKET_RUMBLE]  = { "./resources/rocket_rumble.wav" };
 
 	for (unsigned int i = 0; i < soundEffects.size(); ++i) {
 		soundEffects[i].chunk = Mix_LoadWAV(soundEffects[i].filename.c_str());

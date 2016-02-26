@@ -11,7 +11,7 @@ std::map<unsigned char, PoTextLabel::TypeFaceCharacter> PoTextLabel::initTypeFac
 		throw std::string("PoTextLabel::initGeometry - free type init error");
 
 	FT_Face typeFace;
-	if (FT_New_Face(freeType, "c:/1/consola.ttf", 0, &typeFace))
+	if (FT_New_Face(freeType, "resources/consola.ttf", 0, &typeFace))
 		throw std::string("PoTextLabel::initGeometry - font file load error");
 
 	if (FT_Set_Pixel_Sizes(typeFace, 0, 48))
