@@ -7,7 +7,6 @@ class PoPendulum : public PhysicalObject {
 public:
 	PoPendulum(GameState* gameState);
 	void doRenderUpdate();
-	void sdlInputEventCallback(const Event& eventObj);
 	~PoPendulum();
 
 private:
@@ -18,8 +17,10 @@ private:
 	void doPhysicalUpdate();
 	void initGeometry();
 	void initPhysics();
-
-	PhysicalMassMultiBody* multiBody;
+	
+	PhysicalMass* hingePointMass;
+	PhysicalMass* bobMass;
+	btHingeConstraint* hingeConstraint;
 };
 
 #endif

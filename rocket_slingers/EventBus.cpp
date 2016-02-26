@@ -8,7 +8,7 @@ EventBus::EventBus(GameState* gameState) {
 	screenToWorldCoordinateScalerY = gameState->worldViewportScaler / gameState->resolutionHeight;
 
 	sdlEventTypeMapping[SDL_FIRSTEVENT] = Event::EventType::NULL_EVENT;
-	sdlEventTypeMapping[SDL_QUIT] = Event::EventType::NULL_EVENT;
+	sdlEventTypeMapping[SDL_QUIT] = Event::EventType::QUIT_EVENT;
 	sdlEventTypeMapping[SDL_APP_TERMINATING] = Event::EventType::NULL_EVENT;
 	sdlEventTypeMapping[SDL_APP_LOWMEMORY] = Event::EventType::NULL_EVENT;
 	sdlEventTypeMapping[SDL_APP_WILLENTERBACKGROUND] = Event::EventType::NULL_EVENT;
@@ -72,54 +72,35 @@ void EventBus::subscribeToGameEvent(Event::GameEvent gameEvent, EventListener* s
 
 bool EventBus::processInput() {
 
-	unsigned int i = 0;
-
 	SDL_Event inputEvent;
 	while (SDL_PollEvent(&inputEvent) == 1) {
-		if (inputEvent.type == SDL_KEYDOWN && inputEvent.key.keysym.sym == SDLK_ESCAPE) { // debug, change this to a shutdown event listener
+
+		if (inputEvent.type == SDL_KEYDOWN && inputEvent.key.keysym.sym == SDLK_ESCAPE) { // temporary - something menu will post a QUIT_EVENT
 			return false;
 		}
 		else
 		{
 			Event::EventType eventType = sdlEventTypeMapping[inputEvent.type];
-			if (eventType == Event::EventType::NULL_EVENT)
-				break;
+			if (eventType == Event::EventType::NULL_EVENT)   // ignore events we don't care about
+				continue;
 
-			if (inputEvent.key.repeat != 0)  // some input we don't care about, exit
-				break;
-
-			Event e;
-			e.eventType = eventType;
-
-
-//			if (inputEvent.key.keysym.sym != SDLK_w && inputEvent.type == SDL_KEYDOWN && inputEvent.key.repeat != 0) {
-//				std::cout << "key repeat" << std::endl;
-//			}
-
-			//if (e.eventType == Event::EventType::NULL_EVENT || (inputEvent.type == SDL_KEYDOWN && inputEvent.key.repeat != 0))  // some input we don't care about, exit
-
+			if (eventType == Event::EventType::QUIT_EVENT)
+				return false;
 
 			glm::vec3 cameraPosition;
 			gameState->camera->getPosition(cameraPosition);
+
+			Event e;
+			e.eventType = eventType;
 			e.sdlInputEvent = &inputEvent;
 			e.eventPoster = nullptr;
 			e.eventWorldCoordinateX = ((float) inputEvent.button.x * screenToWorldCoordinateScalerX) + cameraPosition.x;
 			e.eventWorldCoordinateY = (gameState->worldViewportScaler - ((float) inputEvent.button.y * screenToWorldCoordinateScalerY)) + cameraPosition.y;
 
-//			if (e.eventType == Event::EventType::SDL_MOUSE_BUTTON) {
-	//			std::cout << "got mouse button" << std::endl;
-				//std::cout << "calling subsribers to event type: " << e.eventType << " " << e.sdlInputEvent->button.button << std::endl;
-		//	}
-
 			callSubscribers(e);
-			i++;
-
 		}
 
 	}
-
-	if(i != 0)
-		std::cout << "Processed inputs: " << i << std::endl;
 
 	return true;
 }

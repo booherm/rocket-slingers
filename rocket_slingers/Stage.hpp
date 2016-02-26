@@ -5,13 +5,11 @@
 #include "PoAxes.hpp"
 #include "PoGuy.hpp"
 #include "PoPendulum.hpp"
-#include "PoPendulum2.hpp"
-//#include "PoRope.hpp"
-//#include "PoBetterRope.hpp"
 #include "PoRigidBodyRope.hpp"
 #include "PoPhysicsRenderer.hpp"
 #include "PoReticule.hpp"
 #include "PoTextLabel.hpp"
+#include "PoTextLabelFps.hpp"
 
 class GameState;
 

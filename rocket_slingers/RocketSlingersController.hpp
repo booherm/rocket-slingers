@@ -2,16 +2,24 @@
 #define ROCKETSLINGERSCONTROLLER_HPP
 
 #include "GameState.hpp"
+#include <windows.h>
 
 class RocketSlingersController {
 public:
+
 	RocketSlingersController();
 	void start();
 	~RocketSlingersController();
 
 private:
-	void initSdl();
+
 	GameState* gameState;
+	FILTERKEYS userFilterKeySettings;
+
+	void initSdl();
+	void disableKeyRepeat();
+	void enableKeyRepeat();
+
 };
 
 #endif

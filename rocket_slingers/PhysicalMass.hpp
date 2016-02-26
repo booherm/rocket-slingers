@@ -15,6 +15,10 @@ public:
 	void addToDynamicsWorld();
 	void getCenterOfMassPosition(glm::vec3& position);
 
+	void addToDynamicsWorldDebug();
+	void finishConstruction();
+
+
 	// try private:
 	void setWorldTransform(const btTransform& worldTrans);
 	void getWorldTransform(btTransform& worldTrans) const;

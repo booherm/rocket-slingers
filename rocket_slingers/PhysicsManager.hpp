@@ -13,10 +13,11 @@ class PhysicsManager {
 public:
 
 	enum CollisionGroup {
-		NO_COLLISION = 0,
-		ROPE_MASS    = 1,
-		PLAYER       = 2,
-		BOUNDARY     = 4
+		NO_COLLISION  = 0,
+		ROPE_MASS     = 1,
+		PLAYER        = 2,
+		BOUNDARY      = 4,
+		SWINGING_MASS = 8
 	};
 
 	PhysicsManager();
@@ -32,6 +33,7 @@ public:
 	static void btVec3ToGlmVec3(const btVector3& btVector, glm::vec3& glmVector);
 	static void glmTransformToBtTransform(const glm::mat4& glmTrans, btTransform& btTrans);
 	static void btTransformToGlmTransform(const btTransform& btTrans, glm::mat4& glmTrans);
+	static void btQuatToGlmQuat(const btQuaternion& btQuat, glm::quat& glmQuat);
 
 private:
 

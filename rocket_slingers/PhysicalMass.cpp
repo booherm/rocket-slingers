@@ -29,8 +29,6 @@ void PhysicalMass::addCollisionShapeBox(const glm::mat4& worldTransform, const g
 void PhysicalMass::addCollisionShape(const glm::mat4& worldTransform, btCollisionShape* collisionShape) {
 
 	collisionShapeComponents.push_back(collisionShape);
-	//this->collisionShape->addChildShape(btTransform::getIdentity(), collisionShape);
-	
 	btTransform worldTransformBt;
 	PhysicsManager::glmTransformToBtTransform(worldTransform, worldTransformBt);
 	this->collisionShape->addChildShape(worldTransformBt, collisionShape);
@@ -38,20 +36,28 @@ void PhysicalMass::addCollisionShape(const glm::mat4& worldTransform, btCollisio
 }
 
 void PhysicalMass::addToDynamicsWorld() {
+	finishConstruction();
+	physicsManager->dynamicsWorld->addRigidBody(rigidBody, collisionGroup, physicsManager->getCollisionGroupInteractions(collisionGroup));
+	
+}
+
+void PhysicalMass::addToDynamicsWorldDebug() {
+	physicsManager->dynamicsWorld->addRigidBody(rigidBody, collisionGroup, physicsManager->getCollisionGroupInteractions(collisionGroup));
+
+}
+void PhysicalMass::finishConstruction() {
 
 	btVector3 inertia(0.0f, 0.0f, 0.0f);
 	collisionShape->calculateLocalInertia(mass, inertia);
 
 	btRigidBody::btRigidBodyConstructionInfo rigidBodyConstructionInfo(mass, this, collisionShape, inertia);
 	rigidBody = new btRigidBody(rigidBodyConstructionInfo);
-//	physicsManager->dynamicsWorld->addRigidBody(rigidBody);
-	physicsManager->dynamicsWorld->addRigidBody(rigidBody, collisionGroup, physicsManager->getCollisionGroupInteractions(collisionGroup));
-	
+
 }
 
 void PhysicalMass::getCenterOfMassPosition(glm::vec3& position) {
-	btVector3 something = rigidBody->getWorldTransform().getOrigin();
-	PhysicsManager::btVec3ToGlmVec3(something, position);
+	btVector3 com = rigidBody->getWorldTransform().getOrigin();
+	PhysicsManager::btVec3ToGlmVec3(com, position);
 }
 
 // called by dynamics world after update only for objects that moved

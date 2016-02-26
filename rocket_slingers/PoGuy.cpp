@@ -314,6 +314,7 @@ void PoGuy::doPhysicalUpdate() {
 	cameraFocalPointPhysicalMass->getCenterOfMassPosition(cameraFocalPointPosition);
 
 	// debug - this displays a reticule at the camera focal point for debugging
+	/*
 	Event e;
 	e.eventPoster = this;
 	e.eventType = Event::EventType::GAME_EVENT;
@@ -321,6 +322,7 @@ void PoGuy::doPhysicalUpdate() {
 	e.eventWorldCoordinateX = cameraFocalPointPosition.x;
 	e.eventWorldCoordinateY = cameraFocalPointPosition.y;
 	gameState->eventBus->postEvent(e);
+	*/
 
 	gameState->camera->updatePosition(glm::vec3(cameraFocalPointPosition.x -7.5f, cameraFocalPointPosition.y - 7.5f, 0.0f));
 }

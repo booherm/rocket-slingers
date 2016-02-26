@@ -5,9 +5,10 @@ PhysicsManager::PhysicsManager(){
 
 	// init collision group interactions
 	collisionGroupInteractions[NO_COLLISION] = NO_COLLISION;
-	collisionGroupInteractions[ROPE_MASS] = NO_COLLISION;
-	collisionGroupInteractions[PLAYER] = PLAYER | BOUNDARY;
-	collisionGroupInteractions[BOUNDARY] = PLAYER;
+	collisionGroupInteractions[ROPE_MASS] = SWINGING_MASS;
+	collisionGroupInteractions[PLAYER] = PLAYER | BOUNDARY | SWINGING_MASS;
+	collisionGroupInteractions[BOUNDARY] = PLAYER | SWINGING_MASS;
+	collisionGroupInteractions[SWINGING_MASS] = PLAYER | BOUNDARY | ROPE_MASS;
 
 	collisionBroadphase = new btDbvtBroadphase();
 	collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -122,4 +123,9 @@ void PhysicsManager::glmTransformToBtTransform(const glm::mat4& glmTrans, btTran
 
 void PhysicsManager::btTransformToGlmTransform(const btTransform& btTrans, glm::mat4& glmTrans) {
 	btTrans.getOpenGLMatrix(glm::value_ptr(glmTrans));
+}
+
+void PhysicsManager::btQuatToGlmQuat(const btQuaternion& btQuat, glm::quat& glmQuat) {
+	btVector3 axis = btQuat.getAxis();
+	glmQuat = glm::angleAxis(btQuat.getAngle(), glm::vec3(axis.x(), axis.y(), axis.z()));
 }

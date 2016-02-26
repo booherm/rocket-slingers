@@ -13,13 +13,15 @@ public:
 		SDL_KEYBOARD,
 		SDL_MOUSE_MOVEMENT,
 		SDL_MOUSE_BUTTON,
+		QUIT_EVENT,
 		GAME_EVENT
 	};
 
 	enum GameEvent {
 		THROW_ROPE,
 		RELEASE_ROPE,
-		MOVE_RETICULE
+		MOVE_RETICULE,
+		FPS_LABEL_UDPATE
 	};
 
 	EventType eventType;

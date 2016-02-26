@@ -91,6 +91,8 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>external\bullet3-2.83.7\src;external\freetype-2.6.3\include;external\glew-1.13.0\include\GL;external\glm-0.9.7.1\glm;external\SDL2_mixer-2.0.1\include;external\SDL2-2.0.4\include;external\soil-1.16\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -125,6 +127,9 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>external\bullet3-2.83.7\src;external\freetype-2.6.3\include;external\glew-1.13.0\include\GL;external\glm-0.9.7.1\glm;external\SDL2_mixer-2.0.1\include;external\SDL2-2.0.4\include;external\soil-1.16\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -154,6 +159,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="PoTextLabelFps.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="EventListener.cpp" />
@@ -162,13 +171,12 @@
     <ClCompile Include="EventBus.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OglShaderProgram.cpp" />
-    <ClCompile Include="PoPendulum.cpp" />
     <ClCompile Include="PhysicalMass.cpp" />
     <ClCompile Include="PhysicalMassMultiBody.cpp" />
     <ClCompile Include="PhysicalObject.cpp" />
     <ClCompile Include="PhysicsManager.cpp" />
     <ClCompile Include="PoBetterRope.cpp" />
-    <ClCompile Include="PoPendulum2.cpp" />
+    <ClCompile Include="PoPendulum.cpp" />
     <ClCompile Include="PoPhysicsRenderer.cpp" />
     <ClCompile Include="PoReticule.cpp" />
     <ClCompile Include="PoRigidBodyRope.cpp" />
@@ -197,12 +205,12 @@
     <ClInclude Include="PhysicalObject.hpp" />
     <ClInclude Include="PhysicsManager.hpp" />
     <ClInclude Include="PoBetterRope.hpp" />
-    <ClInclude Include="PoPendulum2.hpp" />
     <ClInclude Include="PoPendulum.hpp" />
     <ClInclude Include="PoPhysicsRenderer.hpp" />
     <ClInclude Include="PoReticule.hpp" />
     <ClInclude Include="PoRigidBodyRope.hpp" />
     <ClInclude Include="PoTextLabel.hpp" />
+    <ClInclude Include="PoTextLabelFps.hpp" />
     <ClInclude Include="RenderingStructure.hpp" />
     <ClInclude Include="Stage.hpp" />
     <ClInclude Include="PhysicalObjectRenderer.hpp" />
