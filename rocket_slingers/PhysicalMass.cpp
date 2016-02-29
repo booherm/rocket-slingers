@@ -1,12 +1,15 @@
 #include "PhysicalMass.hpp"
-//#include <iostream>
 
-void PhysicalMass::init(GameState* gameState, float mass, const glm::mat4& worldTransform, PhysicsManager::CollisionGroup collisionGroup) {
+std::map<std::string, PhysicalMass*> PhysicalMass::allPhysicalMasses;
+
+void PhysicalMass::init(const std::string& id, GameState* gameState, float mass, const glm::mat4& worldTransform, PhysicsManager::CollisionGroup collisionGroup) {
+	this->id = id;
 	this->physicsManager = gameState->physicsManager;
 	this->mass = mass;
 	this->worldTransform = worldTransform;
 	this->collisionGroup = collisionGroup;
 
+	allPhysicalMasses[id] = this;
 	collisionShape = new btCompoundShape();
 }
 
@@ -36,23 +39,17 @@ void PhysicalMass::addCollisionShape(const glm::mat4& worldTransform, btCollisio
 }
 
 void PhysicalMass::addToDynamicsWorld() {
-	finishConstruction();
-	physicsManager->dynamicsWorld->addRigidBody(rigidBody, collisionGroup, physicsManager->getCollisionGroupInteractions(collisionGroup));
 	
-}
-
-void PhysicalMass::addToDynamicsWorldDebug() {
-	physicsManager->dynamicsWorld->addRigidBody(rigidBody, collisionGroup, physicsManager->getCollisionGroupInteractions(collisionGroup));
-
-}
-void PhysicalMass::finishConstruction() {
-
 	btVector3 inertia(0.0f, 0.0f, 0.0f);
 	collisionShape->calculateLocalInertia(mass, inertia);
 
 	btRigidBody::btRigidBodyConstructionInfo rigidBodyConstructionInfo(mass, this, collisionShape, inertia);
 	rigidBody = new btRigidBody(rigidBodyConstructionInfo);
+	rigidBody->setUserPointer(this);
 
+	physicsManager->dynamicsWorld->addRigidBody(rigidBody, collisionGroup, physicsManager->getCollisionGroupInteractions(collisionGroup));
+	//physicsManager->dynamicsWorld->addRigidBody(rigidBody);
+	
 }
 
 void PhysicalMass::getCenterOfMassPosition(glm::vec3& position) {
@@ -74,6 +71,8 @@ void PhysicalMass::getWorldTransform(btTransform& worldTrans) const {
 }
 
 PhysicalMass::~PhysicalMass() {
+
+	allPhysicalMasses.erase(id);
 
 	for (unsigned int i = 0; i < collisionShapeComponents.size(); ++i) {
 		delete collisionShapeComponents[i];

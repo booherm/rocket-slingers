@@ -13,40 +13,47 @@ PhysicsManager::PhysicsManager(){
 	collisionBroadphase = new btDbvtBroadphase();
 	collisionConfiguration = new btDefaultCollisionConfiguration();
 	collisionDispatcher = new btCollisionDispatcher(collisionConfiguration);
-	//constraintSolver = new btSequentialImpulseConstraintSolver;
-	constraintSolver = new btMultiBodyConstraintSolver;
+	constraintSolver = new btSequentialImpulseConstraintSolver;
+	//constraintSolver = new btMultiBodyConstraintSolver;
 
-	//dynamicsWorld = new btDiscreteDynamicsWorld(collisionDispatcher, collisionBroadphase, constraintSolver, collisionConfiguration);
-	dynamicsWorld = new btMultiBodyDynamicsWorld(collisionDispatcher, collisionBroadphase, constraintSolver, collisionConfiguration);
+	dynamicsWorld = new btDiscreteDynamicsWorld(collisionDispatcher, collisionBroadphase, constraintSolver, collisionConfiguration);
+	//dynamicsWorld = new btMultiBodyDynamicsWorld(collisionDispatcher, collisionBroadphase, constraintSolver, collisionConfiguration);
 	dynamicsWorld->setGravity(btVector3(0.0f, -9.81f, 0.0f));
 	//dynamicsWorld->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 
-
 	// for test
-	groundShape = new btStaticPlaneShape(btVector3(0.0f, 1.0f, 0.0f), 0.0f);
-	groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -1.0f, 0.0f)));
-	btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0.0f, groundMotionState, groundShape, btVector3(0.0f, 0.0f, 0.0f));
-	groundRigidBody = new btRigidBody(groundRigidBodyCI);
-	dynamicsWorld->addRigidBody(groundRigidBody, BOUNDARY, collisionGroupInteractions[BOUNDARY]);
+	boundariesOn = true;
+	if (boundariesOn) {
 
-	leftWallShape = new btStaticPlaneShape(btVector3(1.0f, 0.0f, 0.0f), 0.0f);
-	leftWallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -1.0f, 0.0f)));
-	btRigidBody::btRigidBodyConstructionInfo leftWallRigidBodyCI(0.0f, leftWallMotionState, leftWallShape, btVector3(0.0f, 0.0f, 0.0f));
-	leftWallRigidBody = new btRigidBody(leftWallRigidBodyCI);
-	dynamicsWorld->addRigidBody(leftWallRigidBody, BOUNDARY, collisionGroupInteractions[BOUNDARY]);
+		groundShape = new btStaticPlaneShape(btVector3(0.0f, 1.0f, 0.0f), 0.0f);
+		groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -1.0f, 0.0f)));
+		btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0.0f, groundMotionState, groundShape, btVector3(0.0f, 0.0f, 0.0f));
+		groundRigidBody = new btRigidBody(groundRigidBodyCI);
+		groundRigidBody->setUserPointer(nullptr);
+		dynamicsWorld->addRigidBody(groundRigidBody, BOUNDARY, collisionGroupInteractions[BOUNDARY]);
 
-	rightWallShape = new btStaticPlaneShape(btVector3(-1.0f, 0.0f, 0.0f), -35.5f * 5.0f);
-	rightWallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -1.0f, 0.0f)));
-	btRigidBody::btRigidBodyConstructionInfo rightWallRigidBodyCI(0.0f, rightWallMotionState, rightWallShape, btVector3(0.0f, 0.0f, 0.0f));
-	rightWallRigidBody = new btRigidBody(rightWallRigidBodyCI);
-	dynamicsWorld->addRigidBody(rightWallRigidBody, BOUNDARY, collisionGroupInteractions[BOUNDARY]);
+		leftWallShape = new btStaticPlaneShape(btVector3(1.0f, 0.0f, 0.0f), 0.0f);
+		leftWallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -1.0f, 0.0f)));
+		btRigidBody::btRigidBodyConstructionInfo leftWallRigidBodyCI(0.0f, leftWallMotionState, leftWallShape, btVector3(0.0f, 0.0f, 0.0f));
+		leftWallRigidBody = new btRigidBody(leftWallRigidBodyCI);
+		leftWallRigidBody->setUserPointer(nullptr);
+		dynamicsWorld->addRigidBody(leftWallRigidBody, BOUNDARY, collisionGroupInteractions[BOUNDARY]);
 
-	ceilingShape = new btStaticPlaneShape(btVector3(0.0f, -1.0f, 0.0f), -20.0f * 5.0f);
-	ceilingMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -1.0f, 0.0f)));
-	btRigidBody::btRigidBodyConstructionInfo ceilingRigidBodyCI(0.0f, ceilingMotionState, ceilingShape, btVector3(0.0f, 0.0f, 0.0f));
-	ceilingRigidBody = new btRigidBody(ceilingRigidBodyCI);
-	dynamicsWorld->addRigidBody(ceilingRigidBody, BOUNDARY, collisionGroupInteractions[BOUNDARY]);
+		rightWallShape = new btStaticPlaneShape(btVector3(-1.0f, 0.0f, 0.0f), -55.5f * 5.0f);
+		rightWallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -1.0f, 0.0f)));
+		btRigidBody::btRigidBodyConstructionInfo rightWallRigidBodyCI(0.0f, rightWallMotionState, rightWallShape, btVector3(0.0f, 0.0f, 0.0f));
+		rightWallRigidBody = new btRigidBody(rightWallRigidBodyCI);
+		rightWallRigidBody->setUserPointer(nullptr);
+		dynamicsWorld->addRigidBody(rightWallRigidBody, BOUNDARY, collisionGroupInteractions[BOUNDARY]);
 
+		ceilingShape = new btStaticPlaneShape(btVector3(0.0f, -1.0f, 0.0f), -20.0f * 5.0f);
+		ceilingMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -1.0f, 0.0f)));
+		btRigidBody::btRigidBodyConstructionInfo ceilingRigidBodyCI(0.0f, ceilingMotionState, ceilingShape, btVector3(0.0f, 0.0f, 0.0f));
+		ceilingRigidBody = new btRigidBody(ceilingRigidBodyCI);
+		ceilingRigidBody->setUserPointer(nullptr);
+		dynamicsWorld->addRigidBody(ceilingRigidBody, BOUNDARY, collisionGroupInteractions[BOUNDARY]);
+
+	}
 }
 
 unsigned int PhysicsManager::getCollisionGroupInteractions(CollisionGroup collisionGroup) {
@@ -55,14 +62,12 @@ unsigned int PhysicsManager::getCollisionGroupInteractions(CollisionGroup collis
 
 void PhysicsManager::setDebugRenderer(btIDebugDraw* debugRenderer) {
 	dynamicsWorld->setDebugDrawer(debugRenderer);
-//	dynamicsWorld->getDebugDrawer()->setDebugMode(1);
-
 	dynamicsWorld->getDebugDrawer()->setDebugMode(
 		0
 //		+ btIDebugDraw::DBG_DrawConstraints
 		+ btIDebugDraw::DBG_DrawWireframe
 //		+ btIDebugDraw::DBG_DrawContactPoints
-//		+ btIDebugDraw::DBG_DrawAabb
+		+ btIDebugDraw::DBG_DrawAabb
 //		+ btIDebugDraw::DBG_DrawConstraintLimits
 //		+ btIDebugDraw::DBG_DrawFeaturesText
 //		+ btIDebugDraw::DBG_DrawFrames
@@ -78,26 +83,29 @@ void PhysicsManager::updatePhysics() {
 
 PhysicsManager::~PhysicsManager() {
 
-	// test
-	dynamicsWorld->removeRigidBody(groundRigidBody);
-	delete groundMotionState;
-	delete groundRigidBody;
-	delete groundShape;
+	if (boundariesOn)
+	{
+		// test
+		dynamicsWorld->removeRigidBody(groundRigidBody);
+		delete groundMotionState;
+		delete groundRigidBody;
+		delete groundShape;
 
-	dynamicsWorld->removeRigidBody(leftWallRigidBody);
-	delete leftWallMotionState;
-	delete leftWallRigidBody;
-	delete leftWallShape;
-	
-	dynamicsWorld->removeRigidBody(rightWallRigidBody);
-	delete rightWallMotionState;
-	delete rightWallRigidBody;
-	delete rightWallShape;
+		dynamicsWorld->removeRigidBody(leftWallRigidBody);
+		delete leftWallMotionState;
+		delete leftWallRigidBody;
+		delete leftWallShape;
 
-	dynamicsWorld->removeRigidBody(ceilingRigidBody);
-	delete ceilingMotionState;
-	delete ceilingRigidBody;
-	delete ceilingShape;
+		dynamicsWorld->removeRigidBody(rightWallRigidBody);
+		delete rightWallMotionState;
+		delete rightWallRigidBody;
+		delete rightWallShape;
+
+		dynamicsWorld->removeRigidBody(ceilingRigidBody);
+		delete ceilingMotionState;
+		delete ceilingRigidBody;
+		delete ceilingShape;
+	}
 
 	delete dynamicsWorld;
 	delete constraintSolver;

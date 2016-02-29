@@ -1,6 +1,6 @@
 #ifndef PHYSICALMASSMULTIBODY_HPP
 #define PHYSICALMASSMULTIBODY_HPP
-
+/*
 #include <glm.hpp>
 #include <vector>
 #include "PhysicsManager.hpp"
@@ -43,5 +43,5 @@ private:
 	std::vector<LinkedMass> linkedMasses;
 
 };
-
+*/
 #endif

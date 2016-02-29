@@ -1,6 +1,6 @@
 #include "PoTextLabelFps.hpp"
 
-PoTextLabelFps::PoTextLabelFps(GameState* gameState) : PoTextLabel(gameState) {
+PoTextLabelFps::PoTextLabelFps(const std::string& objectId, GameState* gameState) : PoTextLabel(objectId, gameState) {
 	gameState->eventBus->subscribeToGameEvent(Event::GameEvent::FPS_LABEL_UDPATE, this);
 }
 

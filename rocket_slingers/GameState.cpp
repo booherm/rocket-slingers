@@ -5,7 +5,7 @@ GameState::GameState() {
 	eventBus = new EventBus(this);
 	renderWindow = new RenderWindow(this);
 	camera = new Camera(this);
-	physicalObjectRenderer = new PhysicalObjectRenderer();
+	masterRenderer = new MasterRenderer();
 	audioManager = new AudioManager();
 	physicsManager = new PhysicsManager();
 	activeStage = new Stage(this);
@@ -34,7 +34,6 @@ void GameState::frameEnd() {
 		dFramesPerSecond = fpsFrameRange / totalTime;
 		fFramesPerSecond = (float) dFramesPerSecond;
 		fpsIterationCounter = 0;
-		//std::cout << "fps = " << fFramesPerSecond << std::endl;
 	}
 	else {
 		frameTimes[fpsIterationCounter++] = dLastFrameTotalTimeSeconds;
@@ -45,7 +44,7 @@ GameState::~GameState() {
 	delete activeStage;
 	delete physicsManager;
 	delete audioManager;
-	delete physicalObjectRenderer;
+	delete masterRenderer;
 	delete camera;
 	delete renderWindow;
 	delete eventBus;

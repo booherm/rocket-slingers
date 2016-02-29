@@ -5,16 +5,15 @@
 
 class PoReticule : public PhysicalObject {
 public:
-	PoReticule(GameState* gameState);
+	PoReticule(const std::string& objectId, GameState* gameState);
 	void gameEventCallback(const Event& eventObj);
+	void render();
 
 private:
 	
 	glm::vec3 worldPosition;
+	void initShaders();
 	void initGeometry();
-	void initRenderData();
-	void doRenderUpdate();
-	void setupTransforms();
 };
 
 #endif

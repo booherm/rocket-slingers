@@ -5,15 +5,16 @@
 
 class PoBackground : public PhysicalObject {
 public:
-	PoBackground(GameState* gameState);
-	void doRenderUpdate();
-	
-private:
-	GLuint texture1;
-	GLuint VAO;
+	PoBackground(const std::string& objectId, GameState* gameState);
+	void render();
 
+private:
+
+	float sizeScaler;
+	unsigned int parallaxLayers;
 	void initShaders();
 	void initGeometry();
+
 };
 
 #endif

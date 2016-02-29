@@ -1,228 +1,354 @@
 #include "PoRope.hpp"
 
-PoRope::PoRope(GameState* gameState) : PhysicalObject("PO_ROPE", gameState) {
-	initGeometry();
+PoRope::PoRope(const std::string& objectId, GameState* gameState) : PhysicalObject(objectId, gameState) {
+
+	ropeMassesCount = 20;
 	initShaders();
+	initGeometry();
 
-//	maxAllowedChangeInTime = 0.002f;
-	this->glRenderingMode = GL_LINES;
-
-	//gameState->eventBus->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_LEFT, this);
 	gameState->eventBus->subscribeToGameEvent(Event::GameEvent::THROW_ROPE, this);
-	gameState->physicalObjectRenderer->addPhysicalObject(this);
+	gameState->eventBus->subscribeToGameEvent(Event::GameEvent::RELEASE_ROPE, this);
 }
 
 void PoRope::gameEventCallback(const Event& eventObj) {
-	/*
-	// determine rope anchor and termination coordinates
-	float worldX = eventObj.eventWorldCoordinateX;
-	float worldY = eventObj.eventWorldCoordinateY;
-	glm::vec3 ropeAnchorPoint(worldX, worldY, 0.0f);
-	PhysicalObject* poster = (PhysicalObject*) eventObj.eventPoster;
-	PhysicalMass* guyMainComponentMass = poster->getMainComponentMass();
-	glm::vec3 ropeTerminationPoint = guyMainComponentMass->worldPosition;
 
-	// calculate attributes that will apply to all rope masses
-	float overallRopeLength = glm::distance(ropeAnchorPoint, ropeTerminationPoint);
-	float ropeSegmentLength = overallRopeLength / (ropeMassCount - 1);
-	float theta = Utilities::xyAngleBetweenVectors(glm::vec3(1.0f, 0.0f, 0.0f), ropeAnchorPoint - ropeTerminationPoint);
-	float positionOffsetX = glm::cos(theta) * ropeSegmentLength;
-	float positionOffsetY = glm::sin(theta) * ropeSegmentLength;
+	if (eventObj.gameEvent == Event::GameEvent::THROW_ROPE) {
+		// get reference to the player object
+		player = (PoGuy*)eventObj.eventPoster;
 
-	// Create rope masses.  Each rope mass is a point on the rope joined by a spring segment to it's immediate neighbor
-	// down the rope.  The first and last masses on the rope only have internal spring segments.
-	componentMasses.resize(ropeMassCount);
-	ropeSegmentLengths.resize(ropeMassCount);
-	for (unsigned int massIndex = 0; massIndex < ropeMassCount; massIndex++) {
+		// remove any prior instance
+		destructRope();
 
-		PhysicalMass* ropeMass = &componentMasses[massIndex];
-		ropeMass->mass = ropeMassMass;
-		RopeSegmentLength* rsl = &ropeSegmentLengths[massIndex];
-		rsl->unstretchedLength = ropeSegmentLength;
-		rsl->stretchedLength = ropeSegmentLength;
+		// determine player position
+		btVector3 guyArmLocation;
+		glm::vec3 guyArmLocationGlm;
+		player->getArmLocation(guyArmLocationGlm);
+		PhysicsManager::glmVec3ToBtVec3(guyArmLocationGlm, guyArmLocation);
 
-		// determine mass origin position
-		ropeMass->worldPosition = glm::vec3(ropeAnchorPoint.x - (positionOffsetX * massIndex),
-			ropeAnchorPoint.y - (positionOffsetY * massIndex), 0.0f);
+		// determine click location
+		btVector3 connectionPointLocation;
+		glm::vec3 connectionPointLocationGlm(eventObj.eventWorldCoordinateX, eventObj.eventWorldCoordinateY, 0.0f);
+		PhysicsManager::glmVec3ToBtVec3(connectionPointLocationGlm, connectionPointLocation);
 
+
+
+
+		//////////////////// collision stuff /////////////////
+		unsigned int collisionObjectCount = gameState->physicsManager->dynamicsWorld->getCollisionWorld()->getNumCollisionObjects();
+		std::cout << "Number of collision objects: " << collisionObjectCount << std::endl;
+		btCollisionObjectArray coa = gameState->physicsManager->dynamicsWorld->getCollisionWorld()->getCollisionObjectArray();
+		for (unsigned int j = 0; j < collisionObjectCount; j++) {
+			btCollisionObject* co = coa.at(j);
+			int collisionFlags = co->getCollisionFlags();
+			int activationState = co->getActivationState();
+			btScalar contactProcessingThreshold = co->getContactProcessingThreshold();
+			btScalar hitFraction = co->getHitFraction();
+			bool hasContactResponse = co->hasContactResponse();
+
+			btTransform aabbTransform;
+			btVector3 aabbMin;
+			btVector3 aabbMax;
+			co->getCollisionShape()->getAabb(aabbTransform, aabbMin, aabbMax);
+
+
+			glm::vec3 aabbMinGlm;
+			glm::vec3 aabbMaxGlm;
+			PhysicsManager::btVec3ToGlmVec3(aabbMin, aabbMinGlm);
+			PhysicsManager::btVec3ToGlmVec3(aabbMax, aabbMaxGlm);
+			std::string bbMin = Utilities::vectorToString(aabbMinGlm);
+			std::string bbMax = Utilities::vectorToString(aabbMaxGlm);
+			
+			if (co->getUserPointer() != nullptr) {
+				PhysicalMass* pm = (PhysicalMass*) co->getUserPointer();
+				std::cout
+					<< "object " << j << " id = " << pm->id
+					//<< ", collisionFlags = " << collisionFlags
+					//<< ", activationState = " << activationState
+					//<< ", contactProcessingThreshold = " << contactProcessingThreshold
+					//<< ", hitFraction = " << hitFraction
+					//<< ", hasContactResponse = " << hasContactResponse
+					<< ", bbMin = " << bbMin
+					<< ", bbMax = " << bbMax
+					<< std::endl;
+			}
+			else
+				std::cout
+				<< "object " << j << " id = nullptr"
+				//<< ", collisionFlags = " << collisionFlags
+				//<< ", activationState = " << activationState
+				//<< ", contactProcessingThreshold = " << contactProcessingThreshold
+				//<< ", hitFraction = " << hitFraction
+				//<< ", hasContactResponse = " << hasContactResponse
+				<< ", bbMin = " << bbMin
+				<< ", bbMax = " << bbMax
+				<< std::endl;
+		}
+
+		// test for object hit along the ray to point where mouse was clicked
+		btCollisionWorld::ClosestRayResultCallback hitResult(guyArmLocation, connectionPointLocation);
+
+		//gameState->physicsManager->dynamicsWorld->getDebugDrawer()->drawLine()
+		
+
+
+		// detects rope through boudary
+		//hitResult.m_collisionFilterGroup = 32767;
+		//hitResult.m_collisionFilterMask
+
+
+		// nothing
+		//hitResult.m_collisionFilterGroup = 0;
+
+		// detects rope through boudary
+		//hitResult.m_collisionFilterGroup = -1;
+
+		// detects rope through boudary
+		hitResult.m_collisionFilterGroup = PhysicsManager::CollisionGroup::PLAYER;
+		hitResult.m_collisionFilterMask = PhysicsManager::CollisionGroup::PLAYER | PhysicsManager::CollisionGroup::BOUNDARY | PhysicsManager::CollisionGroup::SWINGING_MASS;
+
+		// detects rope through boudary
+		//hitResult.m_collisionFilterGroup = PhysicsManager::CollisionGroup::PLAYER;
+
+		//hitResult.m_collisionFilterGroup = PhysicsManager::CollisionGroup::PLAYER;
+
+		//hitResult.m_collisionFilterGroup = PhysicsManager::CollisionGroup::BOUNDARY;
+		//hitResult.m_collisionFilterMask = PhysicsManager::CollisionGroup::BOUNDARY;
+
+		// nothing
+		//hitResult.m_collisionFilterGroup = PhysicsManager::CollisionGroup::ROPE_MASS;
+		//hitResult.m_collisionFilterMask = PhysicsManager::CollisionGroup::ROPE_MASS;
+
+		// nothing
+		//hitResult.m_collisionFilterGroup = PhysicsManager::CollisionGroup::ROPE_MASS;
+		//hitResult.m_collisionFilterMask = PhysicsManager::CollisionGroup::ROPE_MASS | PhysicsManager::CollisionGroup::SWINGING_MASS;
+
+		// nothing
+		//hitResult.m_collisionFilterMask = PhysicsManager::CollisionGroup::ROPE_MASS | PhysicsManager::CollisionGroup::SWINGING_MASS | PhysicsManager::CollisionGroup::PLAYER | PhysicsManager::CollisionGroup::BOUNDARY | PhysicsManager::CollisionGroup::NO_COLLISION;
+
+		// nothing
+		//hitResult.m_collisionFilterMask = PhysicsManager::CollisionGroup::ROPE_MASS | PhysicsManager::CollisionGroup::SWINGING_MASS | PhysicsManager::CollisionGroup::PLAYER | PhysicsManager::CollisionGroup::BOUNDARY;
+
+		gameState->physicsManager->dynamicsWorld->getCollisionWorld()->rayTest(guyArmLocation, connectionPointLocation, hitResult);
+		//gameState->physicsManager->dynamicsWorld->rayTest(guyArmLocation, connectionPointLocation, hitResult);
+		std::cout << "testing hit from " << Utilities::vectorToString(guyArmLocationGlm) << " to " << Utilities::vectorToString(connectionPointLocationGlm) << std::endl;
+		if (hitResult.hasHit()) {
+			btVector3 hitLocation = hitResult.m_hitPointWorld;
+			PhysicsManager::btVec3ToGlmVec3(hitLocation, connectionPointLocationGlm);
+			std::cout << "hit detected at " << Utilities::vectorToString(connectionPointLocationGlm) << std::endl;
+		}
+
+
+
+
+		// determine rope length and location properties
+		ropeSegmentLength = glm::distance(connectionPointLocationGlm, guyArmLocationGlm) / (float) ropeMassesCount;
+		glm::vec3 offset = (guyArmLocationGlm - connectionPointLocationGlm) / (float) ropeMassesCount;
+
+		// create new rigid bodies connected by constraints, originating at the connection point, terminating at player position
+		ropeMasses.resize(ropeMassesCount);
+		for (unsigned int i = 0; i < ropeMassesCount; ++i) {
+
+			glm::mat4 worldTransform;
+			worldTransform = glm::translate(worldTransform, connectionPointLocationGlm + (offset * (float) i));
+
+			PhysicalMass* ropeMass = new PhysicalMass();
+			ropeMass->init("PO_ROPE", gameState, i == 0 ? 0.0f : 10.0f, worldTransform, PhysicsManager::CollisionGroup::ROPE_MASS);
+			ropeMass->addCollisionShapeSphere(glm::mat4(), 0.2f);
+			ropeMass->addToDynamicsWorld();
+
+			ropeMass->rigidBody->setActivationState(DISABLE_DEACTIVATION);
+			ropeMasses[i].ropeMass = ropeMass;
+		}
+
+		for (unsigned int i = 0; i < ropeMassesCount - 1; ++i) {
+
+			// link created masses
+			btTransform constraintTransform = btTransform::getIdentity();
+
+			btHingeConstraint* linkConstraint = new btHingeConstraint(
+				*(ropeMasses[i].ropeMass->rigidBody),
+				*(ropeMasses[i + 1].ropeMass->rigidBody),
+				btVector3(0.0f, 0.0f, 0.0f),
+				btVector3(ropeSegmentLength, 0.0f, 0.0f),
+				btVector3(0.0f, 0.0f, 1.0f),
+				btVector3(0.0f, 0.0f, 0.0f),
+				true
+			);
+
+			gameState->physicsManager->dynamicsWorld->addConstraint(linkConstraint);
+			ropeMasses[i].linkConstraint = linkConstraint;
+
+		}
+
+		// constrain the player mass to the end of the rope
+		btHingeConstraint* playerRopeConstraint = new btHingeConstraint(
+			*(ropeMasses[ropeMassesCount - 1].ropeMass->rigidBody),
+			*(player->getRigidBody()),
+			btVector3(0.0f, 0.0f, 0.0f),
+			btVector3(ropeSegmentLength, 0.0f, 0.0f),
+			btVector3(0.0f, 0.0f, 1.0f),
+			btVector3(0.0f, 0.0f, 0.0f),
+			true
+		);
+		gameState->physicsManager->dynamicsWorld->addConstraint(playerRopeConstraint);
+		ropeMasses[ropeMassesCount - 1].linkConstraint = playerRopeConstraint;
+
+		shouldRender = true;
+		shouldDoPhysicalUpdate = true;
+
+		// play rope deployment sound effect
+		gameState->audioManager->playSoundEffect(AudioManager::SoundEffectId::WHIP, 0);
 	}
+	else {
+		// rope release
+		destructRope();
+		shouldRender = false;
+		shouldDoPhysicalUpdate = false;
 
-	// bind the guy main component mass to the last mass on the rope
-	//componentMasses[ropeMassCount - 1].connectMasses(guyMainComponentMass);
-
-	shouldRender = true;
-	shouldDoPhysicalUpdate = true;
-
-	gameState->audioManager->playSoundEffect(AudioManager::SoundEffectId::WHIP, 0);
-	*/
-
+		// play rope release sound effect
+		gameState->audioManager->playSoundEffect(AudioManager::SoundEffectId::ROPE_RETRACT, 0);
+	}
 }
 
-void PoRope::sdlInputEventCallback(const Event& eventObj){
-	
-	/*
-	// determine rope anchor and termination coordinates
-	float worldX = eventObj.eventWorldCoordinateX;
-	float worldY = eventObj.eventWorldCoordinateY;
-	glm::vec3 ropeAnchorPoint(worldX, worldY, 0.0f);
-	glm::vec3 ropeTerminationPoint(10.0f, 15.0f, 0.0f);  // this is a temporary hard-coded point, would get from player position
+void PoRope::initShaders() {
 
-	// calculate attributes that will apply to all rope masses
-	float overallRopeLength = glm::distance(ropeAnchorPoint, ropeTerminationPoint);
-	float ropeSegmentLength = overallRopeLength / (ropeMassCount - 1);
-	float theta = Utilities::xyAngleBetweenVectors(glm::vec3(1.0f, 0.0f, 0.0f), ropeAnchorPoint - ropeTerminationPoint);
-	float positionOffsetX = glm::cos(theta) * ropeSegmentLength;
-	float positionOffsetY = glm::sin(theta) * ropeSegmentLength;
+	// vertex shader
+	std::string vertexShaderSource =
+		"#version 330 core\n"
+		"\n"
+		"layout (location = 0) in vec3 modelVertex;\n"
+		"layout (location = 1) in vec4 colorValue;\n"
+		"\n"
+		"out vec4 fragColor;\n"
+		"\n"
+		"uniform mat4 transformMatrix;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"    gl_Position = transformMatrix * vec4(modelVertex, 1.0f);\n"
+		"    fragColor = colorValue;\n"
+		"}\n";
 
-	// Create rope masses.  Each rope mass is a point on the rope joined by a spring segment to it's immediate neighbor
-	// down the rope.  The first and last masses on the rope only have internal spring segments.
-	componentMasses.resize(ropeMassCount);
-	ropeSegmentLengths.resize(ropeMassCount);
-	for (unsigned int massIndex = 0; massIndex < ropeMassCount; massIndex++) {
+	// fragment shader
+	std::string fragmentShaderSource =
+		"#version 330 core\n"
+		"\n"
+		"in vec4 fragColor;\n"
+		"\n"
+		"out vec4 color;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"    color = fragColor;\n"
+		"}\n";
 
-		PhysicalMass* ropeMass = &componentMasses[massIndex];
-		ropeMass->mass = ropeMassMass;
-		RopeSegmentLength* rsl = &ropeSegmentLengths[massIndex];
-		rsl->unstretchedLength = ropeSegmentLength;
-		rsl->stretchedLength = ropeSegmentLength;
-
-		// determine mass origin position
-		ropeMass->worldPosition = glm::vec3(ropeAnchorPoint.x - (positionOffsetX * massIndex),
-			ropeAnchorPoint.y - (positionOffsetY * massIndex), 0.0f);
-
-	}
-
-	shouldRender = true;
-	shouldDoPhysicalUpdate = true;
-
-	gameState->audioManager->playSoundEffect(AudioManager::SoundEffectId::WHIP, 0);
-	*/
+	shaderProg = OglShaderProgram();
+	shaderProg.createVertexShaderFromSourceString(vertexShaderSource);
+	shaderProg.createFragmentShaderFromSourceString(fragmentShaderSource);
+	shaderProg.build();
 
 }
 
 void PoRope::initGeometry() {
-	// model data
-	modelVertices.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-	modelVertices.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
 
-	modelOriginOffsetData.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	glRenderingMode = GL_LINES;
+	unsigned int vertexCount = 2 * (ropeMassesCount - 1);
+	initModelVertexBuffer(vertexCount);
 
-	for (unsigned int massIndex = 0; massIndex < ropeMassCount - 1; massIndex++) {
-		colorData.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	for (unsigned int i = 0; i < vertexCount; i++) {
 		colorData.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	}
+	initColorBuffer();
+	
+	buildVao(MODEL_VERTEX | COLOR);
+	gameState->masterRenderer->addRenderableObject(this);
 }
 
 void PoRope::doPhysicalUpdate() {
-	/*
-	resetForces();
 
-	// iterate over rope masses of this rope, applying fores starting from the top anchor point
-	for (unsigned int massIndex = 0; massIndex < ropeMassCount; massIndex++) {
+	glm::vec3 pos;
+	ropeMasses[ropeMassesCount - 1].ropeMass->getCenterOfMassPosition(pos);
 
-		// get this rope mass and it's immediate neighbor down the rope
-		PhysicalMass* thisMass = &componentMasses[massIndex];
-		RopeSegmentLength* thisMassSegmentLengths = &ropeSegmentLengths[massIndex];
-		PhysicalMass* nextMass = nullptr;
-		if (massIndex != ropeMassCount - 1)   // last segment has no downward neighbor
-			nextMass = &componentMasses[massIndex + 1];
+	glm::vec3 basePosition;
+	ropeMasses[0].ropeMass->getCenterOfMassPosition(basePosition);
+	pos = pos - basePosition;
 
-		if (nextMass != nullptr) {
-			// calculate and apply spring force
-			glm::vec3 springVector = thisMass->worldPosition - nextMass->worldPosition;
-			thisMassSegmentLengths->stretchedLength = glm::length(springVector);
-			glm::vec3 springForce;
-			if (thisMassSegmentLengths->stretchedLength != 0) {
-				springForce = -(springVector / thisMassSegmentLengths->stretchedLength)
-					* (thisMassSegmentLengths->stretchedLength - thisMassSegmentLengths->unstretchedLength)
-					* springStiffnessConstant;
-			}
+	glm::vec3 rocketForce;
+	player->getRocketForce(rocketForce);
+	float forceMagnitude = glm::length(rocketForce);
+	if (rocketForce.x > 0.0f)
+		forceMagnitude = -forceMagnitude;
 
-			// apply internal spring friction
-			springForce += -(thisMass->velocity - nextMass->velocity) * internalSpringFrictionConstant;
+	// rotate x normal vector to tangent position
+	float theta;
+	if (pos.x == 0.0f) {
+		if (pos.y > 0.0f)
+			theta = glm::half_pi<float>();
+		else
+			theta = glm::three_over_two_pi<float>();
+	}
+	else {
+		theta = glm::atan(pos.y / pos.x);
 
-			// apply spring force to this rope segment
-			thisMass->force += springForce;
-
-			// apply opposite spring force to adjacent mass
-			nextMass->force += -springForce;
+		if (pos.x > 0.0f) {
+			if (pos.y < 0.0f)
+				theta += glm::two_pi<float>();
 		}
-
-		// apply gravitational force
-		thisMass->force += thisMass->mass * glm::vec3(0.0f, -gravitationalConstant, 0.0f);
-
-		// apply air friction force
-		thisMass->force += (-thisMass->velocity * airFrictionConstant);
-
-		glm::vec3 forceSoFar = thisMass->force;
-
-		/*
-		// apply attached forces
-		if (nextMass == nullptr) {
-
-			PhysicalMass* connectedMass = thisMass->connectedPhysicalMasses[0];
-			glm::vec3 connectionVector = thisMass->worldPosition - connectedMass->worldPosition;
-			float stretchedLength = glm::length(connectionVector);
-			glm::vec3 springForce;
-			if (stretchedLength != 0) {
-				springForce = -(connectionVector / stretchedLength)
-					* (stretchedLength - thisMassSegmentLengths->unstretchedLength)
-					* 10000.00f; // springStiffnessConstant;
-			}
-
-			thisMass->force += springForce;
-			connectedMass->force += -springForce;
-
-
-//			thisMass->force += thisMass->connectedPhysicalMasses[0]->force;
-			//thisMass->connectedPhysicalMasses[0]->force -= forceSoFar;
-		}
-		
-
-		if (massIndex > 0) { // do not update velocity or position on the anchor mass
-			thisMass->updatePhysics(changeInTime);
+		else {
+			if (pos.y == 0.0f)
+				theta = glm::pi<float>();
+			else
+				theta += glm::pi<float>();
 		}
 	}
-	*/
+	glm::quat rotationQuaternion = glm::angleAxis(theta, glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::vec3 radialVector = rotationQuaternion * glm::vec3(1.0f, 0.0f, 0.0f);
+	glm::vec3 perpForce(-radialVector.y, radialVector.x, radialVector.z);
+	perpForce = perpForce * forceMagnitude;
 
+	//std::cout << "pos = " << Utilities::vectorToString(pos) << ", theta = " << theta << ", radialVector = " << Utilities::vectorToString(radialVector) << ", perpForce = " << Utilities::vectorToString(perpForce) << std::endl;
+
+	btVector3 perpForceBt;
+	PhysicsManager::glmVec3ToBtVec3(perpForce, perpForceBt);
+	ropeMasses[ropeMassesCount - 1].ropeMass->rigidBody->applyCentralForce(perpForceBt);
 }
 
-void PoRope::doRenderUpdate() {
-	/*
-	transformData.clear();
-	for (unsigned int massIndex = 0; massIndex < ropeMassCount - 1; massIndex++) {
-		PhysicalMass* thisMass = &componentMasses[massIndex];
-		PhysicalMass* nextMass = &componentMasses[massIndex + 1];
+void PoRope::render() {
 
-		// transform
-		glm::mat4 modelTransform;
-		modelTransform = glm::translate(modelTransform, thisMass->worldPosition);
+	modelVertexData.clear();
+	for (unsigned int i = 0; i < ropeMassesCount - 1; ++i) {
+		glm::vec3 thisMassPosition;
+		ropeMasses[i].ropeMass->getCenterOfMassPosition(thisMassPosition);
+		modelVertexData.push_back(thisMassPosition);
 
-		// calculate angle between this segment and the next segment
-		float theta = Utilities::xyAngleBetweenVectors(glm::vec3(1.0f, 0.0f, 0.0f), thisMass->worldPosition - nextMass->worldPosition) - glm::pi<float>();
-
-		// calculate distance between end points of this segment and the next segment
-		float distance = glm::distance(thisMass->worldPosition, nextMass->worldPosition);
-
-		// scale by distance
-		modelTransform = glm::scale(modelTransform, glm::vec3(distance, distance, 1.0f));
-
-		// rotate by theta
-		glm::quat rotationQuaternion = glm::angleAxis(theta, glm::vec3(0.0f, 0.0f, 1.0f));
-		glm::mat4 rotationQuaternionMatrix = glm::toMat4(rotationQuaternion);
-		modelTransform = modelTransform * rotationQuaternionMatrix;
-
-		// view
-		glm::mat4 viewTransform = gameState->camera->getViewTransform();
-
-		// projection
-		glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
-
-		// combine transform
-		glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
-
-		transformData.push_back(transform);
+		glm::vec3 nextMassPosition;
+		ropeMasses[i + 1].ropeMass->getCenterOfMassPosition(nextMassPosition);
+		modelVertexData.push_back(nextMassPosition);
 	}
-	*/
 
+	refreshModelVertexBuffer();
+	
+	glm::mat4 viewTransform = gameState->camera->getViewTransform();
+	glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
+	glm::mat4 transform = projectionTransform * viewTransform;
+
+	shaderProg.use();
+	setUniformValue("transformMatrix", transform);
+	glBindVertexArray(masterVao);
+	glDrawArrays(glRenderingMode, 0, modelVertexData.size());
+
+	abortOnOpenGlError();
+}
+
+PoRope::~PoRope() {
+	destructRope();
+}
+
+void PoRope::destructRope() {
+	for (unsigned int i = 0; i < ropeMasses.size(); ++i) {
+		gameState->physicsManager->dynamicsWorld->removeConstraint(ropeMasses[i].linkConstraint);
+		delete ropeMasses[i].linkConstraint;
+		delete ropeMasses[i].ropeMass;
+	}
+	ropeMasses.clear();
 }

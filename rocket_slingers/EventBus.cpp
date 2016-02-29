@@ -87,8 +87,7 @@ bool EventBus::processInput() {
 			if (eventType == Event::EventType::QUIT_EVENT)
 				return false;
 
-			glm::vec3 cameraPosition;
-			gameState->camera->getPosition(cameraPosition);
+			glm::vec3 cameraPosition = gameState->camera->getPosition();
 
 			Event e;
 			e.eventType = eventType;

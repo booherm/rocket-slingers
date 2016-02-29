@@ -13,11 +13,11 @@ class PhysicsManager {
 public:
 
 	enum CollisionGroup {
-		NO_COLLISION  = 0,
-		ROPE_MASS     = 1,
-		PLAYER        = 2,
-		BOUNDARY      = 4,
-		SWINGING_MASS = 8
+		NO_COLLISION  = 1,
+		ROPE_MASS     = 2,
+		PLAYER        = 4,
+		BOUNDARY      = 8,
+		SWINGING_MASS = 16
 	};
 
 	PhysicsManager();
@@ -26,8 +26,8 @@ public:
 	unsigned int getCollisionGroupInteractions(CollisionGroup collisionGroup);
 	~PhysicsManager();
 
-	//btDiscreteDynamicsWorld* dynamicsWorld;
-	btMultiBodyDynamicsWorld*  dynamicsWorld;
+	btDiscreteDynamicsWorld* dynamicsWorld;
+	//btMultiBodyDynamicsWorld*  dynamicsWorld;
 
 	static void glmVec3ToBtVec3(const glm::vec3& glmVector, btVector3& btVector);
 	static void btVec3ToGlmVec3(const btVector3& btVector, glm::vec3& glmVector);
@@ -42,11 +42,11 @@ private:
 	btBroadphaseInterface* collisionBroadphase;
 	btDefaultCollisionConfiguration* collisionConfiguration;
 	btCollisionDispatcher* collisionDispatcher;
-	//btSequentialImpulseConstraintSolver* constraintSolver;
-	btMultiBodyConstraintSolver* constraintSolver;
+	btSequentialImpulseConstraintSolver* constraintSolver;
+	//btMultiBodyConstraintSolver* constraintSolver;
 
 
-
+	bool boundariesOn;
 	btStaticPlaneShape* groundShape;
 	btDefaultMotionState* groundMotionState;
 	btRigidBody* groundRigidBody;

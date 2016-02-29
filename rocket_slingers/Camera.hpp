@@ -11,21 +11,12 @@ class Camera : public EventListener
 {
 public:
 	Camera(GameState* gameState);
-	glm::mat4 getViewTransform();
-	glm::mat4 getProjectionTransform();
-	void sdlInputEventCallback(const Event& eventObject);
+	const glm::mat4& getViewTransform();
+	const glm::mat4& getProjectionTransform();
 	void updatePosition(const glm::vec3& position);
-	void getPosition(glm::vec3& position);
+	const glm::vec3& getPosition();
 
 private:
-	enum CameraTranslation {
-		CT_FORWARD,
-		CT_BACKWARD,
-		CT_LEFT,
-		CT_RIGHT,
-		CT_UP,
-		CT_DOWN
-	};
 
 	GameState* gameState;
 	float orthoViewWidth;
@@ -39,13 +30,7 @@ private:
 	glm::mat4 projectionTransform;
 	float yaw;
 	float pitch;
-	float movementSpeed;
-	float mouseSensitivity;
-	float zoom;
 
-	void translateCamera(CameraTranslation direction);
-	void updateCameraDirection(float xoffset, float yoffset, bool constrainPitch);
-	void updateCameraZoom(float yoffset);
 	void updateCameraVectors();
 };
 

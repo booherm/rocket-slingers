@@ -6,13 +6,10 @@
 class PoPhysicsRenderer : public PhysicalObject, public btIDebugDraw
 {
 public:
-	PoPhysicsRenderer(GameState* gameState);
-	void doRenderUpdate();
-	void sdlInputEventCallback(const Event& eventObj);
+	PoPhysicsRenderer(const std::string& objectId, GameState* gameState);
+	void render();
 	void drawLine(const btVector3& from, const btVector3& to, const btVector3& color);
 	void flushLines();
-	void afterRender();
-
 
 	~PoPhysicsRenderer();
 
@@ -25,21 +22,10 @@ public:
 	//Svoid setDefaultColors(const DefaultColors&);
 	
 private:
-	void initGeometry();
 
+	int debugMode;
+	void initShaders();
+	void initGeometry();
 };
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-

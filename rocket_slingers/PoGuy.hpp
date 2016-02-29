@@ -6,9 +6,9 @@
 
 class PoGuy : public PhysicalObject {
 public:
-	PoGuy(GameState* gameState);
+	PoGuy(const std::string& objectId, GameState* gameState);
 	void doPhysicalUpdate();
-	void doRenderUpdate();
+	void render();
 	void sdlInputEventCallback(const Event& eventObj);
 	void getArmLocation(glm::vec3& armLocation);
 	void getRocketForce(glm::vec3& rocketForce);
@@ -20,15 +20,16 @@ public:
 private:
 
 	const float scalerToMeter = 0.03936f;
+	glm::vec3 modelOriginOffset;
 	glm::vec3 initialPosition;
 	glm::vec3 rocketForce;
 	PhysicalMass* physicalMass;
 	PhysicalMass* cameraFocalPointPhysicalMass;
 	btGeneric6DofSpring2Constraint* cameraSpringConstraint;
-	//PhysicalMassMultiBody* multiBody;
 
 	bool rocketOn = false;
 	bool ropeThrown = false;
+	void initShaders();
 	void initGeometry();
 	void initPhysics();
 	void initEventSubsriptions();

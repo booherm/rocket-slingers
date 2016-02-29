@@ -1,15 +1,48 @@
 #include "PoReticule.hpp"
 
-PoReticule::PoReticule(GameState* gameState) : PhysicalObject("PO_RETICULE", gameState) {
+PoReticule::PoReticule(const std::string& objectId, GameState* gameState) : PhysicalObject(objectId, gameState) {
 	initShaders();
 	initGeometry();
-	initRenderData();
-
-	shouldRender = true;
-	glRenderingMode = GL_LINES;
-
 	gameState->eventBus->subscribeToGameEvent(Event::GameEvent::MOVE_RETICULE, this);
-	gameState->physicalObjectRenderer->addPhysicalObject(this);
+}
+
+void PoReticule::initShaders() {
+
+	// vertex shader
+	std::string vertexShaderSource =
+		"#version 330 core\n"
+		"\n"
+		"layout (location = 0) in vec3 modelVertex;\n"
+		"layout (location = 1) in vec4 colorValue;\n"
+		"\n"
+		"out vec4 fragColor;\n"
+		"\n"
+		"uniform mat4 transformMatrix;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"    gl_Position = transformMatrix * vec4(modelVertex, 1.0f);\n"
+		"    fragColor = colorValue;\n"
+		"}\n";
+
+	// fragment shader
+	std::string fragmentShaderSource =
+		"#version 330 core\n"
+		"\n"
+		"in vec4 fragColor;\n"
+		"\n"
+		"out vec4 color;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"    color = fragColor;\n"
+		"}\n";
+
+	shaderProg = OglShaderProgram();
+	shaderProg.createVertexShaderFromSourceString(vertexShaderSource);
+	shaderProg.createFragmentShaderFromSourceString(fragmentShaderSource);
+	shaderProg.build();
+
 }
 
 void PoReticule::gameEventCallback(const Event& eventObj) {
@@ -17,40 +50,37 @@ void PoReticule::gameEventCallback(const Event& eventObj) {
 }
 
 void PoReticule::initGeometry() {
-	modelVertices.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-	modelVertices.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
-}
 
-void PoReticule::initRenderData() {
+	glRenderingMode = GL_LINES;
 
-	for (unsigned int i = 0; i < 2; i++) {
+	modelVertexData.push_back(glm::vec3(-0.5f, 0.0f, 0.0f));
+	modelVertexData.push_back(glm::vec3(0.5f, 0.0f, 0.0f));
+	modelVertexData.push_back(glm::vec3(0.0f, -0.5f, 0.0f));
+	modelVertexData.push_back(glm::vec3(0.0f, 0.5f, 0.0f));
+
+	for (unsigned int i = 0; i < modelVertexData.size(); i++)
 		colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-	}
 
-	setupTransforms();
+	zDepth = 0.9f;
+	initModelVertexBuffer();
+	initColorBuffer();
+	buildVao(MODEL_VERTEX | COLOR);
+	shouldRender = true;
+	gameState->masterRenderer->addRenderableObject(this);
 }
 
-void PoReticule::setupTransforms() {
-	transformData.clear();
-	glm::mat4 view = gameState->camera->getViewTransform();
-	glm::mat4 projection = gameState->camera->getProjectionTransform();
+void PoReticule::render() {
 
-	// horizontal line
-	glm::mat4 modelHorz;
-	modelHorz = glm::translate(modelHorz, glm::vec3(-0.5f, 0.0f, 0.0f) + worldPosition);
-	modelHorz = glm::rotate(modelHorz, 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-	glm::mat4 transformHorz = projection * view * modelHorz;
-	transformData.push_back(transformHorz);
+	glm::mat4 modelTransform;
+	modelTransform = glm::translate(modelTransform, worldPosition);
+	glm::mat4 viewTransform = gameState->camera->getViewTransform();
+	glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
+	glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
 
-	// vertical line
-	glm::mat4 modelVert;
-	modelVert = glm::translate(modelVert, glm::vec3(0.0f, -0.5f, 0.0f) + worldPosition);
-	modelVert = glm::rotate(modelVert, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
-	glm::mat4 transformVert = projection * view * modelVert;
-	transformData.push_back(transformVert);
-}
+	shaderProg.use();
+	setUniformValue("transformMatrix", transform);
+	glBindVertexArray(masterVao);
+	glDrawArrays(glRenderingMode, 0, modelVertexData.size());
 
-void PoReticule::doRenderUpdate() {
-	setupTransforms();
+	abortOnOpenGlError();
 }

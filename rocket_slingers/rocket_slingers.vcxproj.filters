@@ -48,13 +48,7 @@
     <ClCompile Include="PoGuy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PoRope.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Utilities.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicalObjectRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PhysicalMass.cpp">
@@ -72,9 +66,6 @@
     <ClCompile Include="EventBus.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PoBetterRope.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PhysicsManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -87,9 +78,6 @@
     <ClCompile Include="PoReticule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PoRigidBodyRope.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PoTextLabel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -97,6 +85,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PoPendulum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PoRope.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderableObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MasterRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -131,13 +128,7 @@
     <ClInclude Include="PoGuy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PoRope.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Utilities.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicalObjectRenderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PhysicalMass.hpp">
@@ -158,9 +149,6 @@
     <ClInclude Include="Event.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PoBetterRope.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PhysicsManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -173,19 +161,22 @@
     <ClInclude Include="PoReticule.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PoRigidBodyRope.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PoTextLabel.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderingStructure.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PoTextLabelFps.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PoPendulum.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PoRope.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderableObject.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MasterRenderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,7 +4,7 @@
 #include "RenderWindow.hpp"
 #include "EventBus.hpp"
 #include "Camera.hpp"
-#include "PhysicalObjectRenderer.hpp"
+#include "MasterRenderer.hpp"
 #include "AudioManager.hpp"
 #include "PhysicsManager.hpp"
 
@@ -12,7 +12,7 @@ class EventBus;
 class RenderWindow;
 class Camera;
 class PhysicalObjectManager;
-class PhysicalObjectRenderer;
+class MasterRenderer;
 class Stage;
 
 class GameState {
@@ -25,7 +25,7 @@ public:
 	EventBus* eventBus;
 	RenderWindow* renderWindow;
 	Camera* camera;
-	PhysicalObjectRenderer* physicalObjectRenderer;
+	MasterRenderer* masterRenderer;
 	AudioManager* audioManager;
 	Stage* activeStage;
 	PhysicsManager* physicsManager;

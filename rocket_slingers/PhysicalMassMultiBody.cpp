@@ -1,4 +1,5 @@
 #include "PhysicalMassMultiBody.hpp"
+/*
 //#include <iostream>
 
 void PhysicalMassMultiBody::init(GameState* gameState, float baseMass, const glm::mat4& baseWorldTransform){
@@ -122,3 +123,4 @@ PhysicalMassMultiBody::~PhysicalMassMultiBody() {
 
 
 }
+*/

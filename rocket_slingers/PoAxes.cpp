@@ -1,70 +1,151 @@
 #include "PoAxes.hpp"
 
-PoAxes::PoAxes(GameState* gameState) : PhysicalObject("PO_AXES", gameState) {
+PoAxes::PoAxes(const std::string& objectId, GameState* gameState) : PhysicalObject(objectId, gameState) {
 	initShaders();
 	initGeometry();
-	initRenderData();
+}
 
-	shouldRender = true;
-	glRenderingMode = GL_LINES;
-	gameState->physicalObjectRenderer->addPhysicalObject(this);
+void PoAxes::initShaders() {
+
+	// vertex shader
+	std::string vertexShaderSource =
+		"#version 330 core\n"
+		"\n"
+		"layout (location = 0) in vec3 modelVertex;\n"
+		"layout (location = 1) in vec4 colorValue;\n"
+		"\n"
+		"out vec4 fragColor;\n"
+		"\n"
+		"uniform mat4 transformMatrix;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"    gl_Position = transformMatrix * vec4(modelVertex, 1.0f);\n"
+		"    fragColor = colorValue;\n"
+		"}\n";
+
+	// fragment shader
+	std::string fragmentShaderSource =
+		"#version 330 core\n"
+		"\n"
+		"in vec4 fragColor;\n"
+		"\n"
+		"out vec4 color;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"    color = fragColor;\n"
+		"}\n";
+
+	shaderProg = OglShaderProgram();
+	shaderProg.createVertexShaderFromSourceString(vertexShaderSource);
+	shaderProg.createFragmentShaderFromSourceString(fragmentShaderSource);
+	shaderProg.build();
+
 }
 
 void PoAxes::initGeometry() {
-	// axes model data
-	modelVertices.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-	modelVertices.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
-}
 
-void PoAxes::pushAxisTransform(glm::mat4 model) {
-	glm::mat4 view = gameState->camera->getViewTransform();
-	glm::mat4 projection = gameState->camera->getProjectionTransform();
-	glm::mat4 transform = projection * view * model;
-	transformData.push_back(transform);
-}
+	glRenderingMode = GL_LINES;
 
-void PoAxes::initRenderData() {
+	float xMinorTickInterval = 1.0f;
+	float xMajorTickInterval = 5.0f;
+	float yMinorTickInterval = 1.0f;
+	float yMajorTickInterval = 5.0f;
 
-	for (unsigned int i = 0; i < 3; i++) {
-		modelOriginOffsetData.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-		colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	float xHalfExtent = (((unsigned int) (1000.0f * gameState->aspectRatio)) / (unsigned int) xMajorTickInterval) * xMajorTickInterval;
+	float yHalfExtent = 1000.0f;
+
+	glm::vec3 color(0.0f, 1.0f, 0.0f);
+	float minorTickAlpha = 0.25f;
+	float majorTickAlpha = 1.00f;
+
+	glm::vec4 axesColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	glm::vec4 minorTickColor = glm::vec4(color, minorTickAlpha);
+	glm::vec4 majorTickColor = glm::vec4(color, majorTickAlpha);
+
+	// y axis
+	modelVertexData.push_back(glm::vec3(0.0f, -yHalfExtent, 0.0f));
+	modelVertexData.push_back(glm::vec3(0.0f, yHalfExtent, 0.0f));
+	colorData.push_back(axesColor);
+	colorData.push_back(axesColor);
+
+	// x minor ticks
+	unsigned int minorTickCount = (unsigned int) xHalfExtent / (unsigned int) xMinorTickInterval;
+	float tickLocation = xMinorTickInterval;
+	for (unsigned int i = 1; i <= minorTickCount; ++i) {
+		modelVertexData.push_back(glm::vec3(tickLocation, -yHalfExtent, 0.0f));
+		modelVertexData.push_back(glm::vec3(tickLocation, yHalfExtent, 0.0f));
+		modelVertexData.push_back(glm::vec3(-tickLocation, -yHalfExtent, 0.0f));
+		modelVertexData.push_back(glm::vec3(-tickLocation, yHalfExtent, 0.0f));
+
+		if (i % (unsigned int) xMajorTickInterval == 0) {
+			colorData.push_back(majorTickColor);
+			colorData.push_back(majorTickColor);
+			colorData.push_back(majorTickColor);
+			colorData.push_back(majorTickColor);
+		}
+		else {
+			colorData.push_back(minorTickColor);
+			colorData.push_back(minorTickColor);
+			colorData.push_back(minorTickColor);
+			colorData.push_back(minorTickColor);
+		}
+
+		tickLocation += xMinorTickInterval;
 	}
 
 	// x axis
-	glm::mat4 modelX;
-	modelX = glm::translate(modelX, glm::vec3(xMin, 0.0f, 0.0f));
-	modelX = glm::rotate(modelX, 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-	modelX = glm::scale(modelX, glm::vec3(xMax - xMin, 1.0f, 1.0f));
-	pushAxisTransform(modelX);
+	modelVertexData.push_back(glm::vec3(-xHalfExtent, 0.0f, 0.0f));
+	modelVertexData.push_back(glm::vec3(xHalfExtent, 0.0f, 0.0f));
+	colorData.push_back(axesColor);
+	colorData.push_back(axesColor);
 
-	// y axis
-	glm::mat4 modelY;
-	modelY = glm::translate(modelY, glm::vec3(0.0f, yMin, 0.0f));
-	modelY = glm::rotate(modelY, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
-	modelY = glm::scale(modelY, glm::vec3(yMax - yMin, 1.0f, 1.0f));
-	pushAxisTransform(modelY);
+	// y minor ticks
+	minorTickCount = (unsigned int) yHalfExtent / (unsigned int) yMinorTickInterval;
+	tickLocation = yMinorTickInterval;
+	for (unsigned int i = 1; i <= minorTickCount; ++i) {
+		modelVertexData.push_back(glm::vec3(-xHalfExtent, tickLocation, 0.0f));
+		modelVertexData.push_back(glm::vec3(xHalfExtent, tickLocation, 0.0f));
+		modelVertexData.push_back(glm::vec3(-xHalfExtent, -tickLocation, 0.0f));
+		modelVertexData.push_back(glm::vec3(xHalfExtent, -tickLocation, 0.0f));
 
-	// z axis
-	glm::mat4 modelZ;
-	modelZ = glm::translate(modelZ, glm::vec3(0.0f, 0.0f, zMin));
-	modelZ = glm::rotate(modelZ, -glm::half_pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
-	modelZ = glm::scale(modelZ, glm::vec3(zMax - zMin, 1.0f, 1.0f));
-	pushAxisTransform(modelZ);
+		if (i % (unsigned int) yMajorTickInterval == 0) {
+			colorData.push_back(majorTickColor);
+			colorData.push_back(majorTickColor);
+			colorData.push_back(majorTickColor);
+			colorData.push_back(majorTickColor);
+		}
+		else {
+			colorData.push_back(minorTickColor);
+			colorData.push_back(minorTickColor);
+			colorData.push_back(minorTickColor);
+			colorData.push_back(minorTickColor);
+		}
 
-	// x minor ticks
-	float xTotal = abs(xMin) + abs(xMax);
-	unsigned int xMinorTickCount = (unsigned int) (xTotal / xMinorTickInterval);
-	unsigned int xMajorTickCount = (unsigned int) (xTotal / xMajorTickInterval);
-	float tickLocation = 0.25f;// xMin;
-	for (unsigned int i = 0; i < xMinorTickCount; ++i) {
-		glm::mat4 tick;
-		tick = glm::translate(tick, glm::vec3(tickLocation, yMin, 0.0f));
-		tick = glm::rotate(tick, -glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
-		tick = glm::scale(tick, glm::vec3(yMax - yMin, 1.0f, 1.0f));
-		tickLocation += xMinorTickInterval;
-		colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 0.25f));
-		colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 0.25f));
-		pushAxisTransform(tick);
+		tickLocation += yMinorTickInterval;
 	}
+
+	zDepth = 0.9f;
+	initModelVertexBuffer();
+	initColorBuffer();
+	buildVao(MODEL_VERTEX | COLOR);
+	shouldRender = true;
+	gameState->masterRenderer->addRenderableObject(this);
+
+}
+
+void PoAxes::render() {
+
+	glm::mat4 viewTransform = gameState->camera->getViewTransform();
+	glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
+	glm::mat4 transform = projectionTransform * viewTransform;
+
+	shaderProg.use();
+	setUniformValue("transformMatrix", transform);
+	glBindVertexArray(masterVao);
+	glDrawArrays(glRenderingMode, 0, modelVertexData.size());
+
+	abortOnOpenGlError();
+
 }

@@ -1,14 +1,54 @@
 #include "PoPendulum.hpp"
 
-PoPendulum::PoPendulum(GameState* gameState) : PhysicalObject("PO_PENDULUM", gameState) {
+PoPendulum::PoPendulum(const std::string& objectId, GameState* gameState) : PhysicalObject(objectId, gameState) {
 
 	initialPosition = glm::vec3(15.0f, 15.0f, 0.0f);
 
 	initShaders();
 	initGeometry();
 	initPhysics();
+	shouldDoPhysicalUpdate = true;
 
-	shouldDoPhysicalUpdate = false;
+}
+
+void PoPendulum::initShaders() {
+
+	// vertex shader
+	std::string vertexShaderSource =
+		"#version 330 core\n"
+		"\n"
+		"layout (location = 0) in vec3 modelVertex;\n"
+		"layout (location = 1) in vec4 colorValue;\n"
+		"\n"
+		"out vec4 fragColor;\n"
+		"\n"
+		"uniform vec3 modelOriginOffset;\n"
+		"uniform mat4 transformMatrix;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"    gl_Position = transformMatrix * vec4(modelVertex + modelOriginOffset, 1.0f);\n"
+		"    fragColor = colorValue;\n"
+		"}\n";
+
+	// fragment shader
+	std::string fragmentShaderSource =
+		"#version 330 core\n"
+		"\n"
+		"in vec4 fragColor;\n"
+		"\n"
+		"out vec4 color;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"    color = fragColor;\n"
+		"}\n";
+
+	shaderProg = OglShaderProgram();
+	shaderProg.createVertexShaderFromSourceString(vertexShaderSource);
+	shaderProg.createFragmentShaderFromSourceString(fragmentShaderSource);
+	shaderProg.build();
+
 }
 
 void PoPendulum::initGeometry() {
@@ -26,56 +66,59 @@ void PoPendulum::initGeometry() {
 	points.push_back(glm::vec3(0.0f, -0.15f, 0.0f));  // I = 8
 
 	// pendulum model triangles
-	modelVertices.push_back(points[0]);
-	modelVertices.push_back(points[6]);
-	modelVertices.push_back(points[7]);
-	modelVertices.push_back(points[0]);
-	modelVertices.push_back(points[8]);
-	modelVertices.push_back(points[6]);
-	modelVertices.push_back(points[8]);
-	modelVertices.push_back(points[3]);
-	modelVertices.push_back(points[6]);
-	modelVertices.push_back(points[8]);
-	modelVertices.push_back(points[1]);
-	modelVertices.push_back(points[3]);
-	modelVertices.push_back(points[1]);
-	modelVertices.push_back(points[2]);
-	modelVertices.push_back(points[3]);
-	modelVertices.push_back(points[6]);
-	modelVertices.push_back(points[3]);
-	modelVertices.push_back(points[4]);
-	modelVertices.push_back(points[6]);
-	modelVertices.push_back(points[4]);
-	modelVertices.push_back(points[5]);
+	modelVertexData.push_back(points[0]);
+	modelVertexData.push_back(points[6]);
+	modelVertexData.push_back(points[7]);
+	modelVertexData.push_back(points[0]);
+	modelVertexData.push_back(points[8]);
+	modelVertexData.push_back(points[6]);
+	modelVertexData.push_back(points[8]);
+	modelVertexData.push_back(points[3]);
+	modelVertexData.push_back(points[6]);
+	modelVertexData.push_back(points[8]);
+	modelVertexData.push_back(points[1]);
+	modelVertexData.push_back(points[3]);
+	modelVertexData.push_back(points[1]);
+	modelVertexData.push_back(points[2]);
+	modelVertexData.push_back(points[3]);
+	modelVertexData.push_back(points[6]);
+	modelVertexData.push_back(points[3]);
+	modelVertexData.push_back(points[4]);
+	modelVertexData.push_back(points[6]);
+	modelVertexData.push_back(points[4]);
+	modelVertexData.push_back(points[5]);
 
-	modelOriginOffsetData.push_back(glm::vec3(0.0f, -0.85f, 0.0f));
+	modelOriginOffset = glm::vec3(0.0f, -0.85f, 0.0f);
 
 	// color
 	glm::vec4 modelColor(1.0f, 1.0f, 0.0f, 1.0f);
-	for (unsigned int i = 0; i < modelVertices.size(); i++)
+	for (unsigned int i = 0; i < modelVertexData.size(); i++)
 		colorData.push_back(modelColor);
 
-	gameState->physicalObjectRenderer->addPhysicalObject(this);
+	initModelVertexBuffer();
+	initColorBuffer();
+	buildVao(MODEL_VERTEX | COLOR);
+	gameState->masterRenderer->addRenderableObject(this);
 	shouldRender = true;
 }
 
 void PoPendulum::initPhysics() {
 
 	glm::mat4 worldTransform;
-	worldTransform = glm::translate(worldTransform, initialPosition + (modelOriginOffsetData[0] * sizeScaler));
+	worldTransform = glm::translate(worldTransform, initialPosition + (modelOriginOffset * sizeScaler));
 
 	// hinge point
 	glm::mat4 hingePointTransform;
 	hingePointTransform = glm::translate(worldTransform, glm::vec3(0.0f, 0.85 * sizeScaler, 0.0f));
 	hingePointMass = new PhysicalMass();
-	hingePointMass->init(gameState, 0.0f, hingePointTransform, PhysicsManager::CollisionGroup::NO_COLLISION);
+	hingePointMass->init("PENDULUM_HINGE_POINT", gameState, 0.0f, hingePointTransform, PhysicsManager::CollisionGroup::NO_COLLISION);
 	hingePointMass->addToDynamicsWorld();
 
 	// bob mass and collider shapes
 	glm::mat4 identityTransform;
 	glm::mat4 armComTransform = glm::translate(identityTransform, glm::vec3(0.0f, ((0.7f / 2.0f) + 0.15f) * sizeScaler, 0.0f));
 	bobMass = new PhysicalMass();
-	bobMass->init(gameState, 500.0f, worldTransform, PhysicsManager::CollisionGroup::SWINGING_MASS);
+	bobMass->init("PENDULUM_BOB_MASS", gameState, 500.0f, worldTransform, PhysicsManager::CollisionGroup::SWINGING_MASS);
 	bobMass->addCollisionShapeBox(armComTransform, glm::vec3(0.1f, 0.7f, 0.0f) * sizeScaler);
 	bobMass->addCollisionShapeBox(identityTransform, glm::vec3(1.0f, 0.3f, 0.0f) * sizeScaler);
 	bobMass->addToDynamicsWorld();
@@ -110,27 +153,26 @@ void PoPendulum::doPhysicalUpdate() {
 
 }
 
-void PoPendulum::doRenderUpdate() {
+void PoPendulum::render() {
 
-	transformData.clear();
-
-	// model transform
 	glm::mat4 modelTransform;
 	modelTransform = glm::translate(modelTransform, initialPosition);
 	modelTransform = glm::scale(modelTransform, glm::vec3(sizeScaler, sizeScaler, 1.0f));
 	glm::quat rotationQuaternion;
 	PhysicsManager::btQuatToGlmQuat(bobMass->rigidBody->getOrientation(), rotationQuaternion);
 	modelTransform = modelTransform * glm::toMat4(rotationQuaternion);
-
-	// view
 	glm::mat4 viewTransform = gameState->camera->getViewTransform();
-
-	// projection
 	glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
-
-	// combine transform
 	glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
-	transformData.push_back(transform);
+
+
+	shaderProg.use();
+	setUniformValue("transformMatrix", transform);
+	setUniformValue("modelOriginOffset", modelOriginOffset);
+	glBindVertexArray(masterVao);
+	glDrawArrays(glRenderingMode, 0, modelVertexData.size());
+
+	abortOnOpenGlError();
 }
 
 PoPendulum::~PoPendulum() {

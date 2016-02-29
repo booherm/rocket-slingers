@@ -5,7 +5,7 @@
 
 class PoTextLabelFps : public PoTextLabel {
 public:
-	PoTextLabelFps(GameState* gameState);
+	PoTextLabelFps(const std::string& objectId, GameState* gameState);
 	void gameEventCallback(const Event& eventObj);
 
 private:

@@ -2,31 +2,33 @@
 #define POROPE_HPP
 
 #include "PhysicalObject.hpp"
+#include "PoGuy.hpp"
 
 class PoRope : public PhysicalObject {
 public:
-	PoRope(GameState* gameState);
+
+	PoRope(const std::string& objectId, GameState* gameState);
 	void doPhysicalUpdate();
-	void doRenderUpdate();
+	void render();
 	void gameEventCallback(const Event& eventObj);
-	void sdlInputEventCallback(const Event& eventObj);
+	~PoRope();
 
 private:
 
-	struct RopeSegmentLength {
-		float unstretchedLength;
-		float stretchedLength;
+	struct RopeSegment {
+		PhysicalMass* ropeMass;
+		btHingeConstraint* linkConstraint;
 	};
 
-	unsigned int ropeMassCount = 30;// 15;
-	float ropeMassMass = 0.05f;
-	float springStiffnessConstant = 10000.0f;
-	float internalSpringFrictionConstant = 0.2f;
-	float airFrictionConstant = 0.02f;
-	float gravitationalConstant = 9.81f;
+	float ropeSegmentLength;
+	unsigned int ropeMassesCount;
+	std::vector<RopeSegment> ropeMasses;
+	PoGuy* player = nullptr;
 
-	std::vector<RopeSegmentLength> ropeSegmentLengths;
+	void initShaders();
 	void initGeometry();
+	void destructRope();
+
 };
 
 #endif

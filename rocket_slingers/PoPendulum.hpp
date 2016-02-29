@@ -5,19 +5,21 @@
 
 class PoPendulum : public PhysicalObject {
 public:
-	PoPendulum(GameState* gameState);
-	void doRenderUpdate();
+	PoPendulum(const std::string& objectId, GameState* gameState);
+	void render();
 	~PoPendulum();
 
 private:
 
 	float sizeScaler = 5.0f;
+	glm::vec3 modelOriginOffset;
 
 	glm::vec3 initialPosition;
-	void doPhysicalUpdate();
+	void initShaders();
 	void initGeometry();
 	void initPhysics();
-	
+	void doPhysicalUpdate();
+
 	PhysicalMass* hingePointMass;
 	PhysicalMass* bobMass;
 	btHingeConstraint* hingeConstraint;

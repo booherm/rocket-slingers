@@ -14,10 +14,8 @@ public:
 		unsigned int advance;
 	};
 	
-	PoTextLabel(GameState* gameState);
-	void doPhysicalUpdate();
-	void doRenderUpdate();
-	void customRender();
+	PoTextLabel(const std::string& objectId, GameState* gameState);
+	void render();
 	void setTextValue(const std::string& value);
 	void setColor(const glm::vec4& color);
 	void setSizeScaler(float sizeScaler);
@@ -32,11 +30,10 @@ private:
 	std::string currentValue;
 	glm::vec3 worldPosition;
 	float sizeScaler;
+	glm::mat4 projectionTransform;
 
 	void initShaders();
 	void initGeometry();
-	void initPhysics();
-	void abortOnOpenGlError();
 };
 
 #endif

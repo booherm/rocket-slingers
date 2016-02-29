@@ -1,6 +1,6 @@
 #include "PoGuy.hpp"
 
-PoGuy::PoGuy(GameState* gameState) : PhysicalObject("PO_GUY", gameState) {
+PoGuy::PoGuy(const std::string& objectId, GameState* gameState) : PhysicalObject(objectId, gameState) {
 	initShaders();
 	initGeometry();
 	initPhysics();
@@ -85,6 +85,46 @@ void PoGuy::sdlInputEventCallback(const Event& eventObj) {
 
 		}
 	}
+}
+
+void PoGuy::initShaders() {
+
+	// vertex shader
+	std::string vertexShaderSource =
+		"#version 330 core\n"
+		"\n"
+		"layout (location = 0) in vec3 modelVertex;\n"
+		"layout (location = 1) in vec4 colorValue;\n"
+		"\n"
+		"out vec4 fragColor;\n"
+		"\n"
+		"uniform vec3 modelOriginOffset;\n"
+		"uniform mat4 transformMatrix;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"    gl_Position = transformMatrix * vec4(modelVertex + modelOriginOffset, 1.0f);\n"
+		"    fragColor = colorValue;\n"
+		"}\n";
+
+	// fragment shader
+	std::string fragmentShaderSource =
+		"#version 330 core\n"
+		"\n"
+		"in vec4 fragColor;\n"
+		"\n"
+		"out vec4 color;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"    color = fragColor;\n"
+		"}\n";
+
+	shaderProg = OglShaderProgram();
+	shaderProg.createVertexShaderFromSourceString(vertexShaderSource);
+	shaderProg.createFragmentShaderFromSourceString(fragmentShaderSource);
+	shaderProg.build();
+
 }
 
 void PoGuy::initGeometry() {
@@ -210,19 +250,22 @@ void PoGuy::initGeometry() {
 	unsigned int guyModelVertexIndex = 0;
 	for (unsigned int t = 0; t < 53; t++) {
 		for (unsigned int v = 0; v < 3; v++) {
-			modelVertices.push_back(glm::vec3(guyModelVerticesSet[guyModelTriangleVertexIds[t][v]][0], guyModelVerticesSet[guyModelTriangleVertexIds[t][v]][1], 0.0f));
+			modelVertexData.push_back(glm::vec3(guyModelVerticesSet[guyModelTriangleVertexIds[t][v]][0], guyModelVerticesSet[guyModelTriangleVertexIds[t][v]][1], 0.0f));
 		}
 	}
 
 	// push color data
-	for (unsigned int i = 0; i < modelVertices.size(); i++) {
+	for (unsigned int i = 0; i < modelVertexData.size(); i++) {
 		colorData.push_back(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 	}
 
 	// set model origin
-	modelOriginOffsetData.push_back(glm::vec3(-18.0f, -35.0f, 0.0f));
+	modelOriginOffset = glm::vec3(-18.0f, -35.0f, 0.0f);
 
-	gameState->physicalObjectRenderer->addPhysicalObject(this);
+	initModelVertexBuffer();
+	initColorBuffer();
+	buildVao(MODEL_VERTEX | COLOR);
+	gameState->masterRenderer->addRenderableObject(this);
 	shouldRender = true;
 }
 
@@ -233,7 +276,7 @@ void PoGuy::initPhysics() {
 	worldTransform = glm::translate(worldTransform, initialPosition);
 
 	physicalMass = new PhysicalMass();
-	physicalMass->init(gameState, 62.0f, worldTransform, PhysicsManager::CollisionGroup::PLAYER);
+	physicalMass->init("PO_GUY_PLAYER", gameState, 62.0f, worldTransform, PhysicsManager::CollisionGroup::PLAYER);
 	physicalMass->addCollisionShapeSphere(glm::mat4(), 1.0f);
 	physicalMass->addToDynamicsWorld();
 	//physicalMass->rigidBody->setGravity(btVector3(0.0f, 0.0f, 0.0f));
@@ -243,7 +286,7 @@ void PoGuy::initPhysics() {
 
 
 	cameraFocalPointPhysicalMass = new PhysicalMass();
-	cameraFocalPointPhysicalMass->init(gameState, 1.0f, cameraFocalPointTransform, PhysicsManager::CollisionGroup::NO_COLLISION);
+	cameraFocalPointPhysicalMass->init("CAMERA_FOCAL_POINT", gameState, 1.0f, cameraFocalPointTransform, PhysicsManager::CollisionGroup::NO_COLLISION);
 	cameraFocalPointPhysicalMass->addToDynamicsWorld();
 	cameraFocalPointPhysicalMass->rigidBody->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 	cameraFocalPointPhysicalMass->rigidBody->setActivationState(DISABLE_DEACTIVATION);
@@ -337,38 +380,25 @@ void PoGuy::updateTransformFromRope(const btTransform& transform) {
 	physicalMass->rigidBody->setCenterOfMassTransform(transform);
 }
 
-/*
-void PoGuy::addForceFromRope(const glm::vec3& ropeForce) {
-	btVector3 ropeForceBt;
-	PhysicsManager::glmVec3ToBtVec3(ropeForce, ropeForceBt);
-	physicalMass->rigidBody->applyCentralForce(ropeForceBt);
-	//physicalMass->rigidBody->setLinearVelocity(ropeForceBt);
-
-}
-*/
-
 btRigidBody* PoGuy::getRigidBody() {
 	return physicalMass->rigidBody;
 }
 
-void PoGuy::doRenderUpdate() {
+void PoGuy::render() {
 
-	transformData.clear();
-
-	// model transform: translate, scale, rotate
 	glm::mat4 modelTransform = physicalMass->worldTransform;
 	modelTransform = glm::scale(modelTransform, glm::vec3(scalerToMeter, scalerToMeter, 1.0f));
-
-	// view
 	glm::mat4 viewTransform = gameState->camera->getViewTransform();
-
-	// projection
 	glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
-
-	// combine transform
 	glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
-	transformData.push_back(transform);
 
+	shaderProg.use();
+	setUniformValue("transformMatrix", transform);
+	setUniformValue("modelOriginOffset", modelOriginOffset);
+	glBindVertexArray(masterVao);
+	glDrawArrays(glRenderingMode, 0, modelVertexData.size());
+
+	abortOnOpenGlError();
 }
 
 void PoGuy::getArmLocation(glm::vec3& armLocation) {

@@ -9,26 +9,25 @@
 class PhysicalMass : public btMotionState {
 public:
 
-	void init(GameState* gameState, float mass, const glm::mat4& worldTransform, PhysicsManager::CollisionGroup collisionGroup);
+	void init(const std::string& id, GameState* gameState, float mass, const glm::mat4& worldTransform, PhysicsManager::CollisionGroup collisionGroup);
 	void addCollisionShapeSphere(const glm::mat4& worldTransform, float collisionShpereRadius);
 	void addCollisionShapeBox(const glm::mat4& worldTransform, const glm::vec3& boxExtents);
 	void addToDynamicsWorld();
 	void getCenterOfMassPosition(glm::vec3& position);
-
-	void addToDynamicsWorldDebug();
-	void finishConstruction();
-
 
 	// try private:
 	void setWorldTransform(const btTransform& worldTrans);
 	void getWorldTransform(btTransform& worldTrans) const;
 
 	float mass;
+	std::string id;
 	btRigidBody* rigidBody = nullptr;
 	glm::mat4 worldTransform;
 	~PhysicalMass();
 
 private:
+
+	static std::map<std::string, PhysicalMass*> allPhysicalMasses;
 
 	PhysicsManager* physicsManager;
 	btCompoundShape* collisionShape = nullptr;

@@ -1,76 +1,83 @@
 #include "PoPhysicsRenderer.hpp"
 
-PoPhysicsRenderer::PoPhysicsRenderer(GameState* gameState) : PhysicalObject("PO_PHYSICS_RENDERER", gameState) {
-	initGeometry();
+PoPhysicsRenderer::PoPhysicsRenderer(const std::string& objectId, GameState* gameState) : PhysicalObject(objectId, gameState) {
 	initShaders();
-	glRenderingMode = GL_LINES;
-	shouldRender = true;
-	gameState->physicalObjectRenderer->addPhysicalObject(this);
+	initGeometry();
 	gameState->physicsManager->setDebugRenderer(this);
 }
 
 void PoPhysicsRenderer::drawLine(const btVector3& from, const btVector3& to, const btVector3& color) {
 
-	
-	glm::vec3 fromVec(from.x(), from.y(), from.z());
-	glm::vec3 toVec(to.x(), to.y(), to.z());
-	//glm::vec4 colorVec(color.x(), color.y(), color.z(), 1.0f);
-	glm::vec4 colorVec(1.0f, 1.0f, 1.0f, 1.0f);
+	glm::vec3 fromVec(from.x(), from.y(), 0.0f);
+	glm::vec3 toVec(to.x(), to.y(), 0.0f);
 
+	glm::vec4 colorVec;
+	if(color.x() == 0.0f && color.y() == 0.0f  && color.z() == 0.0f)
+		colorVec = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	else
+		colorVec = glm::vec4(color.x(), color.y(), color.z(), 1.0f);
+
+	modelVertexData.push_back(fromVec);
+	modelVertexData.push_back(toVec);
 	colorData.push_back(colorVec);
 	colorData.push_back(colorVec);
-
-	// transform
-	glm::mat4 modelTransform;
-	modelTransform = glm::translate(modelTransform, fromVec);
-
-	// calculate angle between this segment and the next segment
-	float theta = Utilities::xyAngleBetweenVectors(glm::vec3(1.0f, 0.0f, 0.0f), fromVec - toVec) - glm::pi<float>();
-
-	// calculate distance between end points of this segment and the next segment
-	float distance = glm::distance(fromVec, toVec);
-
-	// scale by distance
-	modelTransform = glm::scale(modelTransform, glm::vec3(distance, distance, 1.0f));
-
-	// rotate by theta
-	glm::quat rotationQuaternion = glm::angleAxis(theta, glm::vec3(0.0f, 0.0f, 1.0f));
-	glm::mat4 rotationQuaternionMatrix = glm::toMat4(rotationQuaternion);
-	modelTransform = modelTransform * rotationQuaternionMatrix;
-
-	// view
-	glm::mat4 viewTransform = gameState->camera->getViewTransform();
-
-	// projection
-	glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
-
-	// combine transform
-	glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
-
-	transformData.push_back(transform);
-
 }
 
 void PoPhysicsRenderer::flushLines() {
 }
 
-void PoPhysicsRenderer::afterRender() {
-	transformData.clear();
-	colorData.clear();
-}
+void PoPhysicsRenderer::initShaders() {
 
-void PoPhysicsRenderer::doRenderUpdate() {
+	// vertex shader
+	std::string vertexShaderSource =
+		"#version 330 core\n"
+		"\n"
+		"layout (location = 0) in vec3 modelVertex;\n"
+		"layout (location = 1) in vec4 colorValue;\n"
+		"\n"
+		"out vec4 fragColor;\n"
+		"\n"
+		"uniform mat4 transformMatrix;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"    gl_Position = transformMatrix * vec4(modelVertex, 1.0f);\n"
+		"    fragColor = colorValue;\n"
+		"}\n";
 
-}
+	// fragment shader
+	std::string fragmentShaderSource =
+		"#version 330 core\n"
+		"\n"
+		"in vec4 fragColor;\n"
+		"\n"
+		"out vec4 color;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"    color = fragColor;\n"
+		"}\n";
 
-void PoPhysicsRenderer::sdlInputEventCallback(const Event& eventObj) {
+	shaderProg = OglShaderProgram();
+	shaderProg.createVertexShaderFromSourceString(vertexShaderSource);
+	shaderProg.createFragmentShaderFromSourceString(fragmentShaderSource);
+	shaderProg.build();
 
 }
 
 void PoPhysicsRenderer::initGeometry() {
-	// model data
-	modelVertices.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-	modelVertices.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+
+	glRenderingMode = GL_LINES;
+	zDepth = 1.0f;
+
+	unsigned int maxVertices = 10000;
+	initModelVertexBuffer(maxVertices);
+	initColorBuffer(maxVertices);
+
+	buildVao(MODEL_VERTEX | COLOR);
+	gameState->masterRenderer->addRenderableObject(this);
+	shouldRender = true;
+
 }
 
 PoPhysicsRenderer::~PoPhysicsRenderer() {};
@@ -79,18 +86,36 @@ void PoPhysicsRenderer::drawContactPoint(const btVector3& PointOnB, const btVect
 };
 
 void PoPhysicsRenderer::reportErrorWarning(const char* warningString) {
+	throw std::string(warningString);
 };
 
 void PoPhysicsRenderer::draw3dText(const btVector3& location, const char* textString) {
 };
 
 void PoPhysicsRenderer::setDebugMode(int debugMode) {
+	this->debugMode = debugMode;
 };
 
 int	 PoPhysicsRenderer::getDebugMode() const {
-	return 1;
+	return debugMode;
 };
 
-//void PoPhysicsRenderer::setDefaultColors(const DefaultColors&) {
-//
-//}
+void PoPhysicsRenderer::render() {
+
+	refreshModelVertexBuffer();
+	refreshColorBuffer();
+
+	glm::mat4 viewTransform = gameState->camera->getViewTransform();
+	glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
+	glm::mat4 transform = projectionTransform * viewTransform;
+
+	shaderProg.use();
+	setUniformValue("transformMatrix", transform);
+	glBindVertexArray(masterVao);
+	glDrawArrays(glRenderingMode, 0, modelVertexData.size());
+
+	modelVertexData.clear();
+	colorData.clear();
+
+	abortOnOpenGlError();
+}

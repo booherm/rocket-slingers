@@ -5,7 +5,7 @@
 #include "PoAxes.hpp"
 #include "PoGuy.hpp"
 #include "PoPendulum.hpp"
-#include "PoRigidBodyRope.hpp"
+#include "PoRope.hpp"
 #include "PoPhysicsRenderer.hpp"
 #include "PoReticule.hpp"
 #include "PoTextLabel.hpp"
