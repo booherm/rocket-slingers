@@ -10,7 +10,7 @@ void PhysicalMass::init(const std::string& id, GameState* gameState, float mass,
 	this->collisionGroup = collisionGroup;
 
 	allPhysicalMasses[id] = this;
-	collisionShape = new btCompoundShape();
+	collisionShape = new btCompoundShape(false, 0);
 }
 
 void PhysicalMass::addCollisionShapeSphere(const glm::mat4& worldTransform, float collisionShpereRadius) {
@@ -32,6 +32,7 @@ void PhysicalMass::addCollisionShapeBox(const glm::mat4& worldTransform, const g
 void PhysicalMass::addCollisionShape(const glm::mat4& worldTransform, btCollisionShape* collisionShape) {
 
 	collisionShapeComponents.push_back(collisionShape);
+	//this->collisionShape = collisionShape;
 	btTransform worldTransformBt;
 	PhysicsManager::glmTransformToBtTransform(worldTransform, worldTransformBt);
 	this->collisionShape->addChildShape(worldTransformBt, collisionShape);
@@ -48,8 +49,7 @@ void PhysicalMass::addToDynamicsWorld() {
 	rigidBody->setUserPointer(this);
 
 	physicsManager->dynamicsWorld->addRigidBody(rigidBody, collisionGroup, physicsManager->getCollisionGroupInteractions(collisionGroup));
-	//physicsManager->dynamicsWorld->addRigidBody(rigidBody);
-	
+
 }
 
 void PhysicalMass::getCenterOfMassPosition(glm::vec3& position) {
@@ -69,6 +69,31 @@ void PhysicalMass::getWorldTransform(btTransform& worldTrans) const {
 	PhysicsManager::glmTransformToBtTransform(worldTransform, worldTrans);
 
 }
+
+void PhysicalMass::setGravity(const glm::vec3& gravity) {
+	btVector3 gravityBt;
+	PhysicsManager::glmVec3ToBtVec3(gravity, gravityBt);
+	rigidBody->setGravity(gravityBt);
+}
+
+void PhysicalMass::setActivationState(int state) {
+	rigidBody->setActivationState(state);
+}
+
+/*
+void PhysicalMass::setCenterOfMassTransform(const glm::mat4& transform) {
+	btTransform transformBt;
+	PhysicsManager::glmTransformToBtTransform(transform, transformBt);
+	rigidBody->setCenterOfMassTransform(transformBt);
+}
+*/
+
+void PhysicalMass::applyCentralImpulse(const glm::vec3& impulse) {
+	btVector3 impulseBt;
+	PhysicsManager::glmVec3ToBtVec3(impulse, impulseBt);
+	rigidBody->applyCentralImpulse(impulseBt);
+}
+
 
 PhysicalMass::~PhysicalMass() {
 

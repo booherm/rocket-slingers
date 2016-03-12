@@ -22,7 +22,8 @@ public:
 		ROPE_PULL,
 		ROPE_RETRACT,
 		RUSTY_SWING,
-		WHIP,
+		ROPE_HIT,
+		ROPE_MISS,
 		ROCKET_RUMBLE,
 		SOUND_EFFECT_LAST
 	};
@@ -31,7 +32,7 @@ public:
 	void playMusicTrack(MusicTrackId musicTrackId);
 	unsigned int playSoundEffect(SoundEffectId effectId, int repetition);
 	void stopSoundEffect(unsigned int soundEffectInstanceId);
-
+	void setSoundEffectsVolume(unsigned int volume);
 	~AudioManager();
 
 private:

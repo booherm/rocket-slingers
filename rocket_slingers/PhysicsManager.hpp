@@ -2,9 +2,13 @@
 #define PHYSICSMANAGER_HPP
 
 #include <btBulletDynamicsCommon.h>
-#include <BulletDynamics/Featherstone/btMultiBodyDynamicsWorld.h>
-#include <BulletDynamics/Featherstone/btMultiBodyConstraintSolver.h>
-#include <BulletDynamics/Featherstone/btMultiBodyLinkCollider.h>
+//#include <BulletDynamics/Featherstone/btMultiBodyDynamicsWorld.h>
+//#include <BulletDynamics/Featherstone/btMultiBodyConstraintSolver.h>
+//#include <BulletDynamics/Featherstone/btMultiBodyLinkCollider.h>
+#include <BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
+#include <BulletSoftBody/btDefaultSoftBodySolver.h>
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
+
 #include <glm.hpp>
 #include <gtc/type_ptr.hpp>
 #include <map>
@@ -24,10 +28,12 @@ public:
 	void setDebugRenderer(btIDebugDraw* debugRenderer);
 	void updatePhysics();
 	unsigned int getCollisionGroupInteractions(CollisionGroup collisionGroup);
+	bool testRayHit(const glm::vec3& fromPoint, const glm::vec3& toPoint, CollisionGroup collisionGroup, glm::vec3& hitLocation);
 	~PhysicsManager();
 
-	btDiscreteDynamicsWorld* dynamicsWorld;
-	//btMultiBodyDynamicsWorld*  dynamicsWorld;
+	//btDiscreteDynamicsWorld* dynamicsWorld;
+	//btMultiBodyDynamicsWorld* dynamicsWorld;
+	btSoftRigidDynamicsWorld* dynamicsWorld;
 
 	static void glmVec3ToBtVec3(const glm::vec3& glmVector, btVector3& btVector);
 	static void btVec3ToGlmVec3(const btVector3& btVector, glm::vec3& glmVector);
@@ -40,10 +46,12 @@ private:
 	std::map<CollisionGroup, unsigned int> collisionGroupInteractions;
 
 	btBroadphaseInterface* collisionBroadphase;
-	btDefaultCollisionConfiguration* collisionConfiguration;
+	//btDefaultCollisionConfiguration* collisionConfiguration;
+	btSoftBodyRigidBodyCollisionConfiguration* collisionConfiguration;
 	btCollisionDispatcher* collisionDispatcher;
 	btSequentialImpulseConstraintSolver* constraintSolver;
 	//btMultiBodyConstraintSolver* constraintSolver;
+	btDefaultSoftBodySolver* softBodyConstraintSolver;
 
 
 	bool boundariesOn;
@@ -62,7 +70,11 @@ private:
 	btStaticPlaneShape* ceilingShape;
 	btDefaultMotionState* ceilingMotionState;
 	btRigidBody* ceilingRigidBody;
-
+	/*
+	btBoxShape* boxShape;
+	btDefaultMotionState* boxMotionState;
+	btRigidBody* boxRigidBody;
+	*/
 };
 
 #endif

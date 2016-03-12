@@ -1,15 +1,7 @@
 #ifndef STAGE_HPP
 #define STAGE_HPP
 
-#include "PoBackground.hpp"
-#include "PoAxes.hpp"
-#include "PoGuy.hpp"
-#include "PoPendulum.hpp"
-#include "PoRope.hpp"
-#include "PoPhysicsRenderer.hpp"
-#include "PoReticule.hpp"
-#include "PoTextLabel.hpp"
-#include "PoTextLabelFps.hpp"
+#include "AllPhysicalObjects.hpp"
 
 class GameState;
 
@@ -19,12 +11,18 @@ public:
 
 	Stage(GameState* gameState);
 	void update();
+	PhysicalObject* getPhysicalObject(const std::string& objectId);
+
 	~Stage();
 
 private:
 	
+	typedef std::pair<unsigned int, std::string> StageObjectKeyUpdateOrder;
+
 	GameState* gameState;
-	std::vector<PhysicalObject*> stageObjects;
+	std::map<StageObjectKeyUpdateOrder, PhysicalObject*> stageObjectsInUpdateOrder;
+	std::map<std::string, PhysicalObject*> stageObjectsById;
+	void pushStageObject(PhysicalObject* physicalObject, unsigned int objectUpdateOrder);
 };
 
 #endif

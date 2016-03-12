@@ -16,7 +16,8 @@ AudioManager::AudioManager() {
 	soundEffects[ROPE_PULL]      = { "./resources/rope_pull.wav" };
 	soundEffects[ROPE_RETRACT]   = { "./resources/rope_retract.wav" };
 	soundEffects[RUSTY_SWING]    = { "./resources/rusty_swing.wav" };
-	soundEffects[WHIP]           = { "./resources/whip.wav" };
+	soundEffects[ROPE_HIT]       = { "./resources/whip.wav" };
+	soundEffects[ROPE_MISS]      = { "./resources/rope_pull.wav" };
 	soundEffects[ROCKET_RUMBLE]  = { "./resources/rocket_rumble.wav" };
 
 	for (unsigned int i = 0; i < soundEffects.size(); ++i) {
@@ -58,6 +59,10 @@ void AudioManager::stopSoundEffect(unsigned int soundEffectInstanceId) {
 	channels[channel] = 0; // mark as free to be used again
 	effectInstanceChannels.erase(soundEffectInstanceId);
 
+}
+
+void AudioManager::setSoundEffectsVolume(unsigned int volume) {
+	Mix_Volume(-1, volume);
 }
 
 AudioManager::~AudioManager() {

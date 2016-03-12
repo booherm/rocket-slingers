@@ -11,9 +11,8 @@
 class EventBus;
 class RenderWindow;
 class Camera;
-class PhysicalObjectManager;
-class MasterRenderer;
 class Stage;
+class MasterRenderer;
 
 class GameState {
 public:

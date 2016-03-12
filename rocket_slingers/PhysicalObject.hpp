@@ -11,6 +11,7 @@
 #include "RenderableObject.hpp"
 
 class EventBus;
+class GameState;
 
 class PhysicalObject : public EventListener, public RenderableObject {
 public:

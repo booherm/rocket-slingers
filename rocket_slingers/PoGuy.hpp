@@ -11,10 +11,11 @@ public:
 	void render();
 	void sdlInputEventCallback(const Event& eventObj);
 	void getArmLocation(glm::vec3& armLocation);
-	void getRocketForce(glm::vec3& rocketForce);
-	void updateTransformFromRope(const btTransform& transform);
-	//void addForceFromRope(const glm::vec3& ropeForce);
-	btRigidBody* getRigidBody();
+	void getRocketImpulse(glm::vec3& rocketImpulse);
+	//void updateTransformFromRope(const btTransform& transform);
+	void setRopeAttachedToStructure(bool attachedToStructure);
+	//btRigidBody* getRigidBody();
+	PhysicalMass* getPhysicalMass();
 	~PoGuy();
 
 private:
@@ -22,13 +23,14 @@ private:
 	const float scalerToMeter = 0.03936f;
 	glm::vec3 modelOriginOffset;
 	glm::vec3 initialPosition;
-	glm::vec3 rocketForce;
+	glm::vec3 rocketImpulse;
 	PhysicalMass* physicalMass;
 	PhysicalMass* cameraFocalPointPhysicalMass;
 	btGeneric6DofSpring2Constraint* cameraSpringConstraint;
 
-	bool rocketOn = false;
-	bool ropeThrown = false;
+	bool rocketOn;
+	bool ropeAttachedToStructure;
+	bool gravityOn;
 	void initShaders();
 	void initGeometry();
 	void initPhysics();
@@ -38,7 +40,7 @@ private:
 	unsigned int keyDownCount;
 	std::map<int, bool> keyStates;
 
-	float rocketForceMagnitude = 1800.0f;
+	float rocketImpulseMagnitude;
 };
 
 #endif

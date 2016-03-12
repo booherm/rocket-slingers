@@ -97,7 +97,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;BulletCollision.lib;BulletDynamics.lib;LinearMath.lib;freetype.lib;glew32.lib;SDL2_mixer.lib;SDL2.lib;SOIL.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;BulletCollision.lib;BulletDynamics.lib;BulletSoftBody.lib;LinearMath.lib;freetype.lib;glew32.lib;SDL2_mixer.lib;SDL2.lib;SOIL.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>external\bullet3-2.83.7\lib\Debug;external\freetype-2.6.3\lib;external\glew-1.13.0\lib\Release\Win32;external\SDL2_mixer-2.0.1\lib\x86;external\SDL2-2.0.4\lib\x86;external\soil-1.16\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -136,7 +136,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;BulletCollision.lib;BulletDynamics.lib;LinearMath.lib;freetype.lib;glew32.lib;SDL2_mixer.lib;SDL2.lib;SOIL.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;BulletCollision.lib;BulletDynamics.lib;BulletSoftBody.lib;LinearMath.lib;freetype.lib;glew32.lib;SDL2_mixer.lib;SDL2.lib;SOIL.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>external\bullet3-2.83.7\lib\Release;external\freetype-2.6.3\lib;external\glew-1.13.0\lib\Release\Win32;external\SDL2_mixer-2.0.1\lib\x86;external\SDL2-2.0.4\lib\x86;external\soil-1.16\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -159,6 +159,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="PhysicalObjectManager.cpp" />
+    <ClCompile Include="PoBoundary.cpp" />
+    <ClCompile Include="PoBox.cpp" />
+    <ClCompile Include="PoRopeSoftBody.cpp" />
+    <ClCompile Include="PoRopeTarget.cpp" />
     <ClCompile Include="PoTextLabelFps.cpp">
       <SubType>
       </SubType>
@@ -191,6 +196,7 @@
     <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AllPhysicalObjects.hpp" />
     <ClInclude Include="AudioManager.hpp" />
     <ClInclude Include="Camera.hpp" />
     <ClInclude Include="Event.hpp" />
@@ -202,11 +208,16 @@
     <ClInclude Include="PhysicalMass.hpp" />
     <ClInclude Include="PhysicalMassMultiBody.hpp" />
     <ClInclude Include="PhysicalObject.hpp" />
+    <ClInclude Include="PhysicalObjectManager.hpp" />
     <ClInclude Include="PhysicsManager.hpp" />
+    <ClInclude Include="PoBoundary.hpp" />
+    <ClInclude Include="PoBox.hpp" />
     <ClInclude Include="PoPendulum.hpp" />
     <ClInclude Include="PoPhysicsRenderer.hpp" />
     <ClInclude Include="PoReticule.hpp" />
     <ClInclude Include="PoRope.hpp" />
+    <ClInclude Include="PoRopeSoftBody.hpp" />
+    <ClInclude Include="PoRopeTarget.hpp" />
     <ClInclude Include="PoTextLabel.hpp" />
     <ClInclude Include="PoTextLabelFps.hpp" />
     <ClInclude Include="RenderableObject.hpp" />

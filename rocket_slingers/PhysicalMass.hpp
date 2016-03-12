@@ -13,7 +13,11 @@ public:
 	void addCollisionShapeSphere(const glm::mat4& worldTransform, float collisionShpereRadius);
 	void addCollisionShapeBox(const glm::mat4& worldTransform, const glm::vec3& boxExtents);
 	void addToDynamicsWorld();
+	void applyCentralImpulse(const glm::vec3& impulse);
 	void getCenterOfMassPosition(glm::vec3& position);
+	//void setCenterOfMassTransform(const glm::mat4& transform);
+	void setGravity(const glm::vec3& gravity);
+	void setActivationState(int state);
 
 	// try private:
 	void setWorldTransform(const btTransform& worldTrans);
@@ -31,6 +35,7 @@ private:
 
 	PhysicsManager* physicsManager;
 	btCompoundShape* collisionShape = nullptr;
+	//btCollisionShape* collisionShape = nullptr;
 	std::vector<btCollisionShape*> collisionShapeComponents;
 	PhysicsManager::CollisionGroup collisionGroup;
 

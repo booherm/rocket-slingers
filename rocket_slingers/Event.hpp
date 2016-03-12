@@ -21,7 +21,8 @@ public:
 		THROW_ROPE,
 		RELEASE_ROPE,
 		MOVE_RETICULE,
-		FPS_LABEL_UDPATE
+		FPS_LABEL_UDPATE,
+		CAMERA_MOVED
 	};
 
 	EventType eventType;

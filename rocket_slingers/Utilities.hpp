@@ -9,7 +9,7 @@ namespace Utilities {
 	// gives the angle between the x and y components of 3d vectors
 	float xyAngleBetweenVectors(glm::vec3 baseVector, glm::vec3 toVector);
 
-	std::string vectorToString(glm::vec3 vector);
+	std::string vectorToString(const glm::vec3& vector);
 }
 
 #endif

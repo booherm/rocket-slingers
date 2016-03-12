@@ -20,8 +20,10 @@ private:
 		btHingeConstraint* linkConstraint;
 	};
 
-	float ropeSegmentLength;
+	bool attachedToStructure;
 	unsigned int ropeMassesCount;
+	float maxRopeLength;
+	float maxRopeSegmentLength;
 	std::vector<RopeSegment> ropeMasses;
 	PoGuy* player = nullptr;
 

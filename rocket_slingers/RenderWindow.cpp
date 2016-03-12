@@ -14,6 +14,8 @@ void RenderWindow::publishFrame() {
 
 void RenderWindow::initGlWindow() {
 
+	SDL_ShowCursor(SDL_DISABLE);
+
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -55,6 +57,10 @@ void RenderWindow::initGlWindow() {
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// enable face culling
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);

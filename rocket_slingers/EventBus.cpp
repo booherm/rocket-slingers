@@ -22,6 +22,7 @@ EventBus::EventBus(GameState* gameState) {
 	sdlEventTypeMapping[SDL_TEXTEDITING] = Event::EventType::NULL_EVENT;
 	sdlEventTypeMapping[SDL_TEXTINPUT] = Event::EventType::NULL_EVENT;
 	sdlEventTypeMapping[SDL_KEYMAPCHANGED] = Event::EventType::NULL_EVENT;
+//	sdlEventTypeMapping[SDL_MOUSEMOTION] = Event::EventType::SDL_MOUSE_MOVEMENT;
 	sdlEventTypeMapping[SDL_MOUSEMOTION] = Event::EventType::NULL_EVENT;
 	sdlEventTypeMapping[SDL_MOUSEBUTTONDOWN] = Event::EventType::SDL_MOUSE_BUTTON;
 	sdlEventTypeMapping[SDL_MOUSEBUTTONUP] = Event::EventType::SDL_MOUSE_BUTTON;
@@ -55,6 +56,10 @@ EventBus::EventBus(GameState* gameState) {
 	sdlEventTypeMapping[SDL_LASTEVENT] = Event::EventType::NULL_EVENT;
 
 }
+
+//void EventBus::subscribeToMouseMotionEvent(EventListener* subscribingObject) {
+//	mouseMotionSubscriptions.push_back(subscribingObject);
+//}
 
 void EventBus::subscribeToKeyboardEvent(unsigned int keyState, unsigned int key, EventListener* subscribingObject) {
 	KeyboardSubscriptionKey subscriptionKey(keyState, key);
@@ -108,6 +113,17 @@ bool EventBus::processInput() {
 void EventBus::callSubscribers(const Event& eventObj) {
 	switch (eventObj.eventType) {
 
+		/*
+		// mouse movement
+		case Event::EventType::SDL_MOUSE_MOVEMENT:
+		{
+			for (auto subscriber : mouseMotionSubscriptions) {
+				subscriber->sdlInputEventCallback(eventObj);
+			}
+			break;
+		}
+		*/
+
 		// keyboard
 		case Event::EventType::SDL_KEYBOARD:
 		{
@@ -151,6 +167,15 @@ void EventBus::callSubscribers(const Event& eventObj) {
 		}
 
 	}
+}
+
+void EventBus::getMousePosition(float &x, float &y) {
+	int xi, yi;
+	SDL_GetMouseState(&xi, &yi);
+
+	glm::vec3 cameraPosition = gameState->camera->getPosition();
+	x = ((float) xi * screenToWorldCoordinateScalerX) + cameraPosition.x;
+	y = (gameState->worldViewportScaler - ((float) yi * screenToWorldCoordinateScalerY)) + cameraPosition.y;
 }
 
 void EventBus::postEvent(const Event& eventObj) {

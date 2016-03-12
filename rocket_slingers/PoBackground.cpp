@@ -1,10 +1,22 @@
 #include "PoBackground.hpp"
-#include "SOIL.h"
-#include <gtc/type_ptr.hpp>
 
 PoBackground::PoBackground(const std::string& objectId, GameState* gameState) : PhysicalObject(objectId, gameState) {
 	initShaders();
 	initGeometry();
+
+	cameraPosition = gameState->camera->getPosition();
+	gameState->eventBus->subscribeToGameEvent(Event::GameEvent::CAMERA_MOVED, this);
+}
+
+void PoBackground::gameEventCallback(const Event& eventObj) {
+
+	// update parallax layer positions based on camera movement
+	glm::vec3 translation = glm::vec3(cameraPosition.x - eventObj.eventWorldCoordinateX, cameraPosition.y - eventObj.eventWorldCoordinateY, 0.0f);
+	for (unsigned int i = 0; i < parallaxLayers; ++i) {
+		transformData[i] = glm::translate(transformData[i], translation * (float) (i + 1) * 0.1f);
+	}
+	cameraPosition = glm::vec3(eventObj.eventWorldCoordinateX, eventObj.eventWorldCoordinateY, 0.0f);
+
 }
 
 void PoBackground::initGeometry() {
@@ -21,6 +33,16 @@ void PoBackground::initGeometry() {
 	modelVertexData.push_back(glm::vec3(1.0f * xScaler, 1.0f * yScaler, 0.0f) * sizeScaler);
 	modelVertexData.push_back(glm::vec3(0.0f * xScaler, 1.0f * yScaler, 0.0f) * sizeScaler);
 
+	/*
+	they don't tile :( 
+	modelVertexData.push_back(glm::vec3(1.0f * xScaler, 0.0f * yScaler, 0.0f));
+	modelVertexData.push_back(glm::vec3(2.0f * xScaler, 0.0f * yScaler, 0.0f) * sizeScaler);
+	modelVertexData.push_back(glm::vec3(2.0f * xScaler, 1.0f * yScaler, 0.0f) * sizeScaler);
+	modelVertexData.push_back(glm::vec3(1.0f * xScaler, 0.0f * yScaler, 0.0f) * sizeScaler);
+	modelVertexData.push_back(glm::vec3(2.0f * xScaler, 1.0f * yScaler, 0.0f) * sizeScaler);
+	modelVertexData.push_back(glm::vec3(1.0f * xScaler, 1.0f * yScaler, 0.0f) * sizeScaler);
+	*/
+
 	textureCoordinateData.push_back(glm::vec2(0.0f, 0.0f));
 	textureCoordinateData.push_back(glm::vec2(1.0f, 0.0f));
 	textureCoordinateData.push_back(glm::vec2(1.0f, 1.0f));
@@ -28,7 +50,16 @@ void PoBackground::initGeometry() {
 	textureCoordinateData.push_back(glm::vec2(1.0f, 1.0f));
 	textureCoordinateData.push_back(glm::vec2(0.0f, 1.0f));
 
-	parallaxLayers = 4;
+	/*
+	textureCoordinateData.push_back(glm::vec2(0.0f, 0.0f));
+	textureCoordinateData.push_back(glm::vec2(1.0f, 0.0f));
+	textureCoordinateData.push_back(glm::vec2(1.0f, 1.0f));
+	textureCoordinateData.push_back(glm::vec2(0.0f, 0.0f));
+	textureCoordinateData.push_back(glm::vec2(1.0f, 1.0f));
+	textureCoordinateData.push_back(glm::vec2(0.0f, 1.0f));
+	*/
+
+	parallaxLayers = 3;
 	for (unsigned int i = 0; i < parallaxLayers; ++i) {
 		std::string fileName = "resources/backgrounds/background_03_parallax_0" + std::to_string(i + 1) + ".png";
 		generateTexture(fileName);
@@ -39,6 +70,8 @@ void PoBackground::initGeometry() {
 	initTextureCoordinateBuffer();
 	buildVao(MODEL_VERTEX | TEXTURE_COORDINATE);
 	shouldRender = true;
+
+	projectionTransform = gameState->camera->getProjectionTransform();
 
 	gameState->masterRenderer->addRenderableObject(this);
 }
@@ -86,22 +119,15 @@ void PoBackground::initShaders() {
 
 void PoBackground::render() {
 	
-//	glm::mat4 viewTransform = gameState->camera->getViewTransform();
-	glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
-	
 	shaderProg.use();
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(masterVao);
-	for (unsigned int i = 0; i < parallaxLayers; i++) {
 
-//		glm::mat4 transform = projectionTransform * viewTransform * transformData[i];
+	for (unsigned int i = 0; i < parallaxLayers; i++) {
 		glm::mat4 transform = projectionTransform * transformData[i];
 		setUniformValue("transformMatrix", transform);
 		glBindTexture(GL_TEXTURE_2D, textureIds[i]);
-		glDrawArrays(glRenderingMode, 0, 6);
-
-		transformData[i] = glm::translate(transformData[i], glm::vec3(0.005f * i, 0.0f, 0.0f));
-
+		glDrawArrays(glRenderingMode, 0, modelVertexData.size());
 	}
 
 	abortOnOpenGlError();

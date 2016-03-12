@@ -13,6 +13,6 @@ float Utilities::xyAngleBetweenVectors(glm::vec3 baseVector, glm::vec3 toVector)
 	return theta;
 }
 
-std::string Utilities::vectorToString(glm::vec3 vector) {
+std::string Utilities::vectorToString(const glm::vec3& vector) {
 	return "(" + std::to_string(vector.x) + ", " + std::to_string(vector.y) + ", " + std::to_string(vector.z) + ")";
 }

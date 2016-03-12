@@ -6,12 +6,15 @@ PoGuy::PoGuy(const std::string& objectId, GameState* gameState) : PhysicalObject
 	initPhysics();
 	initEventSubsriptions();
 
+	rocketImpulseMagnitude = 100.0f;
 	keyDownCount = 0;
 	keyStates[SDLK_w] = false;
 	keyStates[SDLK_s] = false;
 	keyStates[SDLK_a] = false;
 	keyStates[SDLK_d] = false;
 	rocketOn = false;
+	ropeAttachedToStructure = false;
+	gravityOn = true;
 }
 
 void PoGuy::initEventSubsriptions() {
@@ -23,6 +26,7 @@ void PoGuy::initEventSubsriptions() {
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_s, this);
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_a, this);
 	gameState->eventBus->subscribeToKeyboardEvent(SDL_RELEASED, SDLK_d, this);
+	gameState->eventBus->subscribeToKeyboardEvent(SDL_PRESSED, SDLK_g, this);
 	gameState->eventBus->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_LEFT, this);
 	gameState->eventBus->subscribeToMouseButtonEvent(SDL_PRESSED, SDL_BUTTON_RIGHT, this);
 }
@@ -41,7 +45,7 @@ void PoGuy::sdlInputEventCallback(const Event& eventObj) {
 			deployRopeEvent.eventWorldCoordinateX = eventObj.eventWorldCoordinateX;
 			deployRopeEvent.eventWorldCoordinateY = eventObj.eventWorldCoordinateY;
 			gameState->eventBus->postEvent(deployRopeEvent);
-			ropeThrown = true;
+			//ropeThrown = true;
 
 		} else {
 
@@ -53,12 +57,24 @@ void PoGuy::sdlInputEventCallback(const Event& eventObj) {
 			releaseRopeEvent.eventWorldCoordinateX = eventObj.eventWorldCoordinateX;
 			releaseRopeEvent.eventWorldCoordinateY = eventObj.eventWorldCoordinateY;
 			gameState->eventBus->postEvent(releaseRopeEvent);
-			ropeThrown = false;
+			//ropeThrown = false;
 
 		}
 	}
 	else {
 		if (eventObj.sdlInputEvent->key.state == SDL_PRESSED) {
+
+			if (eventObj.sdlInputEvent->key.keysym.sym == SDLK_g) {
+				if (gravityOn) {
+					physicalMass->setGravity(glm::vec3(0.0f, 0.0f, 0.0f));
+					gravityOn = false;
+				}
+				else
+				{
+					physicalMass->setGravity(glm::vec3(0.0f, -9.81f, 0.0f));
+					gravityOn = true;
+				}
+			}
 
 			// log key down state
 			keyStates[eventObj.sdlInputEvent->key.keysym.sym] = true;
@@ -271,15 +287,16 @@ void PoGuy::initGeometry() {
 
 void PoGuy::initPhysics() {
 
-	initialPosition = glm::vec3(5.0f, 15.0f, 0.0f);
+	initialPosition = glm::vec3(5.0f, 5.0f, 0.0f);
 	glm::mat4 worldTransform;
 	worldTransform = glm::translate(worldTransform, initialPosition);
 
 	physicalMass = new PhysicalMass();
 	physicalMass->init("PO_GUY_PLAYER", gameState, 62.0f, worldTransform, PhysicsManager::CollisionGroup::PLAYER);
+//	physicalMass->init("PO_GUY_PLAYER", gameState, 62.0f, worldTransform, PhysicsManager::CollisionGroup::NO_COLLISION);
 	physicalMass->addCollisionShapeSphere(glm::mat4(), 1.0f);
 	physicalMass->addToDynamicsWorld();
-	//physicalMass->rigidBody->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+	physicalMass->setGravity(glm::vec3(0.0f, -9.81, 0.0f));
 
 	glm::mat4 cameraFocalPointTransform;
 	cameraFocalPointTransform = glm::translate(cameraFocalPointTransform, glm::vec3(5.0f, 10.0f, 0.0f));
@@ -288,8 +305,8 @@ void PoGuy::initPhysics() {
 	cameraFocalPointPhysicalMass = new PhysicalMass();
 	cameraFocalPointPhysicalMass->init("CAMERA_FOCAL_POINT", gameState, 1.0f, cameraFocalPointTransform, PhysicsManager::CollisionGroup::NO_COLLISION);
 	cameraFocalPointPhysicalMass->addToDynamicsWorld();
-	cameraFocalPointPhysicalMass->rigidBody->setGravity(btVector3(0.0f, 0.0f, 0.0f));
-	cameraFocalPointPhysicalMass->rigidBody->setActivationState(DISABLE_DEACTIVATION);
+	cameraFocalPointPhysicalMass->setGravity(glm::vec3());
+	cameraFocalPointPhysicalMass->setActivationState(DISABLE_DEACTIVATION);
 
 
 	// 6dof constraint
@@ -326,28 +343,26 @@ void PoGuy::initPhysics() {
 void PoGuy::doPhysicalUpdate() {
 	
 	// setup rocket force based on key state
-	rocketForce = glm::vec3();
+	rocketImpulse = glm::vec3();
 	if (rocketOn) {
 		if (keyStates[SDLK_d]) {
-			rocketForce.x += rocketForceMagnitude;
+			rocketImpulse.x += rocketImpulseMagnitude;
 		}
 		if (keyStates[SDLK_a]) {
-			rocketForce.x -= rocketForceMagnitude;
+			rocketImpulse.x -= rocketImpulseMagnitude;
 		}
 		if (keyStates[SDLK_w]) {
-			rocketForce.y += rocketForceMagnitude;
+			rocketImpulse.y += rocketImpulseMagnitude;
 		}
 		if (keyStates[SDLK_s]) {
-			rocketForce.y -= rocketForceMagnitude;
+			rocketImpulse.y -= rocketImpulseMagnitude;
 			
 		}
 
-		// Only apply the force to the rigid body if the rope is not thrown.  If it is,
-		// the rope will have a mass to represnt the player.
-		if (!ropeThrown) {
-			btVector3 rocketForceBt;
-			PhysicsManager::glmVec3ToBtVec3(rocketForce, rocketForceBt);  // debug - isolate?
-			physicalMass->rigidBody->applyCentralForce(rocketForceBt);
+		// Only apply the rocket impulse to the rigid body if the rope is not attached to a structure.  If it is,
+		// the rope will have a mass to represent the player.
+		if (!ropeAttachedToStructure) {
+			physicalMass->applyCentralImpulse(rocketImpulse);
 		}
 
 	}
@@ -370,19 +385,28 @@ void PoGuy::doPhysicalUpdate() {
 	gameState->camera->updatePosition(glm::vec3(cameraFocalPointPosition.x -7.5f, cameraFocalPointPosition.y - 7.5f, 0.0f));
 }
 
-void PoGuy::getRocketForce(glm::vec3& rocketForce) {
+void PoGuy::getRocketImpulse(glm::vec3& rocketImpulse) {
 	// provide rocket force to rope
-	rocketForce = this->rocketForce;
+	rocketImpulse = this->rocketImpulse;
 }
 
+/*
 void PoGuy::updateTransformFromRope(const btTransform& transform) {
 	// updating the position based on rope position
 	physicalMass->rigidBody->setCenterOfMassTransform(transform);
+	physicalMass->setCenterOfMassTransform(transform);
+}
+*/
+
+PhysicalMass* PoGuy::getPhysicalMass() {
+	return physicalMass;
 }
 
+/*
 btRigidBody* PoGuy::getRigidBody() {
 	return physicalMass->rigidBody;
 }
+*/
 
 void PoGuy::render() {
 
@@ -404,6 +428,10 @@ void PoGuy::render() {
 void PoGuy::getArmLocation(glm::vec3& armLocation) {
 	// provide center of mass of rigid body as arm location (rope connection point)
 	physicalMass->getCenterOfMassPosition(armLocation);
+}
+
+void PoGuy::setRopeAttachedToStructure(bool attachedToStructure) {
+	ropeAttachedToStructure = attachedToStructure;
 }
 
 PoGuy::~PoGuy() {

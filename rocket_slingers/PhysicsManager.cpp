@@ -1,6 +1,7 @@
 #include "PhysicsManager.hpp"
 #include <iostream>
 
+
 PhysicsManager::PhysicsManager(){
 
 	// init collision group interactions
@@ -11,18 +12,21 @@ PhysicsManager::PhysicsManager(){
 	collisionGroupInteractions[SWINGING_MASS] = PLAYER | BOUNDARY | ROPE_MASS;
 
 	collisionBroadphase = new btDbvtBroadphase();
-	collisionConfiguration = new btDefaultCollisionConfiguration();
+	//collisionConfiguration = new btDefaultCollisionConfiguration();
+	collisionConfiguration = new btSoftBodyRigidBodyCollisionConfiguration();
 	collisionDispatcher = new btCollisionDispatcher(collisionConfiguration);
-	constraintSolver = new btSequentialImpulseConstraintSolver;
+	constraintSolver = new btSequentialImpulseConstraintSolver();
+	softBodyConstraintSolver = new btDefaultSoftBodySolver();
 	//constraintSolver = new btMultiBodyConstraintSolver;
 
-	dynamicsWorld = new btDiscreteDynamicsWorld(collisionDispatcher, collisionBroadphase, constraintSolver, collisionConfiguration);
+	//dynamicsWorld = new btDiscreteDynamicsWorld(collisionDispatcher, collisionBroadphase, constraintSolver, collisionConfiguration);
 	//dynamicsWorld = new btMultiBodyDynamicsWorld(collisionDispatcher, collisionBroadphase, constraintSolver, collisionConfiguration);
+	dynamicsWorld = new btSoftRigidDynamicsWorld(collisionDispatcher, collisionBroadphase, constraintSolver, collisionConfiguration, softBodyConstraintSolver);
 	dynamicsWorld->setGravity(btVector3(0.0f, -9.81f, 0.0f));
 	//dynamicsWorld->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 
 	// for test
-	boundariesOn = true;
+	boundariesOn = false;
 	if (boundariesOn) {
 
 		groundShape = new btStaticPlaneShape(btVector3(0.0f, 1.0f, 0.0f), 0.0f);
@@ -53,11 +57,43 @@ PhysicsManager::PhysicsManager(){
 		ceilingRigidBody->setUserPointer(nullptr);
 		dynamicsWorld->addRigidBody(ceilingRigidBody, BOUNDARY, collisionGroupInteractions[BOUNDARY]);
 
+
+		/*
+		boxShape = new btBoxShape(btVector3(1.0f, 1.0f, 0.0f));
+		boxMotionState = new btDefaultMotionState();
+		btRigidBody::btRigidBodyConstructionInfo boxCI(10.0f, boxMotionState, boxShape, btVector3(0.0f, 0.0f, 0.0f));
+		boxRigidBody = new btRigidBody(boxCI);
+		boxRigidBody->setUserPointer(nullptr);
+		btTransform boxTransform;
+		boxTransform.setIdentity();
+		boxTransform.setOrigin(btVector3(20.0f, 20.0f, 0.0f));
+		boxRigidBody->setWorldTransform(boxTransform);
+		dynamicsWorld->addRigidBody(boxRigidBody, SWINGING_MASS, collisionGroupInteractions[SWINGING_MASS]);
+		*/
 	}
 }
 
 unsigned int PhysicsManager::getCollisionGroupInteractions(CollisionGroup collisionGroup) {
 	return collisionGroupInteractions[collisionGroup];
+}
+
+bool PhysicsManager::testRayHit(const glm::vec3& fromPoint, const glm::vec3& toPoint, CollisionGroup collisionGroup, glm::vec3& hitLocation) {
+
+	btVector3 fromPointBt, toPointBt;
+	glmVec3ToBtVec3(fromPoint, fromPointBt);
+	glmVec3ToBtVec3(toPoint, toPointBt);
+
+	btCollisionWorld::ClosestRayResultCallback hitResult(fromPointBt, toPointBt);
+	hitResult.m_collisionFilterGroup = collisionGroup;
+	hitResult.m_collisionFilterMask = collisionGroupInteractions[collisionGroup];
+	dynamicsWorld->rayTest(fromPointBt, toPointBt, hitResult);
+
+	if (hitResult.hasHit()) {
+		PhysicsManager::btVec3ToGlmVec3(hitResult.m_hitPointWorld, hitLocation);
+		return true;
+	}
+
+	return false;
 }
 
 void PhysicsManager::setDebugRenderer(btIDebugDraw* debugRenderer) {
@@ -105,10 +141,19 @@ PhysicsManager::~PhysicsManager() {
 		delete ceilingMotionState;
 		delete ceilingRigidBody;
 		delete ceilingShape;
+
+		/*
+		dynamicsWorld->removeRigidBody(boxRigidBody);
+		delete boxMotionState;
+		delete boxRigidBody;
+		delete boxShape;
+		*/
+
 	}
 
 	delete dynamicsWorld;
 	delete constraintSolver;
+	delete softBodyConstraintSolver;
 	delete collisionConfiguration;
 	delete collisionDispatcher;
 	delete collisionBroadphase;

@@ -41,8 +41,20 @@ void Camera::updateCameraVectors() {
 }
 
 void Camera::updatePosition(const glm::vec3& position) {
+
+	glm::vec3 oldPosition = this->position;
 	this->position = position;
 	viewTransform = glm::lookAt(position, position + front, up);
+
+	if (oldPosition != position) {
+		Event e;
+		e.eventPoster = this;
+		e.eventType = Event::EventType::GAME_EVENT;
+		e.gameEvent = Event::GameEvent::CAMERA_MOVED;
+		e.eventWorldCoordinateX = position.x;
+		e.eventWorldCoordinateY = position.y;
+		gameState->eventBus->postEvent(e);
+	}
 }
 
 const glm::vec3& Camera::getPosition() {
