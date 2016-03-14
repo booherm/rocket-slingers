@@ -2,9 +2,6 @@
 #define PHYSICSMANAGER_HPP
 
 #include <btBulletDynamicsCommon.h>
-//#include <BulletDynamics/Featherstone/btMultiBodyDynamicsWorld.h>
-//#include <BulletDynamics/Featherstone/btMultiBodyConstraintSolver.h>
-//#include <BulletDynamics/Featherstone/btMultiBodyLinkCollider.h>
 #include <BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
 #include <BulletSoftBody/btDefaultSoftBodySolver.h>
 #include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
@@ -32,7 +29,6 @@ public:
 	~PhysicsManager();
 
 	//btDiscreteDynamicsWorld* dynamicsWorld;
-	//btMultiBodyDynamicsWorld* dynamicsWorld;
 	btSoftRigidDynamicsWorld* dynamicsWorld;
 
 	static void glmVec3ToBtVec3(const glm::vec3& glmVector, btVector3& btVector);
@@ -46,35 +42,11 @@ private:
 	std::map<CollisionGroup, unsigned int> collisionGroupInteractions;
 
 	btBroadphaseInterface* collisionBroadphase;
-	//btDefaultCollisionConfiguration* collisionConfiguration;
-	btSoftBodyRigidBodyCollisionConfiguration* collisionConfiguration;
+	btDefaultCollisionConfiguration* collisionConfiguration;
+	//btSoftBodyRigidBodyCollisionConfiguration* collisionConfiguration;
 	btCollisionDispatcher* collisionDispatcher;
 	btSequentialImpulseConstraintSolver* constraintSolver;
-	//btMultiBodyConstraintSolver* constraintSolver;
 	btDefaultSoftBodySolver* softBodyConstraintSolver;
-
-
-	bool boundariesOn;
-	btStaticPlaneShape* groundShape;
-	btDefaultMotionState* groundMotionState;
-	btRigidBody* groundRigidBody;
-
-	btStaticPlaneShape* leftWallShape;
-	btDefaultMotionState* leftWallMotionState;
-	btRigidBody* leftWallRigidBody;
-
-	btStaticPlaneShape* rightWallShape;
-	btDefaultMotionState* rightWallMotionState;
-	btRigidBody* rightWallRigidBody;
-
-	btStaticPlaneShape* ceilingShape;
-	btDefaultMotionState* ceilingMotionState;
-	btRigidBody* ceilingRigidBody;
-	/*
-	btBoxShape* boxShape;
-	btDefaultMotionState* boxMotionState;
-	btRigidBody* boxRigidBody;
-	*/
 };
 
 #endif

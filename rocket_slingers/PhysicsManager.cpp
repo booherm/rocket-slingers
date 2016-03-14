@@ -11,66 +11,26 @@ PhysicsManager::PhysicsManager(){
 	collisionGroupInteractions[BOUNDARY] = PLAYER | SWINGING_MASS;
 	collisionGroupInteractions[SWINGING_MASS] = PLAYER | BOUNDARY | ROPE_MASS;
 
-	collisionBroadphase = new btDbvtBroadphase();
-	//collisionConfiguration = new btDefaultCollisionConfiguration();
-	collisionConfiguration = new btSoftBodyRigidBodyCollisionConfiguration();
+	//collisionBroadphase = new btDbvtBroadphase();
+	//btAxisSweep3(const btVector3& worldAabbMin, const btVector3& worldAabbMax, unsigned short int maxHandles = 16384, btOverlappingPairCache* pairCache = 0, bool disableRaycastAccelerator = false);
+
+	collisionBroadphase = new btAxisSweep3(btVector3(-250.0f, -250.0f, -10.0f), btVector3(250.0f, 250.0f, 10.0f));
+	collisionConfiguration = new btDefaultCollisionConfiguration();
+//	collisionConfiguration = new btSoftBodyRigidBodyCollisionConfiguration();
+
 	collisionDispatcher = new btCollisionDispatcher(collisionConfiguration);
 	constraintSolver = new btSequentialImpulseConstraintSolver();
 	softBodyConstraintSolver = new btDefaultSoftBodySolver();
-	//constraintSolver = new btMultiBodyConstraintSolver;
-
-	//dynamicsWorld = new btDiscreteDynamicsWorld(collisionDispatcher, collisionBroadphase, constraintSolver, collisionConfiguration);
-	//dynamicsWorld = new btMultiBodyDynamicsWorld(collisionDispatcher, collisionBroadphase, constraintSolver, collisionConfiguration);
+	
 	dynamicsWorld = new btSoftRigidDynamicsWorld(collisionDispatcher, collisionBroadphase, constraintSolver, collisionConfiguration, softBodyConstraintSolver);
 	dynamicsWorld->setGravity(btVector3(0.0f, -9.81f, 0.0f));
-	//dynamicsWorld->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+	//btContactSolverInfo& info = dynamicsWorld->getSolverInfo();
+	//std::cout << "current solver iterations = " << info.m_numIterations << std::endl;
+//	std::cout << "info.m_timeStep = " << info.m_timeStep << std::endl;
+	//info.m_timeStep = 0.0005f;
+	//std::cout << "info.m_splitImpulse = " << info.m_splitImpulse << std::endl;
+	//info.m_timeStep .m_numIterations = 500;
 
-	// for test
-	boundariesOn = false;
-	if (boundariesOn) {
-
-		groundShape = new btStaticPlaneShape(btVector3(0.0f, 1.0f, 0.0f), 0.0f);
-		groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -1.0f, 0.0f)));
-		btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0.0f, groundMotionState, groundShape, btVector3(0.0f, 0.0f, 0.0f));
-		groundRigidBody = new btRigidBody(groundRigidBodyCI);
-		groundRigidBody->setUserPointer(nullptr);
-		dynamicsWorld->addRigidBody(groundRigidBody, BOUNDARY, collisionGroupInteractions[BOUNDARY]);
-
-		leftWallShape = new btStaticPlaneShape(btVector3(1.0f, 0.0f, 0.0f), 0.0f);
-		leftWallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -1.0f, 0.0f)));
-		btRigidBody::btRigidBodyConstructionInfo leftWallRigidBodyCI(0.0f, leftWallMotionState, leftWallShape, btVector3(0.0f, 0.0f, 0.0f));
-		leftWallRigidBody = new btRigidBody(leftWallRigidBodyCI);
-		leftWallRigidBody->setUserPointer(nullptr);
-		dynamicsWorld->addRigidBody(leftWallRigidBody, BOUNDARY, collisionGroupInteractions[BOUNDARY]);
-
-		rightWallShape = new btStaticPlaneShape(btVector3(-1.0f, 0.0f, 0.0f), -55.5f * 5.0f);
-		rightWallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -1.0f, 0.0f)));
-		btRigidBody::btRigidBodyConstructionInfo rightWallRigidBodyCI(0.0f, rightWallMotionState, rightWallShape, btVector3(0.0f, 0.0f, 0.0f));
-		rightWallRigidBody = new btRigidBody(rightWallRigidBodyCI);
-		rightWallRigidBody->setUserPointer(nullptr);
-		dynamicsWorld->addRigidBody(rightWallRigidBody, BOUNDARY, collisionGroupInteractions[BOUNDARY]);
-
-		ceilingShape = new btStaticPlaneShape(btVector3(0.0f, -1.0f, 0.0f), -20.0f * 5.0f);
-		ceilingMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -1.0f, 0.0f)));
-		btRigidBody::btRigidBodyConstructionInfo ceilingRigidBodyCI(0.0f, ceilingMotionState, ceilingShape, btVector3(0.0f, 0.0f, 0.0f));
-		ceilingRigidBody = new btRigidBody(ceilingRigidBodyCI);
-		ceilingRigidBody->setUserPointer(nullptr);
-		dynamicsWorld->addRigidBody(ceilingRigidBody, BOUNDARY, collisionGroupInteractions[BOUNDARY]);
-
-
-		/*
-		boxShape = new btBoxShape(btVector3(1.0f, 1.0f, 0.0f));
-		boxMotionState = new btDefaultMotionState();
-		btRigidBody::btRigidBodyConstructionInfo boxCI(10.0f, boxMotionState, boxShape, btVector3(0.0f, 0.0f, 0.0f));
-		boxRigidBody = new btRigidBody(boxCI);
-		boxRigidBody->setUserPointer(nullptr);
-		btTransform boxTransform;
-		boxTransform.setIdentity();
-		boxTransform.setOrigin(btVector3(20.0f, 20.0f, 0.0f));
-		boxRigidBody->setWorldTransform(boxTransform);
-		dynamicsWorld->addRigidBody(boxRigidBody, SWINGING_MASS, collisionGroupInteractions[SWINGING_MASS]);
-		*/
-	}
 }
 
 unsigned int PhysicsManager::getCollisionGroupInteractions(CollisionGroup collisionGroup) {
@@ -114,43 +74,13 @@ void PhysicsManager::setDebugRenderer(btIDebugDraw* debugRenderer) {
 
 void PhysicsManager::updatePhysics() {
 	dynamicsWorld->stepSimulation(1 / 60.0f, 10);
+	//dynamicsWorld->stepSimulation(1 / 30.0f, 10);
+
 	dynamicsWorld->debugDrawWorld();
 }
 
 PhysicsManager::~PhysicsManager() {
-
-	if (boundariesOn)
-	{
-		// test
-		dynamicsWorld->removeRigidBody(groundRigidBody);
-		delete groundMotionState;
-		delete groundRigidBody;
-		delete groundShape;
-
-		dynamicsWorld->removeRigidBody(leftWallRigidBody);
-		delete leftWallMotionState;
-		delete leftWallRigidBody;
-		delete leftWallShape;
-
-		dynamicsWorld->removeRigidBody(rightWallRigidBody);
-		delete rightWallMotionState;
-		delete rightWallRigidBody;
-		delete rightWallShape;
-
-		dynamicsWorld->removeRigidBody(ceilingRigidBody);
-		delete ceilingMotionState;
-		delete ceilingRigidBody;
-		delete ceilingShape;
-
-		/*
-		dynamicsWorld->removeRigidBody(boxRigidBody);
-		delete boxMotionState;
-		delete boxRigidBody;
-		delete boxShape;
-		*/
-
-	}
-
+	
 	delete dynamicsWorld;
 	delete constraintSolver;
 	delete softBodyConstraintSolver;

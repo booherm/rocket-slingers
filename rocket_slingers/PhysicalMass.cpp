@@ -9,6 +9,7 @@ void PhysicalMass::init(const std::string& id, GameState* gameState, float mass,
 	this->worldTransform = worldTransform;
 	this->collisionGroup = collisionGroup;
 
+	ccdEnabled = false;
 	allPhysicalMasses[id] = this;
 	collisionShape = new btCompoundShape(false, 0);
 }
@@ -29,6 +30,10 @@ void PhysicalMass::addCollisionShapeBox(const glm::mat4& worldTransform, const g
 
 }
 
+void PhysicalMass::enableCcd() {
+	ccdEnabled = true;
+}
+
 void PhysicalMass::addCollisionShape(const glm::mat4& worldTransform, btCollisionShape* collisionShape) {
 
 	collisionShapeComponents.push_back(collisionShape);
@@ -47,6 +52,11 @@ void PhysicalMass::addToDynamicsWorld() {
 	btRigidBody::btRigidBodyConstructionInfo rigidBodyConstructionInfo(mass, this, collisionShape, inertia);
 	rigidBody = new btRigidBody(rigidBodyConstructionInfo);
 	rigidBody->setUserPointer(this);
+
+	if (ccdEnabled) {
+		rigidBody->setCcdMotionThreshold(1.0f);
+		rigidBody->setCcdSweptSphereRadius(5.0f);
+	}
 
 	physicsManager->dynamicsWorld->addRigidBody(rigidBody, collisionGroup, physicsManager->getCollisionGroupInteractions(collisionGroup));
 

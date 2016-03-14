@@ -17,19 +17,22 @@ private:
 
 	PoGuy* player;
 	btSoftBody* ropeSoftBody;
-	PhysicalMass* bob;
+	//PhysicalMass* bob;
 
-	glm::vec3 ropeStartPosition;
-	glm::vec3 ropeEndPosition;
-	unsigned int maxRopeSegments;
+	
+	//glm::vec3 ropeStartPosition;
+	//glm::vec3 ropeEndPosition;
+	//unsigned int maxRopeSegments;
+	//float maxRopeSegmentLength;
+//	unsigned int initalRopeSegments;
+	unsigned int ropeSegmentsCount;
+	float maxRopeLength;
 	float maxRopeSegmentLength;
-	unsigned int initalRopeSegments;
 
 	void initShaders();
 	void initGeometry();
 	void initPhysics();
-	void setSegmentLength(const int& idxFirstLink, const int& idxLastLink, const btScalar& length);
-	btScalar getSegmentLength(const int& idxFirstLink, const int& idxLastLink);
+	void destructRope();
 };
 
 #endif

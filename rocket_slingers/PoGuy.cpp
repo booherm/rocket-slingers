@@ -295,7 +295,9 @@ void PoGuy::initPhysics() {
 	physicalMass->init("PO_GUY_PLAYER", gameState, 62.0f, worldTransform, PhysicsManager::CollisionGroup::PLAYER);
 //	physicalMass->init("PO_GUY_PLAYER", gameState, 62.0f, worldTransform, PhysicsManager::CollisionGroup::NO_COLLISION);
 	physicalMass->addCollisionShapeSphere(glm::mat4(), 1.0f);
+	physicalMass->enableCcd();
 	physicalMass->addToDynamicsWorld();
+
 	physicalMass->setGravity(glm::vec3(0.0f, -9.81, 0.0f));
 
 	glm::mat4 cameraFocalPointTransform;

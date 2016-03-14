@@ -18,8 +18,9 @@ void RocketSlingersController::initSdl() {
 		throw "RocketSlingersController::initSdl - SDL initialization failed: " + sdlError;
 	}
 	SDL_DisableScreenSaver();
-
+	SDL_SetRelativeMouseMode(SDL_TRUE);
 }
+
 void RocketSlingersController::disableKeyRepeat() {
 
 	// get and store user filter key settings

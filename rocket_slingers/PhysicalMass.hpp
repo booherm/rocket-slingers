@@ -18,6 +18,7 @@ public:
 	//void setCenterOfMassTransform(const glm::mat4& transform);
 	void setGravity(const glm::vec3& gravity);
 	void setActivationState(int state);
+	void enableCcd();
 
 	// try private:
 	void setWorldTransform(const btTransform& worldTrans);
@@ -38,6 +39,7 @@ private:
 	//btCollisionShape* collisionShape = nullptr;
 	std::vector<btCollisionShape*> collisionShapeComponents;
 	PhysicsManager::CollisionGroup collisionGroup;
+	bool ccdEnabled;
 
 	void addCollisionShape(const glm::mat4& transform, btCollisionShape* collisionShape);
 
