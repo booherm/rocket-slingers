@@ -31,6 +31,10 @@ PhysicsManager::PhysicsManager(){
 	//std::cout << "info.m_splitImpulse = " << info.m_splitImpulse << std::endl;
 	//info.m_timeStep .m_numIterations = 500;
 
+	// Box2d
+	box2dWorld = new b2World(b2Vec2(0.0f, -9.81f));
+
+
 }
 
 unsigned int PhysicsManager::getCollisionGroupInteractions(CollisionGroup collisionGroup) {
@@ -72,11 +76,27 @@ void PhysicsManager::setDebugRenderer(btIDebugDraw* debugRenderer) {
 	);
 }
 
+void PhysicsManager::setBox2dDebugRenderer(b2Draw* debugRenderer) {
+
+	debugRenderer->SetFlags(
+		0
+		+ b2Draw::e_shapeBit	///< draw shapes
+		+ b2Draw::e_jointBit	///< draw joint connections
+		+ b2Draw::e_aabbBit	///< draw axis aligned bounding boxes
+		+ b2Draw::e_pairBit      	///< draw broad-phase pairs
+		+ b2Draw::e_centerOfMassBit
+	);
+	box2dWorld->SetDebugDraw(debugRenderer);
+
+}
+
 void PhysicsManager::updatePhysics() {
 	dynamicsWorld->stepSimulation(1 / 60.0f, 10);
 	//dynamicsWorld->stepSimulation(1 / 30.0f, 10);
 
 	dynamicsWorld->debugDrawWorld();
+	box2dWorld->DrawDebugData();
+	box2dWorld->Step(1 / 60.0f, 6, 2);
 }
 
 PhysicsManager::~PhysicsManager() {
@@ -87,7 +107,8 @@ PhysicsManager::~PhysicsManager() {
 	delete collisionConfiguration;
 	delete collisionDispatcher;
 	delete collisionBroadphase;
-	
+
+	delete box2dWorld;
 }
 
 void PhysicsManager::glmVec3ToBtVec3(const glm::vec3& glmVector, btVector3& btVector) {

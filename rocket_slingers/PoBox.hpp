@@ -18,6 +18,12 @@ private:
 	float xScaler = 10.0f;
 	float yScaler = 3.0f;
 
+	
+
+	b2Body* groundBody;
+	b2Body* body;
+
+	
 	void initShaders();
 	void initGeometry();
 	void initPhysics();

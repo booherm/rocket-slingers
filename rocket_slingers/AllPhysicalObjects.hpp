@@ -8,6 +8,7 @@
 #include "PoGuy.hpp"
 #include "PoPendulum.hpp"
 #include "PoPhysicsRenderer.hpp"
+#include "PoPhysicsRendererBox2d.hpp"
 #include "PoReticule.hpp"
 #include "PoRope.hpp"
 #include "PoRopeSoftBody.hpp"

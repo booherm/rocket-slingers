@@ -1,8 +1,9 @@
 #include "PoBox.hpp"
+#include <Box2d/Rope/b2Rope.h>
 
 PoBox::PoBox(const std::string& objectId, GameState* gameState) : PhysicalObject(objectId, gameState) {
-	initShaders();
-	initGeometry();
+	//initShaders();
+	//initGeometry();
 	initPhysics();
 }
 
@@ -74,17 +75,60 @@ void PoBox::initPhysics() {
 	glm::mat4 worldTransform;
 	worldTransform = glm::translate(worldTransform, position);
 
+	/*
 	physicalMass = new PhysicalMass();
 	physicalMass->init("PO_BOX", gameState, 0.0f, worldTransform, PhysicsManager::CollisionGroup::BOUNDARY);
 	physicalMass->addCollisionShapeBox(glm::mat4(), glm::vec3(2.0f * xScaler, 2.0f * yScaler, 0.0f));
 	physicalMass->addToDynamicsWorld();
+	*/
+
+
+	float width = 100.0f;
+	float height = 5.0f;
+
+	b2BodyDef groundBodyDef;
+	groundBodyDef.position.Set(width / 2.0f, -(height / 2.0f));
+	groundBody = gameState->physicsManager->box2dWorld->CreateBody(&groundBodyDef);
+	b2PolygonShape groundBox;
+
+	// The extents are the half-widths of the box.
+	groundBox.SetAsBox(width / 2.0f, height / 2.0f);
+
+	
+	// Add the ground fixture to the ground body.
+	groundBody->CreateFixture(&groundBox, 0.0f);
+
+	// Define the dynamic body. We set its position and call the body factory.
+	b2BodyDef bodyDef;
+	bodyDef.type = b2_dynamicBody;
+	bodyDef.position.Set(25.0f, 30.0f);
+	body = gameState->physicsManager->box2dWorld->CreateBody(&bodyDef);
+
+	// Define another box shape for our dynamic body.
+	b2PolygonShape dynamicBox;
+	dynamicBox.SetAsBox(1.0f, 1.0f);
+
+	// Define the dynamic body fixture.
+	b2FixtureDef fixtureDef;
+	fixtureDef.shape = &dynamicBox;
+
+	// Set the box density to be non-zero, so it will be dynamic.
+	fixtureDef.density = 1.0f;
+
+	// Override the default friction.
+	fixtureDef.friction = 0.3f;
+
+	// Add the shape to the body.
+	body->CreateFixture(&fixtureDef);
 
 	shouldDoPhysicalUpdate = true;
 
 }
 
 void PoBox::doPhysicalUpdate() {
-	physicalMass->getCenterOfMassPosition(position);
+	//physicalMass->getCenterOfMassPosition(position);
+	b2Vec2 position = body->GetPosition();
+	std::cout << "position = (" << position.x << ", " << position.y << ")" << std::endl;
 }
 
 void PoBox::render() {
@@ -105,5 +149,8 @@ void PoBox::render() {
 
 
 PoBox::~PoBox() {
-	delete physicalMass;
+	//delete physicalMass;
+
+	gameState->physicsManager->box2dWorld->DestroyBody(body);
+	gameState->physicsManager->box2dWorld->DestroyBody(groundBody);
 }

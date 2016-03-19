@@ -6,6 +6,8 @@
 #include <BulletSoftBody/btDefaultSoftBodySolver.h>
 #include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
 
+#include <Box2D/Box2D.h>
+
 #include <glm.hpp>
 #include <gtc/type_ptr.hpp>
 #include <map>
@@ -23,6 +25,7 @@ public:
 
 	PhysicsManager();
 	void setDebugRenderer(btIDebugDraw* debugRenderer);
+	void setBox2dDebugRenderer(b2Draw* debugRenderer);
 	void updatePhysics();
 	unsigned int getCollisionGroupInteractions(CollisionGroup collisionGroup);
 	bool testRayHit(const glm::vec3& fromPoint, const glm::vec3& toPoint, CollisionGroup collisionGroup, glm::vec3& hitLocation);
@@ -36,6 +39,12 @@ public:
 	static void glmTransformToBtTransform(const glm::mat4& glmTrans, btTransform& btTrans);
 	static void btTransformToGlmTransform(const btTransform& btTrans, glm::mat4& glmTrans);
 	static void btQuatToGlmQuat(const btQuaternion& btQuat, glm::quat& glmQuat);
+
+
+	// Box2D
+	b2World* box2dWorld;
+
+
 
 private:
 
