@@ -12,13 +12,11 @@ public:
 
 private:
 
-//	PhysicalMass* physicalMass;
 	glm::vec3 position;
 
 	float xScaler = 10.0f;
 	float yScaler = 3.0f;
 
-	b2Body* groundBody;
 	b2Body* boxBody;
 	b2Body* circleBody;
 	

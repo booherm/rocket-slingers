@@ -15,7 +15,7 @@ Stage::Stage(GameState* gameState) {
 	//pushStageObject(new PoReticule("RETICULE", gameState), 2);
 	pushStageObject(new PoAxes("AXES", gameState), 2);
 	//pushStageObject(new PoBox("BOX", gameState), 2);
-	pushStageObject(new PoPhysicsRenderer("PHYSICS_RENDERER", gameState), 2);
+	//pushStageObject(new PoPhysicsRenderer("PHYSICS_RENDERER", gameState), 2);
 
 	PoBoundary* floorBoundary = new PoBoundary("FLOOR", gameState, glm::vec3(100.0f, 5.0f, 0.0f), glm::vec3(0.0f, -5.0f, 0.0f));
 	pushStageObject(floorBoundary, 1);

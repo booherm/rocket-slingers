@@ -39,8 +39,8 @@ void PhysicsManager::setBox2dDebugRenderer(b2Draw* debugRenderer) {
 }
 
 void PhysicsManager::updatePhysics() {
-	box2dWorld->DrawDebugData();
 	box2dWorld->Step(1 / 60.0f, 6, 10);
+	box2dWorld->DrawDebugData();
 	//box2dWorld->Step(1 / 60.0f, 6, 20);
 	//box2dWorld->Step(1 / 60.0f, 6, 1000);
 }

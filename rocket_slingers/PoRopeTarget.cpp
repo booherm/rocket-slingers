@@ -58,10 +58,6 @@ void PoRopeTarget::doPhysicalUpdate() {
 	PoGuy* guy = (PoGuy*) gameState->activeStage->getPhysicalObject("GUY");
 	glm::vec3 armLocGlm;
 	guy->getArmLocation(armLocGlm);
-	//btVector3 armLoc;
-	//PhysicsManager::glmVec3ToBtVec3(armLocGlm, armLoc);
-	//btVector3 worldPositionBt;
-	//PhysicsManager::glmVec3ToBtVec3(worldPosition, worldPositionBt);
 
 	WorldRayCastCallback cb;
 	gameState->physicsManager->box2dWorld->RayCast(&cb, b2Vec2(armLocGlm.x, armLocGlm.y), b2Vec2(worldPosition.x, worldPosition.y));
@@ -87,35 +83,6 @@ void PoRopeTarget::doPhysicalUpdate() {
 
 		//std::cout << "hit detected at " << Utilities::vectorToString(hitLocationGlm) << std::endl;
 	}
-
-	/*
-	btCollisionWorld::ClosestRayResultCallback hitResult(armLoc, worldPositionBt);
-	hitResult.m_collisionFilterGroup = PhysicsManager::CollisionGroup::PLAYER;
-	hitResult.m_collisionFilterMask = PhysicsManager::CollisionGroup::PLAYER | PhysicsManager::CollisionGroup::BOUNDARY | PhysicsManager::CollisionGroup::SWINGING_MASS;
-	gameState->physicsManager->dynamicsWorld->rayTest(armLoc, worldPositionBt, hitResult);
-	if (hitResult.hasHit()) {
-		glm::vec3(hitLocationGlm);
-		btVector3 hitLocation = hitResult.m_hitPointWorld;
-		PhysicsManager::btVec3ToGlmVec3(hitLocation, hitLocationGlm);
-
-		modelVertexData.push_back(armLocGlm);
-		modelVertexData.push_back(hitLocationGlm);
-		modelVertexData.push_back(glm::vec3(hitLocationGlm.x - 0.5f, hitLocationGlm.y, 0.0f));
-		modelVertexData.push_back(glm::vec3(hitLocationGlm.x + 0.5f, hitLocationGlm.y, 0.0f));
-		modelVertexData.push_back(glm::vec3(hitLocationGlm.x, hitLocationGlm.y - 0.5f, 0.0f));
-		modelVertexData.push_back(glm::vec3(hitLocationGlm.x, hitLocationGlm.y + 0.5f, 0.0f));
-		modelVertexData.push_back(hitLocationGlm);
-		modelVertexData.push_back(worldPosition);
-		modelVertexData.push_back(glm::vec3(worldPosition.x - 0.5f, worldPosition.y, 0.0f));
-		modelVertexData.push_back(glm::vec3(worldPosition.x + 0.5f, worldPosition.y, 0.0f));
-		modelVertexData.push_back(glm::vec3(worldPosition.x, worldPosition.y - 0.5f, 0.0f));
-		modelVertexData.push_back(glm::vec3(worldPosition.x, worldPosition.y + 0.5f, 0.0f));
-
-		for (unsigned int i = 0; i < modelVertexData.size(); i++)
-			colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-
-		//std::cout << "hit detected at " << Utilities::vectorToString(hitLocationGlm) << std::endl;
-	}*/
 	else {
 
 		modelVertexData.push_back(armLocGlm);
@@ -149,11 +116,9 @@ void PoRopeTarget::render() {
 
 	refreshModelVertexBuffer();
 	refreshColorBuffer();
-	glm::mat4 modelTransform;
-//	modelTransform = glm::translate(modelTransform, worldPosition);
 	glm::mat4 viewTransform = gameState->camera->getViewTransform();
 	glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
-	glm::mat4 transform = projectionTransform * viewTransform;// *modelTransform;
+	glm::mat4 transform = projectionTransform * viewTransform;
 
 	shaderProg.use();
 	setUniformValue("transformMatrix", transform);

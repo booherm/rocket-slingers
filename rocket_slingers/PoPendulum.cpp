@@ -61,7 +61,7 @@ void PoPendulum::initGeometry() {
 	points.push_back(glm::vec3(-0.5f, 0.15f, 0.0f));  // H = 7
 	points.push_back(glm::vec3(0.0f, -0.15f, 0.0f));  // I = 8
 
-													  // pendulum model triangles
+	// pendulum model triangles
 	modelVertexData.push_back(points[0]);
 	modelVertexData.push_back(points[6]);
 	modelVertexData.push_back(points[7]);
@@ -130,24 +130,6 @@ void PoPendulum::initPhysics() {
 	revJointDef.collideConnected = false;
 	revJoint = (b2RevoluteJoint*) gameState->physicsManager->box2dWorld->CreateJoint(&revJointDef);
 
-	shouldDoPhysicalUpdate = true;
-
-}
-
-void PoPendulum::doPhysicalUpdate() {
-
-	/*
-	glm::vec3 pos;
-	bobMass->getCenterOfMassPosition(pos);
-
-	Event e;
-	e.eventPoster = this;
-	e.eventType = Event::EventType::GAME_EVENT;
-	e.gameEvent = Event::GameEvent::MOVE_RETICULE;
-	e.eventWorldCoordinateX = pos.x;
-	e.eventWorldCoordinateY = pos.y;
-	gameState->eventBus->postEvent(e);
-	*/
 }
 
 void PoPendulum::render() {

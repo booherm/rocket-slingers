@@ -18,7 +18,6 @@ private:
 	void initShaders();
 	void initGeometry();
 	void initPhysics();
-	void doPhysicalUpdate();
 
 	b2Body* rigidBody;
 	b2RevoluteJoint* revJoint;

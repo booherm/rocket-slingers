@@ -12,10 +12,7 @@ public:
 	void sdlInputEventCallback(const Event& eventObj);
 	void getArmLocation(glm::vec3& armLocation);
 	void getRocketImpulse(glm::vec3& rocketImpulse);
-	//void updateTransformFromRope(const btTransform& transform);
 	void setRopeAttachedToStructure(bool attachedToStructure);
-	//btRigidBody* getRigidBody();
-	//PhysicalMass* getPhysicalMass();
 	b2Body* getRigidBody();
 	~PoGuy();
 
@@ -25,7 +22,6 @@ private:
 	glm::vec3 modelOriginOffset;
 	glm::vec3 initialPosition;
 	glm::vec3 rocketImpulse;
-	//PhysicalMass* physicalMass;
 	b2Body* rigidBody;
 	//PhysicalMass* cameraFocalPointPhysicalMass;
 	//btGeneric6DofSpring2Constraint* cameraSpringConstraint;

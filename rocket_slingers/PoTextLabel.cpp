@@ -180,7 +180,6 @@ void PoTextLabel::render() {
 		charXPosition += (typeFaceChar.advance >> 6) * sizeScaler;
 	}
 
-	//glBindVertexArray(0);
 	abortOnOpenGlError();
 }
 

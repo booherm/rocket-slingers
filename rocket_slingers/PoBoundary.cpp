@@ -90,35 +90,16 @@ void PoBoundary::initGeometry() {
 
 void PoBoundary::initPhysics() {
 
-	glm::mat4 worldTransform;
-	worldTransform = glm::translate(worldTransform, glm::vec3(position.x + (scalers.x / 2.0f), position.y + (scalers.y / 2.0f), 0.0f));
-
-	// falling box
 	b2BodyDef rigidBodyDef;
-//	rigidBodyDef.position
 	rigidBodyDef.position.Set(position.x + (scalers.x / 2.0f), position.y + (scalers.y / 2.0f));
 	rigidBody = gameState->physicsManager->box2dWorld->CreateBody(&rigidBodyDef);
 	b2PolygonShape rigidBodyShape;
 	rigidBodyShape.SetAsBox(scalers.x / 2.0f, scalers.y / 2.0f);
 	b2FixtureDef rigidBodyFixtureDef;
 	rigidBodyFixtureDef.shape = &rigidBodyShape;
-//	rigidBodyFixtureDef.density = 1.0f;
 	rigidBodyFixtureDef.friction = 0.3f;
 	rigidBodyFixtureDef.userData = this;
 	rigidBody->CreateFixture(&rigidBodyFixtureDef);
-	
-
-//	physicalMass = new PhysicalMass();
-//	physicalMass->init(objectId, gameState, 0.0f, worldTransform, PhysicsManager::CollisionGroup::BOUNDARY);
-//	physicalMass->addCollisionShapeBox(glm::mat4(), glm::vec3(scalers.x, scalers.y, 0.0f));
-//	physicalMass->addToDynamicsWorld();
-
-	shouldDoPhysicalUpdate = true;
-
-}
-
-void PoBoundary::doPhysicalUpdate() {
-	//physicalMass->getCenterOfMassPosition(position);
 }
 
 void PoBoundary::render() {

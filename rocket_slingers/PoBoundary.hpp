@@ -6,15 +6,12 @@
 class PoBoundary : public PhysicalObject {
 public:
 	PoBoundary(const std::string& objectId, GameState* gameState, const glm::vec3& scalers, const glm::vec3& position);
-	void doPhysicalUpdate();
 	void render();
 	~PoBoundary();
 
 private:
 
-	//PhysicalMass* physicalMass;
 	b2Body* rigidBody;
-
 	glm::vec3 position;
 	glm::vec3 scalers;
 

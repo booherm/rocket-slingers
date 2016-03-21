@@ -25,7 +25,6 @@ protected:
 		MODEL_VERTEX = 1,
 		COLOR = 4,
 		TEXTURE_COORDINATE = 8
-		//TRANSFORM = 16
 	};
 
 	unsigned int glRenderingMode;
@@ -33,7 +32,6 @@ protected:
 	unsigned int modelVertexVbo;
 	unsigned int colorVbo;
 	unsigned int textureCoordinateVbo;
-	//unsigned int transformVbo;
 	std::vector<glm::vec3> modelVertexData;
 	std::vector<glm::vec4> colorData;
 	std::vector<glm::vec2> textureCoordinateData;
@@ -49,12 +47,10 @@ protected:
 	void initColorBuffer();
 	void initColorBuffer(unsigned int reservedSize);
 	void initTextureCoordinateBuffer();
-	//void initTransformBuffer();
 
 	void refreshModelVertexBuffer();
 	void refreshColorBuffer();
 	void refreshTextureCoordinateBuffer();
-	//void refreshTransformBuffer();
 
 	void buildVao(unsigned int vaoComponents);
 	void setUniformValue(const std::string& uniformId, const glm::mat4& mat4);

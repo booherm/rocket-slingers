@@ -60,18 +60,6 @@ void RenderableObject::initTextureCoordinateBuffer() {
 	abortOnOpenGlError();
 }
 
-/*
-void RenderableObject::initTransformBuffer() {
-
-	glGenBuffers(1, &transformVbo);
-	generatedBufferIds.push_back(transformVbo);
-	glBindBuffer(GL_ARRAY_BUFFER, transformVbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * transformData.size(), transformData.data(), GL_STATIC_DRAW);
-
-	abortOnOpenGlError();
-}
-*/
-
 void RenderableObject::refreshModelVertexBuffer() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, modelVertexVbo);
@@ -95,16 +83,6 @@ void RenderableObject::refreshTextureCoordinateBuffer() {
 	abortOnOpenGlError();
 
 }
-
-/*
-void RenderableObject::refreshTransformBuffer() {
-
-	glBindBuffer(GL_ARRAY_BUFFER, transformVbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * transformData.size(), transformData.data());
-	abortOnOpenGlError();
-
-}
-*/
 
 void RenderableObject::buildVao(unsigned int vaoComponents) {
 
@@ -134,17 +112,6 @@ void RenderableObject::buildVao(unsigned int vaoComponents) {
 		abortOnOpenGlError();
 	}
 
-	/*
-	if (vaoComponents & TRANSFORM) {
-		glBindBuffer(GL_ARRAY_BUFFER, transformVbo);
-		for (unsigned int i = 0; i < 4; i++) {
-			glVertexAttribPointer(vertexAttribIndex, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*) (i * sizeof(glm::vec4)));
-			glEnableVertexAttribArray(vertexAttribIndex++);
-		}
-		abortOnOpenGlError();
-	}
-	*/
-
 	glBindVertexArray(0);
 	abortOnOpenGlError();
 
@@ -172,7 +139,6 @@ void RenderableObject::generateTexture(const std::string& fileName) {
 	int width, height;
 	unsigned char* image = SOIL_load_image(fileName.c_str(), &width, &height, 0, SOIL_LOAD_RGBA);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-	//glGenerateMipmap(GL_TEXTURE_2D);
 	SOIL_free_image_data(image);
 
 	abortOnOpenGlError();

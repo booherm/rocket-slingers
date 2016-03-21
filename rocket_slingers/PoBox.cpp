@@ -83,16 +83,6 @@ void PoBox::initPhysics() {
 	*/
 
 
-	// ground box
-	float width = 100.0f;
-	float height = 5.0f;
-	b2BodyDef groundBodyDef;
-	groundBodyDef.position.Set(width / 2.0f, -(height / 2.0f));
-	groundBody = gameState->physicsManager->box2dWorld->CreateBody(&groundBodyDef);
-	b2PolygonShape groundBox;
-	groundBox.SetAsBox(width / 2.0f, height / 2.0f); // half-extents
-	groundBody->CreateFixture(&groundBox, 0.0f);
-
 	// falling box
 	b2BodyDef boxBodyDef;
 	boxBodyDef.type = b2_dynamicBody;
@@ -147,9 +137,6 @@ void PoBox::render() {
 }
 
 PoBox::~PoBox() {
-	//delete physicalMass;
-
 	gameState->physicsManager->box2dWorld->DestroyBody(circleBody);
 	gameState->physicsManager->box2dWorld->DestroyBody(boxBody);
-	gameState->physicsManager->box2dWorld->DestroyBody(groundBody);
 }

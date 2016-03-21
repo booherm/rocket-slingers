@@ -8,7 +8,6 @@ PoRope::PoRope(const std::string& objectId, GameState* gameState) : PhysicalObje
 	maxRopeSegmentLength = maxRopeLength / ropeSegmentsCount;
 	attachedToStructure = false;
 	anchorRevJoint = nullptr;
-	//ropeMaxLengthJoint = nullptr;
 	initShaders();
 	initGeometry();
 
@@ -35,7 +34,6 @@ void PoRope::gameEventCallback(const Event& eventObj) {
 
 		// test for object hit along the ray to point where mouse was clicked
 		float ropeSegmentLength;
-		//glm::vec3 hitLocation;
 		glm::vec3 ropeTerminationPoint;
 		WorldRayCastCallback cb;
 		gameState->physicsManager->box2dWorld->RayCast(&cb, b2Vec2(playerArmLocation.x, playerArmLocation.y), b2Vec2(clickLocation.x, clickLocation.y));
@@ -56,20 +54,6 @@ void PoRope::gameEventCallback(const Event& eventObj) {
 
 			}
 		}
-		/*
-		if (gameState->physicsManager->testRayHit(playerArmLocation, clickLocation, PhysicsManager::CollisionGroup::PLAYER, hitLocation)) {
-
-		std::cout << "hit detected at " << Utilities::vectorToString(hitLocation) << std::endl;
-
-		// get distance between player and hit point
-		float distance = glm::distance(playerArmLocation, hitLocation);
-		if (distance <= maxRopeLength) {
-		attachedToStructure = true;
-		ropeTerminationPoint = hitLocation;
-		ropeSegmentLength = distance / (float) ropeSegmentsCount;
-		}
-		}
-		*/
 
 		// calculate angle between x unit vector at player arm location to connection point
 		float theta = Utilities::xyAngleBetweenVectors(glm::vec3(1.0f, 0.0f, 0.0f), clickLocation - playerArmLocation);
@@ -127,18 +111,6 @@ void PoRope::gameEventCallback(const Event& eventObj) {
 			revJointDef.collideConnected = false;
 			ropeSegments[i].revJoint = (b2RevoluteJoint*) gameState->physicsManager->box2dWorld->CreateJoint(&revJointDef);
 
-			/*
-			// distance joint for stability
-			b2DistanceJointDef distJointDef;
-			distJointDef.bodyA = ropeSegments[i].body;
-			distJointDef.bodyB = ropeSegments[i + 1].body;
-			distJointDef.localAnchorA.y = -ropeSegmentLength / 2.0f;
-			distJointDef.localAnchorB.y = ropeSegmentLength / 2.0f;
-			distJointDef.collideConnected = false;
-			ropeSegments[i].distJoint = (b2DistanceJoint*) gameState->physicsManager->box2dWorld->CreateJoint(&distJointDef);
-			*/
-
-
 		}
 
 
@@ -149,8 +121,6 @@ void PoRope::gameEventCallback(const Event& eventObj) {
 			ropeJointDef.bodyB = ropeSegments[i].body;
 			ropeJointDef.localAnchorA = b2Vec2(0.0f, 0.0f);
 			ropeJointDef.localAnchorB = b2Vec2(0.0f, 0.0f);
-			//ropeJointDef.localAnchorA.y = ropeSegmentLength / 2.0f;
-			//ropeJointDef.localAnchorB.y = ropeSegmentLength / 2.0f;
 			ropeJointDef.collideConnected = false;
 			ropeJointDef.maxLength = i * ropeSegmentLength;
 			ropeSegments[i].ropeJoint = (b2RopeJoint*) gameState->physicsManager->box2dWorld->CreateJoint(&ropeJointDef);
@@ -162,29 +132,9 @@ void PoRope::gameEventCallback(const Event& eventObj) {
 		playerRevJointDef.bodyA = ropeSegments[ropeSegmentsCount - 1].body;
 		playerRevJointDef.bodyB = playerRigidBody;
 		playerRevJointDef.localAnchorA.y = -ropeSegmentLength / 2.0f;
-		playerRevJointDef.localAnchorB.y = 0.0f; // ropeSegmentLength / 2.0f;
+		playerRevJointDef.localAnchorB.y = 0.0f;
 		playerRevJointDef.collideConnected = false;
 		ropeSegments[ropeSegmentsCount - 1].revJoint = (b2RevoluteJoint*) gameState->physicsManager->box2dWorld->CreateJoint(&playerRevJointDef);
-
-		/*
-		b2DistanceJointDef playerDistJointDef;
-		playerDistJointDef.bodyA = ropeSegments[ropeSegmentsCount - 1].body;
-		playerDistJointDef.bodyB = playerRigidBody;
-		playerDistJointDef.localAnchorA.y = -ropeSegmentLength / 2.0f;
-		playerDistJointDef.localAnchorB.y = 0.0f; // ropeSegmentLength / 2.0f;
-		playerDistJointDef.collideConnected = false;
-		ropeSegments[ropeSegmentsCount - 1].distJoint = (b2DistanceJoint*) gameState->physicsManager->box2dWorld->CreateJoint(&playerDistJointDef);
-		*/
-
-		/*
-		// create rope joint to help prevent stretch
-		b2RopeJointDef ropeJointDef;
-		ropeJointDef.bodyA = ropeSegments[0].body;
-		ropeJointDef.bodyB = ropeSegments[ropeSegmentsCount - 1].body;
-		ropeJointDef.collideConnected = false;
-		ropeJointDef.maxLength = ropeSegmentLength * (ropeSegmentsCount - 1);
-		ropeMaxLengthJoint = (b2RopeJoint*) gameState->physicsManager->box2dWorld->CreateJoint(&ropeJointDef);
-		*/
 
 		attachedToStructure = true;
 		shouldRender = true;
@@ -305,29 +255,21 @@ void PoRope::doPhysicalUpdate() {
 	glm::vec3 perpForce(-radialVector.y, radialVector.x, radialVector.z);
 	perpForce = perpForce * forceMagnitude * 0.1f;
 
-	//std::cout << "pos = " << Utilities::vectorToString(pos) << ", theta = " << theta << ", radialVector = " << Utilities::vectorToString(radialVector) << ", perpForce = " << Utilities::vectorToString(perpForce) << std::endl;
-
-	//btVector3 perpForceBt;
-	//PhysicsManager::glmVec3ToBtVec3(perpForce, perpForceBt);
 	b2Vec2 b2PerpForce(perpForce.x, perpForce.y);
 
-	//ropeMasses[ropeMassesCount - 1].ropeMass->rigidBody->applyCentralImpulse(perpForceBt);
 	ropeSegments[ropeSegmentsCount - 1].revJoint->GetBodyB()->ApplyLinearImpulse(b2PerpForce, b2Vec2(0.0f, 0.0f), true);
 
 }
 
 void PoRope::render() {
 
-	/*
 	modelVertexData.clear();
-	for (unsigned int i = 0; i < ropeSegmentsCount; ++i) {
-	glm::vec3 thisSMassPosition;
-	ropeMasses[i].ropeMass->getCenterOfMassPosition(thisMassPosition);
-	modelVertexData.push_back(thisMassPosition);
-
-	glm::vec3 nextMassPosition;
-	ropeMasses[i + 1].ropeMass->getCenterOfMassPosition(nextMassPosition);
-	modelVertexData.push_back(nextMassPosition);
+	for (unsigned int i = 0; i < ropeSegmentsCount - 1; ++i) {
+		b2Vec2 thisJointLocation = ropeSegments[i].revJoint->GetAnchorB();
+		b2Vec2 nextJointLocation = ropeSegments[i + 1].revJoint->GetAnchorB();
+		
+		modelVertexData.push_back(glm::vec3(thisJointLocation.x, thisJointLocation.y, 0.0f));
+		modelVertexData.push_back(glm::vec3(nextJointLocation.x, nextJointLocation.y, 0.0f));
 	}
 
 	refreshModelVertexBuffer();
@@ -342,7 +284,7 @@ void PoRope::render() {
 	glDrawArrays(glRenderingMode, 0, modelVertexData.size());
 
 	abortOnOpenGlError();
-	*/
+
 
 }
 
@@ -355,13 +297,6 @@ void PoRope::destructRope() {
 		gameState->physicsManager->box2dWorld->DestroyJoint(anchorRevJoint);
 		anchorRevJoint = nullptr;
 	}
-
-	/*
-	if(ropeMaxLengthJoint != nullptr) {
-	gameState->physicsManager->box2dWorld->DestroyJoint(ropeMaxLengthJoint);
-	ropeMaxLengthJoint = nullptr;
-	}
-	*/
 
 	for (unsigned int i = 1; i < ropeSegments.size(); ++i) {
 		gameState->physicsManager->box2dWorld->DestroyJoint(ropeSegments[i].ropeJoint);

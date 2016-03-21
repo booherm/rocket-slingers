@@ -18,11 +18,9 @@ private:
 	struct RopeSegment {
 		b2Body* body;
 		b2RevoluteJoint* revJoint;
-		//b2DistanceJoint* distJoint;
 		b2RopeJoint* ropeJoint;
 	};
 	b2RevoluteJoint* anchorRevJoint;
-	//b2RopeJoint* ropeMaxLengthJoint;
 
 	bool attachedToStructure;
 	unsigned int ropeSegmentsCount;
