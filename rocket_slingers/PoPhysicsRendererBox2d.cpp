@@ -48,6 +48,7 @@ void PoPhysicsRendererBox2d::initShaders() {
 void PoPhysicsRendererBox2d::initGeometry() {
 
 	glRenderingMode = GL_LINES;
+
 	zDepth = 1.0f;
 
 	unsigned int maxVertices = 10000;
@@ -86,23 +87,19 @@ void PoPhysicsRendererBox2d::DrawSolidPolygon(const b2Vec2* vertices, int32 vert
 /// Draw a circle.
 void PoPhysicsRendererBox2d::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color) {
 
-	unsigned int resolution = 10;
+	unsigned int resolution = 50;
 	float increment = glm::two_pi<float>() / resolution;
 
-	b2Vec2* vertices = new b2Vec2[resolution - 1];
-
+	b2Vec2* vertices = new b2Vec2[resolution];
 	
-	for (unsigned int i = 0; i < resolution - 1; i++) {
+	for (unsigned int i = 0; i < resolution; i++) {
 		vertices[i] = b2Vec2(
-			
 			center.x + (radius * glm::cos(i * increment)),
 			center.y + (radius * glm::sin(i * increment))
-	
-			);
-
+		);
 	}
 
-	DrawPolygon(vertices, resolution - 1, color);
+	DrawPolygon(vertices, resolution, color);
 
 	delete vertices;
 }

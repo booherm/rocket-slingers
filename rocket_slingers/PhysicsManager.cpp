@@ -34,7 +34,9 @@ PhysicsManager::PhysicsManager(){
 	// Box2d
 	box2dWorld = new b2World(b2Vec2(0.0f, -9.81f));
 
-
+	// create a static body that joints can use as a refernce when wanting to constrain to the world
+	b2BodyDef worldStaticBodyDef;
+	worldStaticBody = box2dWorld->CreateBody(&worldStaticBodyDef);
 }
 
 unsigned int PhysicsManager::getCollisionGroupInteractions(CollisionGroup collisionGroup) {
@@ -42,6 +44,7 @@ unsigned int PhysicsManager::getCollisionGroupInteractions(CollisionGroup collis
 }
 
 bool PhysicsManager::testRayHit(const glm::vec3& fromPoint, const glm::vec3& toPoint, CollisionGroup collisionGroup, glm::vec3& hitLocation) {
+
 
 	btVector3 fromPointBt, toPointBt;
 	glmVec3ToBtVec3(fromPoint, fromPointBt);
@@ -96,11 +99,15 @@ void PhysicsManager::updatePhysics() {
 
 	dynamicsWorld->debugDrawWorld();
 	box2dWorld->DrawDebugData();
-	box2dWorld->Step(1 / 60.0f, 6, 2);
+	box2dWorld->Step(1 / 60.0f, 6, 10);
+	//box2dWorld->Step(1 / 60.0f, 6, 20);
+	//box2dWorld->Step(1 / 60.0f, 6, 1000);
 }
 
 PhysicsManager::~PhysicsManager() {
 	
+	box2dWorld->DestroyBody(worldStaticBody);
+
 	delete dynamicsWorld;
 	delete constraintSolver;
 	delete softBodyConstraintSolver;

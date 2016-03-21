@@ -162,6 +162,9 @@
     <ClCompile Include="PhysicalObjectManager.cpp" />
     <ClCompile Include="PoBoundary.cpp" />
     <ClCompile Include="PoBox.cpp" />
+    <ClCompile Include="PoGuyBox2d.cpp" />
+    <ClCompile Include="PoPendulumBox2d.cpp" />
+    <ClCompile Include="PoRopeBox2d.cpp" />
     <ClCompile Include="PoRopeSoftBody.cpp" />
     <ClCompile Include="PoRopeTarget.cpp" />
     <ClCompile Include="PoTextLabelFps.cpp">
@@ -187,6 +190,7 @@
     <ClCompile Include="PoTextLabel.cpp" />
     <ClCompile Include="RenderableObject.cpp" />
     <ClCompile Include="PoPhysicsRendererBox2d.cpp" />
+    <ClCompile Include="WorldRayCastCallback.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="MasterRenderer.cpp" />
     <ClCompile Include="PoAxes.cpp" />
@@ -211,6 +215,8 @@
     <ClInclude Include="PhysicalObject.hpp" />
     <ClInclude Include="PhysicalObjectManager.hpp" />
     <ClInclude Include="PhysicsManager.hpp" />
+    <ClInclude Include="PoGuyBox2d.hpp" />
+    <ClInclude Include="PoPendulumBox2d.hpp" />
     <ClInclude Include="PoPhysicsRendererBox2d.hpp" />
     <ClInclude Include="PoBoundary.hpp" />
     <ClInclude Include="PoBox.hpp" />
@@ -218,6 +224,7 @@
     <ClInclude Include="PoPhysicsRenderer.hpp" />
     <ClInclude Include="PoReticule.hpp" />
     <ClInclude Include="PoRope.hpp" />
+    <ClInclude Include="PoRopeBox2d.hpp" />
     <ClInclude Include="PoRopeSoftBody.hpp" />
     <ClInclude Include="PoRopeTarget.hpp" />
     <ClInclude Include="PoTextLabel.hpp" />
@@ -231,6 +238,7 @@
     <ClInclude Include="RenderWindow.hpp" />
     <ClInclude Include="RocketSlingersController.hpp" />
     <ClInclude Include="Utilities.hpp" />
+    <ClInclude Include="WorldRayCastCallback.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

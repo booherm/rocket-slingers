@@ -114,6 +114,18 @@
     <ClCompile Include="PoPhysicsRendererBox2d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PoRopeBox2d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PoGuyBox2d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PoPendulumBox2d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldRayCastCallback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OglShaderProgram.hpp">
@@ -216,6 +228,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PoPhysicsRendererBox2d.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PoRopeBox2d.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PoGuyBox2d.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PoPendulumBox2d.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldRayCastCallback.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

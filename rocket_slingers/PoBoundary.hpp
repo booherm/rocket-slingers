@@ -12,7 +12,9 @@ public:
 
 private:
 
-	PhysicalMass* physicalMass;
+	//PhysicalMass* physicalMass;
+	b2Body* rigidBody;
+
 	glm::vec3 position;
 	glm::vec3 scalers;
 

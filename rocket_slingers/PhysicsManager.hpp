@@ -11,6 +11,7 @@
 #include <glm.hpp>
 #include <gtc/type_ptr.hpp>
 #include <map>
+#include "WorldRayCastCallback.hpp"
 
 class PhysicsManager {
 public:
@@ -43,7 +44,7 @@ public:
 
 	// Box2D
 	b2World* box2dWorld;
-
+	b2Body* worldStaticBody;
 
 
 private:

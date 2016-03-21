@@ -83,43 +83,42 @@ void PoBox::initPhysics() {
 	*/
 
 
+	// ground box
 	float width = 100.0f;
 	float height = 5.0f;
-
 	b2BodyDef groundBodyDef;
 	groundBodyDef.position.Set(width / 2.0f, -(height / 2.0f));
 	groundBody = gameState->physicsManager->box2dWorld->CreateBody(&groundBodyDef);
 	b2PolygonShape groundBox;
-
-	// The extents are the half-widths of the box.
-	groundBox.SetAsBox(width / 2.0f, height / 2.0f);
-
-	
-	// Add the ground fixture to the ground body.
+	groundBox.SetAsBox(width / 2.0f, height / 2.0f); // half-extents
 	groundBody->CreateFixture(&groundBox, 0.0f);
 
-	// Define the dynamic body. We set its position and call the body factory.
-	b2BodyDef bodyDef;
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(25.0f, 30.0f);
-	body = gameState->physicsManager->box2dWorld->CreateBody(&bodyDef);
+	// falling box
+	b2BodyDef boxBodyDef;
+	boxBodyDef.type = b2_dynamicBody;
+	boxBodyDef.position.Set(25.0f, 30.0f);
+	boxBody = gameState->physicsManager->box2dWorld->CreateBody(&boxBodyDef);
+	b2PolygonShape boxBodyShape;
+	boxBodyShape.SetAsBox(1.0f, 1.0f);
+	b2FixtureDef boxFixtureDef;
+	boxFixtureDef.shape = &boxBodyShape;
+	boxFixtureDef.density = 1.0f;
+	boxFixtureDef.friction = 0.3f;
+	boxBody->CreateFixture(&boxFixtureDef);
 
-	// Define another box shape for our dynamic body.
-	b2PolygonShape dynamicBox;
-	dynamicBox.SetAsBox(1.0f, 1.0f);
+	// falling circle
+	b2BodyDef circleBodyDef;
+	circleBodyDef.type = b2_dynamicBody;
+	circleBodyDef.position.Set(30.0f, 30.0f);
+	circleBody = gameState->physicsManager->box2dWorld->CreateBody(&circleBodyDef);
+	b2CircleShape circleBodyShape;
+	circleBodyShape.m_radius = 1.0f;
+	b2FixtureDef circleFixtureDef;
+	circleFixtureDef.shape = &circleBodyShape;
+	circleFixtureDef.density = 1.0f;
+	circleFixtureDef.friction = 0.3f;
+	circleBody->CreateFixture(&circleFixtureDef);
 
-	// Define the dynamic body fixture.
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &dynamicBox;
-
-	// Set the box density to be non-zero, so it will be dynamic.
-	fixtureDef.density = 1.0f;
-
-	// Override the default friction.
-	fixtureDef.friction = 0.3f;
-
-	// Add the shape to the body.
-	body->CreateFixture(&fixtureDef);
 
 	shouldDoPhysicalUpdate = true;
 
@@ -127,8 +126,8 @@ void PoBox::initPhysics() {
 
 void PoBox::doPhysicalUpdate() {
 	//physicalMass->getCenterOfMassPosition(position);
-	b2Vec2 position = body->GetPosition();
-	std::cout << "position = (" << position.x << ", " << position.y << ")" << std::endl;
+	//b2Vec2 position = boxBody->GetPosition();
+	//std::cout << "position = (" << position.x << ", " << position.y << ")" << std::endl;
 }
 
 void PoBox::render() {
@@ -147,10 +146,10 @@ void PoBox::render() {
 	abortOnOpenGlError();
 }
 
-
 PoBox::~PoBox() {
 	//delete physicalMass;
 
-	gameState->physicsManager->box2dWorld->DestroyBody(body);
+	gameState->physicsManager->box2dWorld->DestroyBody(circleBody);
+	gameState->physicsManager->box2dWorld->DestroyBody(boxBody);
 	gameState->physicsManager->box2dWorld->DestroyBody(groundBody);
 }

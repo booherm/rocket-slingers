@@ -2,7 +2,7 @@
 #define POROPETARGET_HPP
 
 #include "PhysicalObject.hpp"
-#include "PoGuy.hpp"
+#include "PoGuyBox2d.hpp"
 
 class PoRopeTarget : public PhysicalObject {
 public:

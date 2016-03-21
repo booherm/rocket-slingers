@@ -55,7 +55,7 @@ void PoRopeTarget::doPhysicalUpdate() {
 	modelVertexData.clear();
 
 	// test ray between player position and target position
-	PoGuy* guy = (PoGuy*) gameState->activeStage->getPhysicalObject("GUY");
+	PoGuyBox2d* guy = (PoGuyBox2d*) gameState->activeStage->getPhysicalObject("GUY_BOX_2D");
 	glm::vec3 armLocGlm;
 	guy->getArmLocation(armLocGlm);
 	btVector3 armLoc;
@@ -63,6 +63,32 @@ void PoRopeTarget::doPhysicalUpdate() {
 	btVector3 worldPositionBt;
 	PhysicsManager::glmVec3ToBtVec3(worldPosition, worldPositionBt);
 
+	WorldRayCastCallback cb;
+	gameState->physicsManager->box2dWorld->RayCast(&cb, b2Vec2(armLocGlm.x, armLocGlm.y), b2Vec2(worldPosition.x, worldPosition.y));
+	if (cb.fixture != nullptr) {
+
+		glm::vec3 hitLocationGlm(cb.point.x, cb.point.y, 0.0f);
+
+		modelVertexData.push_back(armLocGlm);
+		modelVertexData.push_back(hitLocationGlm);
+		modelVertexData.push_back(glm::vec3(hitLocationGlm.x - 0.5f, hitLocationGlm.y, 0.0f));
+		modelVertexData.push_back(glm::vec3(hitLocationGlm.x + 0.5f, hitLocationGlm.y, 0.0f));
+		modelVertexData.push_back(glm::vec3(hitLocationGlm.x, hitLocationGlm.y - 0.5f, 0.0f));
+		modelVertexData.push_back(glm::vec3(hitLocationGlm.x, hitLocationGlm.y + 0.5f, 0.0f));
+		modelVertexData.push_back(hitLocationGlm);
+		modelVertexData.push_back(worldPosition);
+		modelVertexData.push_back(glm::vec3(worldPosition.x - 0.5f, worldPosition.y, 0.0f));
+		modelVertexData.push_back(glm::vec3(worldPosition.x + 0.5f, worldPosition.y, 0.0f));
+		modelVertexData.push_back(glm::vec3(worldPosition.x, worldPosition.y - 0.5f, 0.0f));
+		modelVertexData.push_back(glm::vec3(worldPosition.x, worldPosition.y + 0.5f, 0.0f));
+
+		for (unsigned int i = 0; i < modelVertexData.size(); i++)
+			colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
+		//std::cout << "hit detected at " << Utilities::vectorToString(hitLocationGlm) << std::endl;
+	}
+
+	/*
 	btCollisionWorld::ClosestRayResultCallback hitResult(armLoc, worldPositionBt);
 	hitResult.m_collisionFilterGroup = PhysicsManager::CollisionGroup::PLAYER;
 	hitResult.m_collisionFilterMask = PhysicsManager::CollisionGroup::PLAYER | PhysicsManager::CollisionGroup::BOUNDARY | PhysicsManager::CollisionGroup::SWINGING_MASS;
@@ -89,7 +115,7 @@ void PoRopeTarget::doPhysicalUpdate() {
 			colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
 		//std::cout << "hit detected at " << Utilities::vectorToString(hitLocationGlm) << std::endl;
-	}
+	}*/
 	else {
 
 		modelVertexData.push_back(armLocGlm);
