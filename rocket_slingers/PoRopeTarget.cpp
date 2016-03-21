@@ -55,13 +55,13 @@ void PoRopeTarget::doPhysicalUpdate() {
 	modelVertexData.clear();
 
 	// test ray between player position and target position
-	PoGuyBox2d* guy = (PoGuyBox2d*) gameState->activeStage->getPhysicalObject("GUY_BOX_2D");
+	PoGuy* guy = (PoGuy*) gameState->activeStage->getPhysicalObject("GUY");
 	glm::vec3 armLocGlm;
 	guy->getArmLocation(armLocGlm);
-	btVector3 armLoc;
-	PhysicsManager::glmVec3ToBtVec3(armLocGlm, armLoc);
-	btVector3 worldPositionBt;
-	PhysicsManager::glmVec3ToBtVec3(worldPosition, worldPositionBt);
+	//btVector3 armLoc;
+	//PhysicsManager::glmVec3ToBtVec3(armLocGlm, armLoc);
+	//btVector3 worldPositionBt;
+	//PhysicsManager::glmVec3ToBtVec3(worldPosition, worldPositionBt);
 
 	WorldRayCastCallback cb;
 	gameState->physicsManager->box2dWorld->RayCast(&cb, b2Vec2(armLocGlm.x, armLocGlm.y), b2Vec2(worldPosition.x, worldPosition.y));

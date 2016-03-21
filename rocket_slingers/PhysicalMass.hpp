@@ -1,6 +1,6 @@
 #ifndef PHYSICALMASS_HPP
 #define PHYSICALMASS_HPP
-
+/*
 #include <glm.hpp>
 #include <vector>
 #include "PhysicsManager.hpp"
@@ -44,5 +44,5 @@ private:
 	void addCollisionShape(const glm::mat4& transform, btCollisionShape* collisionShape);
 
 };
-
+*/
 #endif

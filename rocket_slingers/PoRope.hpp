@@ -16,15 +16,20 @@ public:
 private:
 
 	struct RopeSegment {
-		PhysicalMass* ropeMass;
-		btHingeConstraint* linkConstraint;
+		b2Body* body;
+		b2RevoluteJoint* revJoint;
+		//b2DistanceJoint* distJoint;
+		b2RopeJoint* ropeJoint;
 	};
+	b2RevoluteJoint* anchorRevJoint;
+	//b2RopeJoint* ropeMaxLengthJoint;
 
 	bool attachedToStructure;
-	unsigned int ropeMassesCount;
+	unsigned int ropeSegmentsCount;
 	float maxRopeLength;
 	float maxRopeSegmentLength;
-	std::vector<RopeSegment> ropeMasses;
+	float totalRopeMass;
+	std::vector<RopeSegment> ropeSegments;
 	PoGuy* player = nullptr;
 
 	void initShaders();

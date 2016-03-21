@@ -90,14 +90,14 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>external\Box2D\include;external\bullet3-2.83.7\src;external\freetype-2.6.3\include;external\glew-1.13.0\include\GL;external\glm-0.9.7.1\glm;external\SDL2_mixer-2.0.1\include;external\SDL2-2.0.4\include;external\soil-1.16\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>external\Box2D\include;external\freetype-2.6.3\include;external\glew-1.13.0\include\GL;external\glm-0.9.7.1\glm;external\SDL2_mixer-2.0.1\include;external\SDL2-2.0.4\include;external\soil-1.16\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Box2D.lib;BulletCollision.lib;BulletDynamics.lib;BulletSoftBody.lib;freetype.lib;glew32.lib;LinearMath.lib;opengl32.lib;SDL2_mixer.lib;SDL2.lib;SOIL.lib</AdditionalDependencies>
+      <AdditionalDependencies>Box2D.lib;freetype.lib;glew32.lib;opengl32.lib;SDL2_mixer.lib;SDL2.lib;SOIL.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>external\Box2D\lib\Debug;external\bullet3-2.83.7\lib\Debug;external\freetype-2.6.3\lib;external\glew-1.13.0\lib\Release\Win32;external\SDL2_mixer-2.0.1\lib\x86;external\SDL2-2.0.4\lib\x86;external\soil-1.16\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -126,7 +126,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>external\Box2D\include;external\bullet3-2.83.7\src;external\freetype-2.6.3\include;external\glew-1.13.0\include\GL;external\glm-0.9.7.1\glm;external\SDL2_mixer-2.0.1\include;external\SDL2-2.0.4\include;external\soil-1.16\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>external\Box2D\include;external\freetype-2.6.3\include;external\glew-1.13.0\include\GL;external\glm-0.9.7.1\glm;external\SDL2_mixer-2.0.1\include;external\SDL2-2.0.4\include;external\soil-1.16\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -136,8 +136,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Box2D.lib;BulletCollision.lib;BulletDynamics.lib;BulletSoftBody.lib;freetype.lib;glew32.lib;LinearMath.lib;opengl32.lib;SDL2_mixer.lib;SDL2.lib;SOIL.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>external\Box2D\lib\Release;external\bullet3-2.83.7\lib\Release;external\freetype-2.6.3\lib;external\glew-1.13.0\lib\Release\Win32;external\SDL2_mixer-2.0.1\lib\x86;external\SDL2-2.0.4\lib\x86;external\soil-1.16\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Box2D.lib;freetype.lib;glew32.lib;opengl32.lib;SDL2_mixer.lib;SDL2.lib;SOIL.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>external\Box2D\lib\Release;external\freetype-2.6.3\lib;external\glew-1.13.0\lib\Release\Win32;external\SDL2_mixer-2.0.1\lib\x86;external\SDL2-2.0.4\lib\x86;external\soil-1.16\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -159,13 +159,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="PhysicalObjectManager.cpp" />
     <ClCompile Include="PoBoundary.cpp" />
     <ClCompile Include="PoBox.cpp" />
-    <ClCompile Include="PoGuyBox2d.cpp" />
-    <ClCompile Include="PoPendulumBox2d.cpp" />
-    <ClCompile Include="PoRopeBox2d.cpp" />
-    <ClCompile Include="PoRopeSoftBody.cpp" />
     <ClCompile Include="PoRopeTarget.cpp" />
     <ClCompile Include="PoTextLabelFps.cpp">
       <SubType>
@@ -180,7 +175,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OglShaderProgram.cpp" />
     <ClCompile Include="PhysicalMass.cpp" />
-    <ClCompile Include="PhysicalMassMultiBody.cpp" />
     <ClCompile Include="PhysicalObject.cpp" />
     <ClCompile Include="PhysicsManager.cpp" />
     <ClCompile Include="PoPendulum.cpp" />
@@ -189,7 +183,6 @@
     <ClCompile Include="PoRope.cpp" />
     <ClCompile Include="PoTextLabel.cpp" />
     <ClCompile Include="RenderableObject.cpp" />
-    <ClCompile Include="PoPhysicsRendererBox2d.cpp" />
     <ClCompile Include="WorldRayCastCallback.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="MasterRenderer.cpp" />
@@ -211,21 +204,14 @@
     <ClInclude Include="EventBus.hpp" />
     <ClInclude Include="OglShaderProgram.hpp" />
     <ClInclude Include="PhysicalMass.hpp" />
-    <ClInclude Include="PhysicalMassMultiBody.hpp" />
     <ClInclude Include="PhysicalObject.hpp" />
-    <ClInclude Include="PhysicalObjectManager.hpp" />
     <ClInclude Include="PhysicsManager.hpp" />
-    <ClInclude Include="PoGuyBox2d.hpp" />
-    <ClInclude Include="PoPendulumBox2d.hpp" />
-    <ClInclude Include="PoPhysicsRendererBox2d.hpp" />
     <ClInclude Include="PoBoundary.hpp" />
     <ClInclude Include="PoBox.hpp" />
     <ClInclude Include="PoPendulum.hpp" />
     <ClInclude Include="PoPhysicsRenderer.hpp" />
     <ClInclude Include="PoReticule.hpp" />
     <ClInclude Include="PoRope.hpp" />
-    <ClInclude Include="PoRopeBox2d.hpp" />
-    <ClInclude Include="PoRopeSoftBody.hpp" />
     <ClInclude Include="PoRopeTarget.hpp" />
     <ClInclude Include="PoTextLabel.hpp" />
     <ClInclude Include="PoTextLabelFps.hpp" />

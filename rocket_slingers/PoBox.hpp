@@ -12,7 +12,7 @@ public:
 
 private:
 
-	PhysicalMass* physicalMass;
+//	PhysicalMass* physicalMass;
 	glm::vec3 position;
 
 	float xScaler = 10.0f;

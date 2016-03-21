@@ -15,7 +15,8 @@ public:
 	//void updateTransformFromRope(const btTransform& transform);
 	void setRopeAttachedToStructure(bool attachedToStructure);
 	//btRigidBody* getRigidBody();
-	PhysicalMass* getPhysicalMass();
+	//PhysicalMass* getPhysicalMass();
+	b2Body* getRigidBody();
 	~PoGuy();
 
 private:
@@ -24,9 +25,10 @@ private:
 	glm::vec3 modelOriginOffset;
 	glm::vec3 initialPosition;
 	glm::vec3 rocketImpulse;
-	PhysicalMass* physicalMass;
-	PhysicalMass* cameraFocalPointPhysicalMass;
-	btGeneric6DofSpring2Constraint* cameraSpringConstraint;
+	//PhysicalMass* physicalMass;
+	b2Body* rigidBody;
+	//PhysicalMass* cameraFocalPointPhysicalMass;
+	//btGeneric6DofSpring2Constraint* cameraSpringConstraint;
 
 	bool rocketOn;
 	bool ropeAttachedToStructure;
@@ -36,7 +38,7 @@ private:
 	void initPhysics();
 	void initEventSubsriptions();
 	unsigned int soundEffectInstanceId;
-	
+
 	unsigned int keyDownCount;
 	std::map<int, bool> keyStates;
 

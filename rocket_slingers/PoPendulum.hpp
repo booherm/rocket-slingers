@@ -20,9 +20,9 @@ private:
 	void initPhysics();
 	void doPhysicalUpdate();
 
-	PhysicalMass* hingePointMass;
-	PhysicalMass* bobMass;
-	btHingeConstraint* hingeConstraint;
+	b2Body* rigidBody;
+	b2RevoluteJoint* revJoint;
+
 };
 
 #endif

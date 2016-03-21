@@ -3,27 +3,7 @@
 PoPhysicsRenderer::PoPhysicsRenderer(const std::string& objectId, GameState* gameState) : PhysicalObject(objectId, gameState) {
 	initShaders();
 	initGeometry();
-	gameState->physicsManager->setDebugRenderer(this);
-}
-
-void PoPhysicsRenderer::drawLine(const btVector3& from, const btVector3& to, const btVector3& color) {
-
-	glm::vec3 fromVec(from.x(), from.y(), 0.0f);
-	glm::vec3 toVec(to.x(), to.y(), 0.0f);
-
-	glm::vec4 colorVec;
-	if(color.x() == 0.0f && color.y() == 0.0f  && color.z() == 0.0f)
-		colorVec = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	else
-		colorVec = glm::vec4(color.x(), color.y(), color.z(), 1.0f);
-
-	modelVertexData.push_back(fromVec);
-	modelVertexData.push_back(toVec);
-	colorData.push_back(colorVec);
-	colorData.push_back(colorVec);
-}
-
-void PoPhysicsRenderer::flushLines() {
+	gameState->physicsManager->setBox2dDebugRenderer(this);
 }
 
 void PoPhysicsRenderer::initShaders() {
@@ -68,6 +48,7 @@ void PoPhysicsRenderer::initShaders() {
 void PoPhysicsRenderer::initGeometry() {
 
 	glRenderingMode = GL_LINES;
+
 	zDepth = 1.0f;
 
 	unsigned int maxVertices = 10000;
@@ -82,23 +63,67 @@ void PoPhysicsRenderer::initGeometry() {
 
 PoPhysicsRenderer::~PoPhysicsRenderer() {};
 
-void PoPhysicsRenderer::drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color) {
-};
+/// Draw a closed polygon provided in CCW order.
+void PoPhysicsRenderer::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) {
 
-void PoPhysicsRenderer::reportErrorWarning(const char* warningString) {
-	throw std::string(warningString);
-};
+	for (int i = 0; i < vertexCount - 1; i++) {
+		DrawSegment(vertices[i], vertices[i + 1], color);
+	}
 
-void PoPhysicsRenderer::draw3dText(const btVector3& location, const char* textString) {
-};
+	DrawSegment(vertices[vertexCount - 1], vertices[0], color);
 
-void PoPhysicsRenderer::setDebugMode(int debugMode) {
-	this->debugMode = debugMode;
-};
+}
 
-int	 PoPhysicsRenderer::getDebugMode() const {
-	return debugMode;
-};
+/// Draw a solid closed polygon provided in CCW order.
+void PoPhysicsRenderer::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) {
+	for (int i = 0; i < vertexCount - 1; i++) {
+		DrawSegment(vertices[i], vertices[i + 1], color);
+	}
+
+	DrawSegment(vertices[vertexCount - 1], vertices[0], color);
+
+}
+
+/// Draw a circle.
+void PoPhysicsRenderer::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color) {
+
+	unsigned int resolution = 50;
+	float increment = glm::two_pi<float>() / resolution;
+
+	b2Vec2* vertices = new b2Vec2[resolution];
+
+	for (unsigned int i = 0; i < resolution; i++) {
+		vertices[i] = b2Vec2(
+			center.x + (radius * glm::cos(i * increment)),
+			center.y + (radius * glm::sin(i * increment))
+			);
+	}
+
+	DrawPolygon(vertices, resolution, color);
+
+	delete vertices;
+}
+
+/// Draw a solid circle.
+void PoPhysicsRenderer::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color) {
+	DrawCircle(center, radius, color);
+}
+
+/// Draw a line segment.
+void PoPhysicsRenderer::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) {
+	modelVertexData.push_back(glm::vec3(p1.x, p1.y, 0.0f));
+	modelVertexData.push_back(glm::vec3(p2.x, p2.y, 0.0f));
+	colorData.push_back(glm::vec4(color.a, color.r, color.g, color.a));
+	colorData.push_back(glm::vec4(color.a, color.r, color.g, color.a));
+
+}
+
+/// Draw a transform. Choose your own length scale.
+/// @param xf a transform.
+void PoPhysicsRenderer::DrawTransform(const b2Transform& xf) {
+}
+
+
 
 void PoPhysicsRenderer::render() {
 

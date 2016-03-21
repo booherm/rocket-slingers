@@ -72,9 +72,6 @@
     <ClCompile Include="PoPhysicsRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PhysicalMassMultiBody.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PoReticule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -102,25 +99,7 @@
     <ClCompile Include="PoRopeTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PhysicalObjectManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PoBoundary.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PoRopeSoftBody.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PoPhysicsRendererBox2d.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PoRopeBox2d.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PoGuyBox2d.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PoPendulumBox2d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WorldRayCastCallback.cpp">
@@ -185,9 +164,6 @@
     <ClInclude Include="PoPhysicsRenderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PhysicalMassMultiBody.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PoReticule.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -215,28 +191,10 @@
     <ClInclude Include="PoRopeTarget.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PhysicalObjectManager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PoBoundary.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AllPhysicalObjects.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PoRopeSoftBody.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PoPhysicsRendererBox2d.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PoRopeBox2d.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PoGuyBox2d.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PoPendulumBox2d.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WorldRayCastCallback.hpp">

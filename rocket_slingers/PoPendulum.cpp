@@ -1,14 +1,10 @@
 #include "PoPendulum.hpp"
 
 PoPendulum::PoPendulum(const std::string& objectId, GameState* gameState) : PhysicalObject(objectId, gameState) {
-
 	initialPosition = glm::vec3(15.0f, 15.0f, 0.0f);
-
 	initShaders();
 	initGeometry();
 	initPhysics();
-	shouldDoPhysicalUpdate = true;
-
 }
 
 void PoPendulum::initShaders() {
@@ -65,7 +61,7 @@ void PoPendulum::initGeometry() {
 	points.push_back(glm::vec3(-0.5f, 0.15f, 0.0f));  // H = 7
 	points.push_back(glm::vec3(0.0f, -0.15f, 0.0f));  // I = 8
 
-	// pendulum model triangles
+													  // pendulum model triangles
 	modelVertexData.push_back(points[0]);
 	modelVertexData.push_back(points[6]);
 	modelVertexData.push_back(points[7]);
@@ -104,42 +100,43 @@ void PoPendulum::initGeometry() {
 
 void PoPendulum::initPhysics() {
 
-	glm::mat4 worldTransform;
-	worldTransform = glm::translate(worldTransform, initialPosition + (modelOriginOffset * sizeScaler));
+	// rigid body
+	b2BodyDef rigidBodyDef;
+	rigidBodyDef.type = b2_dynamicBody;
+	rigidBodyDef.position.Set(initialPosition.x, initialPosition.y);
+	rigidBody = gameState->physicsManager->box2dWorld->CreateBody(&rigidBodyDef);
+	b2PolygonShape rigidBodyShape;
+	b2FixtureDef rigidBodyFixtureDef;
+	rigidBodyFixtureDef.density = 1.0f;
+	rigidBodyFixtureDef.friction = 0.3f;
+	rigidBodyFixtureDef.userData = this;
 
-	// hinge point
-	glm::mat4 hingePointTransform;
-	hingePointTransform = glm::translate(worldTransform, glm::vec3(0.0f, 0.85 * sizeScaler, 0.0f));
-	hingePointMass = new PhysicalMass();
-	hingePointMass->init("PENDULUM_HINGE_POINT", gameState, 0.0f, hingePointTransform, PhysicsManager::CollisionGroup::NO_COLLISION);
-	hingePointMass->addToDynamicsWorld();
+	// bottom fixture
+	rigidBodyShape.SetAsBox(0.5f * sizeScaler, 0.15f * sizeScaler, b2Vec2(0.0f, -0.85f * sizeScaler), 0.0f);
+	rigidBodyFixtureDef.shape = &rigidBodyShape;
+	rigidBody->CreateFixture(&rigidBodyFixtureDef);
 
-	// bob mass and collider shapes
-	glm::mat4 identityTransform;
-	glm::mat4 armComTransform = glm::translate(identityTransform, glm::vec3(0.0f, ((0.7f / 2.0f) + 0.15f) * sizeScaler, 0.0f));
-	bobMass = new PhysicalMass();
-	bobMass->init("PENDULUM_BOB_MASS", gameState, 500.0f, worldTransform, PhysicsManager::CollisionGroup::SWINGING_MASS);
-	bobMass->addCollisionShapeBox(armComTransform, glm::vec3(0.1f, 0.7f, 0.0f) * sizeScaler);
-	bobMass->addCollisionShapeBox(identityTransform, glm::vec3(1.0f, 0.3f, 0.0f) * sizeScaler);
-	bobMass->addToDynamicsWorld();
+	// arm fixture
+	rigidBodyShape.SetAsBox(0.05f * sizeScaler, 0.35f * sizeScaler, b2Vec2(0.0f, -0.35f * sizeScaler), 0.0f);
+	rigidBodyFixtureDef.shape = &rigidBodyShape;
+	rigidBody->CreateFixture(&rigidBodyFixtureDef);
 
-	// hinge constraint
-	hingeConstraint = new btHingeConstraint(
-		*(hingePointMass->rigidBody),
-		*(bobMass->rigidBody),
-		btVector3(0.0f, 0.0f, 0.0f),
-		btVector3(0.0f, 0.85f * sizeScaler, 0.0f),
-		btVector3(0.0f, 0.0f, 1.0f),
-		btVector3(0.0f, 0.0f, 0.0f),
-		true
-	);
-	hingeConstraint->enableAngularMotor(true, 0.0f, 1.20f);
-	gameState->physicsManager->dynamicsWorld->addConstraint(hingeConstraint);
+	// revolute joint
+	b2RevoluteJointDef revJointDef;
+	revJointDef.bodyA = gameState->physicsManager->worldStaticBody;
+	revJointDef.bodyB = rigidBody;
+	revJointDef.localAnchorA = b2Vec2(initialPosition.x, initialPosition.y);
+	revJointDef.localAnchorB = b2Vec2(0.0f, 0.0f);
+	revJointDef.collideConnected = false;
+	revJoint = (b2RevoluteJoint*) gameState->physicsManager->box2dWorld->CreateJoint(&revJointDef);
+
+	shouldDoPhysicalUpdate = true;
 
 }
 
 void PoPendulum::doPhysicalUpdate() {
 
+	/*
 	glm::vec3 pos;
 	bobMass->getCenterOfMassPosition(pos);
 
@@ -150,7 +147,7 @@ void PoPendulum::doPhysicalUpdate() {
 	e.eventWorldCoordinateX = pos.x;
 	e.eventWorldCoordinateY = pos.y;
 	gameState->eventBus->postEvent(e);
-
+	*/
 }
 
 void PoPendulum::render() {
@@ -159,12 +156,12 @@ void PoPendulum::render() {
 	modelTransform = glm::translate(modelTransform, initialPosition);
 	modelTransform = glm::scale(modelTransform, glm::vec3(sizeScaler, sizeScaler, 1.0f));
 	glm::quat rotationQuaternion;
-	PhysicsManager::btQuatToGlmQuat(bobMass->rigidBody->getOrientation(), rotationQuaternion);
+	rotationQuaternion = glm::rotate(rotationQuaternion, rigidBody->GetAngle(), glm::vec3(0.0f, 0.0f, 1.0f));
 	modelTransform = modelTransform * glm::toMat4(rotationQuaternion);
+
 	glm::mat4 viewTransform = gameState->camera->getViewTransform();
 	glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
 	glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
-
 
 	shaderProg.use();
 	setUniformValue("transformMatrix", transform);
@@ -176,8 +173,6 @@ void PoPendulum::render() {
 }
 
 PoPendulum::~PoPendulum() {
-	gameState->physicsManager->dynamicsWorld->removeConstraint(hingeConstraint);
-	delete hingePointMass;
-	delete bobMass;
-	delete hingeConstraint;
+	gameState->physicsManager->box2dWorld->DestroyJoint(revJoint);
+	gameState->physicsManager->box2dWorld->DestroyBody(rigidBody);
 }

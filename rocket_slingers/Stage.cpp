@@ -7,20 +7,15 @@ Stage::Stage(GameState* gameState) {
 	//gameState->audioManager->playMusicTrack(AudioManager::MusicTrackId::MOTORLICKER);
 	gameState->audioManager->setSoundEffectsVolume(0);
 	
-	//pushStageObject(new PoGuy("GUY", gameState), 3);
-	pushStageObject(new PoGuyBox2d("GUY_BOX_2D", gameState), 3);
-	//pushStageObject(new PoBackground("BACKGROUND", gameState), 1);
+	pushStageObject(new PoGuy("GUY", gameState), 3);
+	pushStageObject(new PoBackground("BACKGROUND", gameState), 1);
 	pushStageObject(new PoRopeTarget("ROPE_TARGET", gameState), 2);
-	//pushStageObject(new PoPendulum("PENDULUM", gameState), 2);
-	pushStageObject(new PoPendulumBox2d("PENDULUM_BOX_2D", gameState), 2);
-	//pushStageObject(new PoRope("ROPE", gameState), 2);
-	//pushStageObject(new PoRopeSoftBody("ROPE_SOFT_BODY", gameState), 2);
-	pushStageObject(new PoRopeBox2d("ROPE_BOX_2D", gameState), 2);
+	pushStageObject(new PoPendulum("PENDULUM", gameState), 2);
+	pushStageObject(new PoRope("ROPE", gameState), 2);
 	//pushStageObject(new PoReticule("RETICULE", gameState), 2);
 	pushStageObject(new PoAxes("AXES", gameState), 2);
 	//pushStageObject(new PoBox("BOX", gameState), 2);
-//	pushStageObject(new PoPhysicsRenderer("PHYSICS_RENDERER", gameState), 2);
-	pushStageObject(new PoPhysicsRendererBox2d("PHYSICS_RENDERER_BOX2D", gameState), 2);
+	pushStageObject(new PoPhysicsRenderer("PHYSICS_RENDERER", gameState), 2);
 
 	PoBoundary* floorBoundary = new PoBoundary("FLOOR", gameState, glm::vec3(100.0f, 5.0f, 0.0f), glm::vec3(0.0f, -5.0f, 0.0f));
 	pushStageObject(floorBoundary, 1);

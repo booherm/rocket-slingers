@@ -6,8 +6,7 @@
 #include "EventListener.hpp"
 #include "GameState.hpp"
 #include "Utilities.hpp"
-#include "PhysicalMass.hpp"
-#include "PhysicalMassMultiBody.hpp"
+//#include "PhysicalMass.hpp"
 #include "RenderableObject.hpp"
 
 class EventBus;

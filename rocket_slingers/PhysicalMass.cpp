@@ -1,5 +1,5 @@
 #include "PhysicalMass.hpp"
-
+/*
 std::map<std::string, PhysicalMass*> PhysicalMass::allPhysicalMasses;
 
 void PhysicalMass::init(const std::string& id, GameState* gameState, float mass, const glm::mat4& worldTransform, PhysicsManager::CollisionGroup collisionGroup) {
@@ -90,13 +90,13 @@ void PhysicalMass::setActivationState(int state) {
 	rigidBody->setActivationState(state);
 }
 
-/*
+
 void PhysicalMass::setCenterOfMassTransform(const glm::mat4& transform) {
 	btTransform transformBt;
 	PhysicsManager::glmTransformToBtTransform(transform, transformBt);
 	rigidBody->setCenterOfMassTransform(transformBt);
 }
-*/
+
 
 void PhysicalMass::applyCentralImpulse(const glm::vec3& impulse) {
 	btVector3 impulseBt;
@@ -123,3 +123,4 @@ PhysicalMass::~PhysicalMass() {
 	}
 
 }
+*/
