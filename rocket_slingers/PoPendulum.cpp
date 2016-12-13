@@ -110,6 +110,8 @@ void PoPendulum::initPhysics() {
 	rigidBodyFixtureDef.density = 1.0f;
 	rigidBodyFixtureDef.friction = 0.3f;
 	rigidBodyFixtureDef.userData = this;
+	rigidBodyFixtureDef.filter.categoryBits = PhysicsManager::CollisionCategory::SWINGING_MASS;
+	rigidBodyFixtureDef.filter.maskBits = gameState->physicsManager->getCollisionMask(PhysicsManager::CollisionCategory::SWINGING_MASS);
 
 	// bottom fixture
 	rigidBodyShape.SetAsBox(0.5f * sizeScaler, 0.15f * sizeScaler, b2Vec2(0.0f, -0.85f * sizeScaler), 0.0f);

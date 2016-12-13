@@ -1,16 +1,18 @@
-#include "PoBoundary.hpp"
+#include "PoSpinAnchor.hpp"
 
-PoBoundary::PoBoundary(const std::string& objectId, GameState* gameState, const glm::vec3& scalers, const glm::vec3& position) : PhysicalObject(objectId, gameState) {
+PoSpinAnchor::PoSpinAnchor(const std::string& objectId, GameState* gameState, const glm::vec3& scalers, const glm::vec3& position) : PhysicalObject(objectId, gameState) {
 
 	this->scalers = scalers;
 	this->position = position;
+	ropeAttachable = true;
+	ropeAttachmentPoint = Utilities::glmVec3ToB2Vec2((position + 0.5f) * scalers);
 
 	initShaders();
 	initGeometry();
 	initPhysics();
 }
 
-void PoBoundary::initShaders() {
+void PoSpinAnchor::initShaders() {
 
 	// vertex shader
 	std::string vertexShaderSource =
@@ -55,7 +57,7 @@ void PoBoundary::initShaders() {
 
 }
 
-void PoBoundary::initGeometry() {
+void PoSpinAnchor::initGeometry() {
 
 	modelVertexData.push_back(glm::vec3(0.0f * scalers.x, 0.0f * scalers.y, 0.0f));
 	modelVertexData.push_back(glm::vec3(1.0f * scalers.x, 0.0f * scalers.y, 0.0f));
@@ -77,7 +79,7 @@ void PoBoundary::initGeometry() {
 
 	// push color data
 	for (unsigned int i = 0; i < modelVertexData.size(); i++) {
-		colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		colorData.push_back(glm::vec4(0.9216f, 0.1059f, 0.9490f, 1.0f));
 	}
 
 	initModelVertexBuffer();
@@ -88,24 +90,25 @@ void PoBoundary::initGeometry() {
 	shouldRender = true;
 }
 
-void PoBoundary::initPhysics() {
+void PoSpinAnchor::initPhysics() {
 
 	b2BodyDef rigidBodyDef;
 	rigidBodyDef.position.Set(position.x + (scalers.x / 2.0f), position.y + (scalers.y / 2.0f));
 	rigidBody = gameState->physicsManager->box2dWorld->CreateBody(&rigidBodyDef);
-	b2PolygonShape rigidBodyShape;
-	rigidBodyShape.SetAsBox(scalers.x / 2.0f, scalers.y / 2.0f);
+	b2CircleShape rigidBodyShape;
+	rigidBodyShape.m_radius = 2.00f;
 	b2FixtureDef rigidBodyFixtureDef;
 	rigidBodyFixtureDef.shape = &rigidBodyShape;
 	rigidBodyFixtureDef.friction = 0.3f;
-	rigidBodyFixtureDef.restitution = 0.0f;
 	rigidBodyFixtureDef.userData = this;
-	rigidBodyFixtureDef.filter.categoryBits = PhysicsManager::CollisionCategory::BOUNDARY;
-	rigidBodyFixtureDef.filter.maskBits = gameState->physicsManager->getCollisionMask(PhysicsManager::CollisionCategory::BOUNDARY);
+	rigidBodyFixtureDef.filter.categoryBits = PhysicsManager::CollisionCategory::ATTACHMENT_POINT;
+	rigidBodyFixtureDef.filter.maskBits = gameState->physicsManager->getCollisionMask(PhysicsManager::CollisionCategory::ATTACHMENT_POINT);
 	rigidBody->CreateFixture(&rigidBodyFixtureDef);
+
+
 }
 
-void PoBoundary::render() {
+void PoSpinAnchor::render() {
 
 	glm::mat4 modelTransform;
 	modelTransform = glm::translate(modelTransform, position);
@@ -124,6 +127,6 @@ void PoBoundary::render() {
 }
 
 
-PoBoundary::~PoBoundary() {
+PoSpinAnchor::~PoSpinAnchor() {
 	gameState->physicsManager->box2dWorld->DestroyBody(rigidBody);
 }

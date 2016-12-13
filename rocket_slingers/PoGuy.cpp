@@ -1,4 +1,6 @@
 #include "PoGuy.hpp"
+#include "PoTubeSection.hpp"
+#include <typeinfo>
 
 PoGuy::PoGuy(const std::string& objectId, GameState* gameState) : PhysicalObject(objectId, gameState) {
 	initShaders();
@@ -6,7 +8,8 @@ PoGuy::PoGuy(const std::string& objectId, GameState* gameState) : PhysicalObject
 	initPhysics();
 	initEventSubsriptions();
 
-	rocketImpulseMagnitude = 10.0f;
+	rocketForceMagnitude = 500.0f;
+	maxSpeed = 100.0f;
 	keyDownCount = 0;
 	keyStates[SDLK_w] = false;
 	keyStates[SDLK_s] = false;
@@ -271,7 +274,8 @@ void PoGuy::initGeometry() {
 
 	// push color data
 	for (unsigned int i = 0; i < modelVertexData.size(); i++) {
-		colorData.push_back(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+		//colorData.push_back(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+		colorData.push_back(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	}
 
 	// set model origin
@@ -290,15 +294,24 @@ void PoGuy::initPhysics() {
 
 	b2BodyDef rigidBodyDef;
 	rigidBodyDef.type = b2_dynamicBody;
+	//rigidBodyDef.linearDamping = 10.00f;
+//	rigidBodyDef.bullet = true;
 	rigidBodyDef.position.Set(initialPosition.x, initialPosition.y);
 	rigidBody = gameState->physicsManager->box2dWorld->CreateBody(&rigidBodyDef);
+	
 	b2CircleShape rigidBodyShape;
 	rigidBodyShape.m_radius = 1.0f;
+
+	//b2PolygonShape rigidBodyShape;
+	//rigidBodyShape.SetAsBox(0.5f, 0.5f);
+
 	b2FixtureDef rigidBodyFixtureDef;
 	rigidBodyFixtureDef.shape = &rigidBodyShape;
 	rigidBodyFixtureDef.density = 1.0f;
-	rigidBodyFixtureDef.friction = 0.3f;
-	rigidBodyFixtureDef.filter.groupIndex = -1;
+	rigidBodyFixtureDef.friction = 1.0f;
+	rigidBodyFixtureDef.restitution = 0.05f;
+	rigidBodyFixtureDef.filter.categoryBits = PhysicsManager::CollisionCategory::PLAYER;
+	rigidBodyFixtureDef.filter.maskBits = gameState->physicsManager->getCollisionMask(PhysicsManager::CollisionCategory::PLAYER);
 	rigidBodyFixtureDef.userData = this;
 	rigidBody->CreateFixture(&rigidBodyFixtureDef);
 
@@ -349,29 +362,37 @@ void PoGuy::initPhysics() {
 void PoGuy::doPhysicalUpdate() {
 
 	// setup rocket force based on key state
-	rocketImpulse = glm::vec3();
+	rocketForce = glm::vec3();
 	if (rocketOn) {
 		if (keyStates[SDLK_d]) {
-			rocketImpulse.x += rocketImpulseMagnitude;
+			rocketForce.x += rocketForceMagnitude;
 		}
 		if (keyStates[SDLK_a]) {
-			rocketImpulse.x -= rocketImpulseMagnitude;
+			rocketForce.x -= rocketForceMagnitude;
 		}
 		if (keyStates[SDLK_w]) {
-			rocketImpulse.y += rocketImpulseMagnitude;
+			rocketForce.y += rocketForceMagnitude;
 		}
 		if (keyStates[SDLK_s]) {
-			rocketImpulse.y -= rocketImpulseMagnitude;
+			rocketForce.y -= rocketForceMagnitude;
 
 		}
 
-		// Only apply the rocket impulse to the rigid body if the rope is not attached to a structure.  If it is,
+		// Only apply the rocket force to the rigid body if the rope is not attached to a structure.  If it is,
 		// the rope will have a mass to represent the player.
 		if (!ropeAttachedToStructure) {
-			rigidBody->ApplyLinearImpulse(b2Vec2(rocketImpulse.x, rocketImpulse.y), b2Vec2(), true);
+			//rigidBody->ApplyLinearForce(b2Vec2(rocketForce.x, rocketForce.y), b2Vec2(), true);
+			rigidBody->ApplyForceToCenter(b2Vec2(rocketForce.x, rocketForce.y), true);
+			//rigidBody->ApplyLinearImpulse(b2Vec2(rocketForce.x, rocketForce.y), b2Vec2(), true);
+
 		}
 
 	}
+
+	for (unsigned int i = 0; i < environmentForces.size(); ++i) {
+		rigidBody->ApplyForceToCenter(environmentForces[i], true);
+	}
+	
 
 	// update camera focal point based on current player position
 	//glm::vec3 cameraFocalPointPosition;
@@ -392,9 +413,9 @@ void PoGuy::doPhysicalUpdate() {
 	gameState->camera->updatePosition(glm::vec3(rigidBody->GetPosition().x - 7.5f, rigidBody->GetPosition().y - 7.5f, 0.0f));
 }
 
-void PoGuy::getRocketImpulse(glm::vec3& rocketImpulse) {
+void PoGuy::getRocketForce(glm::vec3& rocketForce) {
 	// provide rocket force to rope
-	rocketImpulse = this->rocketImpulse;
+	rocketForce = this->rocketForce;
 }
 
 b2Body* PoGuy::getRigidBody() {
@@ -420,16 +441,43 @@ void PoGuy::render() {
 	abortOnOpenGlError();
 }
 
-void PoGuy::getArmLocation(glm::vec3& armLocation) {
+void PoGuy::getArmLocation(b2Vec2& armLocation) {
 	// provide center of mass of rigid body as arm location (rope connection point)
 	armLocation.x = rigidBody->GetPosition().x;
 	armLocation.y = rigidBody->GetPosition().y;
-	armLocation.z = 0.0f;
 }
 
 void PoGuy::setRopeAttachedToStructure(bool attachedToStructure) {
 	ropeAttachedToStructure = attachedToStructure;
 }
+
+void PoGuy::processContactBegin(PhysicalObject* contactingObject, b2Contact* contact) {
+
+	/*
+	if (contact->GetFixtureA()->IsSensor() && contactingObject->objectId.compare(0, 12, "TUBE_SECTION") == 0) {
+//		std::cout << "tube section cast success" << std::endl;
+		PoTubeSection* tubeSection = dynamic_cast<PoTubeSection*>(contactingObject);
+		b2Vec2 force = tubeSection->getFixtureAcceleration(contact->GetFixtureA());
+		environmentForces.push_back(force);
+//		std::cout << "applying force " << Utilities::vectorToString(force) << std::endl;
+
+		//rigidBody->ApplyForceToCenter(force, true);
+	//	rigidBody->ApplyLinearForce(force, b2Vec2(0.0f, 0.0f), true);
+	}
+	*/
+
+}
+
+void PoGuy::processContactEnd(PhysicalObject* contactingObject, b2Contact* contact) {
+
+	/*
+	if (contact->GetFixtureA()->IsSensor() && contactingObject->objectId.compare(0, 12, "TUBE_SECTION") == 0) {
+		environmentForces.clear();
+	}
+	*/
+
+}
+
 
 PoGuy::~PoGuy() {
 	gameState->physicsManager->box2dWorld->DestroyBody(rigidBody);

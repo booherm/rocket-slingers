@@ -23,8 +23,8 @@ void PoBackground::initGeometry() {
 
 	zDepth = -1.0f;
 	sizeScaler = 1.0f;
-	float xScaler = sizeScaler * gameState->worldViewportScaler * gameState->aspectRatio;
-	float yScaler = sizeScaler * gameState->worldViewportScaler;
+	float xScaler = sizeScaler * gameState->worldViewportWidth;
+	float yScaler = sizeScaler * gameState->worldViewportHeight;
 
 	modelVertexData.push_back(glm::vec3(0.0f * xScaler, 0.0f * yScaler, 0.0f));
 	modelVertexData.push_back(glm::vec3(1.0f * xScaler, 0.0f * yScaler, 0.0f) * sizeScaler);
@@ -59,12 +59,72 @@ void PoBackground::initGeometry() {
 	textureCoordinateData.push_back(glm::vec2(0.0f, 1.0f));
 	*/
 
-	parallaxLayers = 3;
-	for (unsigned int i = 0; i < parallaxLayers; ++i) {
-		std::string fileName = "resources/backgrounds/background_03_parallax_0" + std::to_string(i + 1) + ".png";
+	unsigned int backgroundId = 4;
+	if (backgroundId == 1) {
+
+		// greenish dark space
+		parallaxLayers = 3;
+		std::string fileName = "resources/backgrounds/background_01_parallax_01.png";
+		generateTexture(fileName);
+		transformData.push_back(glm::mat4());
+		fileName = "resources/backgrounds/background_01_parallax_02.png";
+		generateTexture(fileName);
+		transformData.push_back(glm::mat4());
+		fileName = "resources/backgrounds/background_01_parallax_05.png";
+		generateTexture(fileName);
+		transformData.push_back(glm::mat4());
+
+	}
+	else if (backgroundId == 2) {
+
+		// blue dark space with planet
+		parallaxLayers = 2;
+		std::string fileName = "resources/backgrounds/background_02_parallax_01.png";
+		generateTexture(fileName);
+		transformData.push_back(glm::mat4());
+		fileName = "resources/backgrounds/background_02_parallax_02.png";
 		generateTexture(fileName);
 		transformData.push_back(glm::mat4());
 	}
+	else if (backgroundId == 3) {
+
+		// dark purple space
+		parallaxLayers = 3;
+		std::string fileName = "resources/backgrounds/background_03_parallax_01.png";
+		generateTexture(fileName);
+		transformData.push_back(glm::mat4());
+		fileName = "resources/backgrounds/background_03_parallax_02.png";
+		generateTexture(fileName);
+		transformData.push_back(glm::mat4());
+		fileName = "resources/backgrounds/background_03_parallax_03.png";
+		generateTexture(fileName);
+		transformData.push_back(glm::mat4());
+	}
+	else if (backgroundId == 4) {
+
+		// colorful space
+		parallaxLayers = 2;
+		std::string fileName = "resources/backgrounds/background_04_parallax_01.png";
+		generateTexture(fileName);
+		transformData.push_back(glm::mat4());
+		fileName = "resources/backgrounds/background_04_parallax_04.png";
+		generateTexture(fileName);
+		transformData.push_back(glm::mat4());
+
+	}
+
+		/*
+	parallaxLayers = 2;
+	for (unsigned int i = 0; i < parallaxLayers; ++i) {
+		//std::string fileName = "resources/backgrounds/background_01_parallax_0" + std::to_string(i + 1) + ".png"; // blue space with planet
+		//std::string fileName = "resources/backgrounds/background_02_parallax_0" + std::to_string(i + 1) + ".png"; // blue space with planet
+		//std::string fileName = "resources/backgrounds/background_03_parallax_0" + std::to_string(i + 1) + ".png";  // dark space
+		std::string fileName = "resources/backgrounds/background_04_parallax_0" + std::to_string(i + 1) + ".png";  // colorful space
+
+		generateTexture(fileName);
+		transformData.push_back(glm::mat4());
+	}
+	*/
 
 	initModelVertexBuffer();
 	initTextureCoordinateBuffer();

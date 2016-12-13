@@ -10,6 +10,7 @@ class Stage
 public:
 
 	Stage(GameState* gameState);
+	void initialize();
 	void update();
 	PhysicalObject* getPhysicalObject(const std::string& objectId);
 

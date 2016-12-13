@@ -2,6 +2,7 @@
 #include "Stage.hpp"
 
 GameState::GameState() {
+
 	eventBus = new EventBus(this);
 	renderWindow = new RenderWindow(this);
 	camera = new Camera(this);
@@ -9,6 +10,7 @@ GameState::GameState() {
 	audioManager = new AudioManager();
 	physicsManager = new PhysicsManager();
 	activeStage = new Stage(this);
+	activeStage->initialize();
 
 	frameTimes.resize(fpsFrameRange);
 

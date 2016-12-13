@@ -14,6 +14,9 @@ public:
 	enum MusicTrackId {
 		DRIPPY_EYE,
 		MOTORLICKER,
+		CLUB_DIVER,
+		FURIOUS_FREAK,
+		EXIT_THE_PREMISES,
 		MUSIC_TRACK_LAST
 	};
 

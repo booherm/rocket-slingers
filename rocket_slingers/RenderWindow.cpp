@@ -36,6 +36,11 @@ void RenderWindow::initGlWindow() {
 		}
 	}
 
+	// windowed mode for screen recording
+	//glWindow = SDL_CreateWindow("Rocket Slingers", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, gameState->resolutionWidth, gameState->resolutionHeight,
+		//SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+
+	// true full screen mode
 	glWindow = SDL_CreateWindow("Rocket Slingers", rightmostDisplayX, rightmostDisplayY,
 		gameState->resolutionWidth, gameState->resolutionHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN);
 

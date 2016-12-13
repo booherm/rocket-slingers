@@ -4,8 +4,8 @@
 EventBus::EventBus(GameState* gameState) {
 	this->gameState = gameState;
 
-	screenToWorldCoordinateScalerX = (gameState->worldViewportScaler * gameState->aspectRatio) / gameState->resolutionWidth;
-	screenToWorldCoordinateScalerY = gameState->worldViewportScaler / gameState->resolutionHeight;
+	screenToWorldCoordinateScalerX = gameState->worldViewportWidth / gameState->resolutionWidth;
+	screenToWorldCoordinateScalerY = gameState->worldViewportHeight / gameState->resolutionHeight;
 
 	sdlEventTypeMapping[SDL_FIRSTEVENT] = Event::EventType::NULL_EVENT;
 	sdlEventTypeMapping[SDL_QUIT] = Event::EventType::QUIT_EVENT;
@@ -99,7 +99,7 @@ bool EventBus::processInput() {
 			e.sdlInputEvent = &inputEvent;
 			e.eventPoster = nullptr;
 			e.eventWorldCoordinateX = ((float) inputEvent.button.x * screenToWorldCoordinateScalerX) + cameraPosition.x;
-			e.eventWorldCoordinateY = (gameState->worldViewportScaler - ((float) inputEvent.button.y * screenToWorldCoordinateScalerY)) + cameraPosition.y;
+			e.eventWorldCoordinateY = (gameState->worldViewportHeight - ((float) inputEvent.button.y * screenToWorldCoordinateScalerY)) + cameraPosition.y;
 
 			callSubscribers(e);
 		}
@@ -175,7 +175,7 @@ void EventBus::getMousePosition(float &x, float &y) {
 
 	glm::vec3 cameraPosition = gameState->camera->getPosition();
 	x = ((float) xi * screenToWorldCoordinateScalerX) + cameraPosition.x;
-	y = (gameState->worldViewportScaler - ((float) yi * screenToWorldCoordinateScalerY)) + cameraPosition.y;
+	y = (gameState->worldViewportHeight - ((float) yi * screenToWorldCoordinateScalerY)) + cameraPosition.y;
 }
 
 void EventBus::postEvent(const Event& eventObj) {

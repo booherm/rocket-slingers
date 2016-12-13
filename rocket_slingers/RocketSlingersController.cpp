@@ -54,7 +54,7 @@ void RocketSlingersController::start() {
 		gameState->frameStart();
 		running = gameState->eventBus->processInput();
 		gameState->activeStage->update();
-		gameState->masterRenderer->render();
+		gameState->masterRenderer->renderDefaultFrameBuffer();
 		gameState->renderWindow->publishFrame();
 		gameState->frameEnd();
 	}

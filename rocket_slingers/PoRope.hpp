@@ -3,6 +3,7 @@
 
 #include "PhysicalObject.hpp"
 #include "PoGuy.hpp"
+#include "PoRopeTarget.hpp"
 
 class PoRope : public PhysicalObject {
 public:
@@ -18,9 +19,7 @@ private:
 	struct RopeSegment {
 		b2Body* body;
 		b2RevoluteJoint* revJoint;
-		b2RopeJoint* ropeJoint;
 	};
-	b2RevoluteJoint* anchorRevJoint;
 
 	bool attachedToStructure;
 	unsigned int ropeSegmentsCount;
@@ -29,6 +28,7 @@ private:
 	float totalRopeMass;
 	std::vector<RopeSegment> ropeSegments;
 	PoGuy* player = nullptr;
+	PoRopeTarget* ropeTarget;
 
 	void initShaders();
 	void initGeometry();

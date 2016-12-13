@@ -1,4 +1,6 @@
 #include "OglShaderProgram.hpp"
+#include <fstream>
+#include <sstream>
 
 OglShaderProgram::OglShaderProgram()
 {
@@ -23,6 +25,27 @@ void OglShaderProgram::createFragmentShaderFromSourceString(const std::string& s
 
 	fragmentShaderId = buildShader(GL_FRAGMENT_SHADER, shaderSource);
 	fragmentShaderSet = true;
+}
+
+void OglShaderProgram::readFile(const std::string& fileName, std::string& sourceCode) {
+	std::ifstream inputFileStream;
+	inputFileStream.open(fileName, std::fstream::in);
+	std::stringstream inputStream;
+	inputStream << inputFileStream.rdbuf();
+	inputFileStream.close();
+	sourceCode = inputStream.str();
+}
+
+void OglShaderProgram::createVertexShaderFromFile(const std::string& fileName) {
+	std::string source;
+	readFile(fileName, source);
+	createVertexShaderFromSourceString(source);
+}
+
+void OglShaderProgram::createFragmentShaderFromFile(const std::string& fileName) {
+	std::string source;
+	readFile(fileName, source);
+	createFragmentShaderFromSourceString(source);
 }
 
 void OglShaderProgram::build()

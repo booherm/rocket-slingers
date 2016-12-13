@@ -10,6 +10,9 @@ AudioManager::AudioManager() {
 	musicTracks.resize(MUSIC_TRACK_LAST);
 	musicTracks[DRIPPY_EYE] = "./resources/drippy_eye.mp3";
 	musicTracks[MOTORLICKER] = "./resources/motorlicker.mp3";
+	musicTracks[CLUB_DIVER] = "./resources/royalty_free_club_diver.mp3";
+	musicTracks[EXIT_THE_PREMISES] = "./resources/royalty_free_exit_the_premises.mp3";
+	musicTracks[FURIOUS_FREAK] = "./resources/royalty_free_furious_freak.mp3";
 
 	soundEffects.resize(SOUND_EFFECT_LAST);
 	soundEffects[BIG_ROPE_CREEK] = { "./resources/big_rope_creek.wav" };

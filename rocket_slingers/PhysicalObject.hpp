@@ -6,8 +6,8 @@
 #include "EventListener.hpp"
 #include "GameState.hpp"
 #include "Utilities.hpp"
-//#include "PhysicalMass.hpp"
 #include "RenderableObject.hpp"
+#include "WorldRayCaster.hpp"
 
 class EventBus;
 class GameState;
@@ -19,7 +19,11 @@ public:
 
 	virtual void sdlInputEventCallback(const Event& eventObj);
 	virtual void gameEventCallback(const Event& eventObj);
+	virtual void processContactBegin(PhysicalObject* contactingObject, b2Contact* contact);
+	virtual void processContactEnd(PhysicalObject* contactingObject, b2Contact* contact);
 	std::string objectId;
+	bool ropeAttachable;
+	b2Vec2 ropeAttachmentPoint;
 
 	// physics
 	void updatePhysicalState();

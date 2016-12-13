@@ -121,6 +121,15 @@ void RenderableObject::setUniformValue(const std::string& uniformId, const glm::
 	glUniformMatrix4fv(glGetUniformLocation(shaderProg.getProgramId(), uniformId.c_str()), 1, false, glm::value_ptr(mat4));
 }
 
+void RenderableObject::setUniformValue(const std::string& uniformId, float f) {
+	GLfloat glf = (GLfloat) f;
+	glUniform1fv(glGetUniformLocation(shaderProg.getProgramId(), uniformId.c_str()), 1, &glf);
+}
+
+void RenderableObject::setUniformValue(const std::string& uniformId, const glm::vec2& vec2) {
+	glUniform2fv(glGetUniformLocation(shaderProg.getProgramId(), uniformId.c_str()), 1, glm::value_ptr(vec2));
+}
+
 void RenderableObject::setUniformValue(const std::string& uniformId, const glm::vec3& vec3) {
 	glUniform3fv(glGetUniformLocation(shaderProg.getProgramId(), uniformId.c_str()), 1, glm::value_ptr(vec3));
 }

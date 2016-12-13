@@ -39,8 +39,9 @@ public:
 	double dLastFrameTotalTimeSeconds;
 	float fLastFrameTotalTimeSeconds;
 
-	const float worldViewportScaler = 20.0f;
+	const float worldViewportHeight = 20.0f;
 	float aspectRatio = (float) resolutionWidth / resolutionHeight;
+	const float worldViewportWidth = worldViewportHeight * aspectRatio;
 
 	glm::vec3 gravitationalAcceleration;
 

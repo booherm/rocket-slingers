@@ -159,9 +159,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="PoBall.cpp" />
     <ClCompile Include="PoBoundary.cpp" />
+    <ClCompile Include="PoBoundary2.cpp" />
     <ClCompile Include="PoBox.cpp" />
     <ClCompile Include="PoRopeTarget.cpp" />
+    <ClCompile Include="PoShaderTester.cpp" />
+    <ClCompile Include="PoSpinAnchor.cpp" />
     <ClCompile Include="PoTextLabelFps.cpp">
       <SubType>
       </SubType>
@@ -182,8 +186,9 @@
     <ClCompile Include="PoReticule.cpp" />
     <ClCompile Include="PoRope.cpp" />
     <ClCompile Include="PoTextLabel.cpp" />
+    <ClCompile Include="PoTubeSection.cpp" />
     <ClCompile Include="RenderableObject.cpp" />
-    <ClCompile Include="WorldRayCastCallback.cpp" />
+    <ClCompile Include="WorldRayCaster.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="MasterRenderer.cpp" />
     <ClCompile Include="PoAxes.cpp" />
@@ -206,15 +211,20 @@
     <ClInclude Include="PhysicalMass.hpp" />
     <ClInclude Include="PhysicalObject.hpp" />
     <ClInclude Include="PhysicsManager.hpp" />
+    <ClInclude Include="PoBall.hpp" />
     <ClInclude Include="PoBoundary.hpp" />
+    <ClInclude Include="PoBoundary2.hpp" />
     <ClInclude Include="PoBox.hpp" />
     <ClInclude Include="PoPendulum.hpp" />
     <ClInclude Include="PoPhysicsRenderer.hpp" />
     <ClInclude Include="PoReticule.hpp" />
     <ClInclude Include="PoRope.hpp" />
     <ClInclude Include="PoRopeTarget.hpp" />
+    <ClInclude Include="PoShaderTester.hpp" />
+    <ClInclude Include="PoSpinAnchor.hpp" />
     <ClInclude Include="PoTextLabel.hpp" />
     <ClInclude Include="PoTextLabelFps.hpp" />
+    <ClInclude Include="PoTubeSection.hpp" />
     <ClInclude Include="RenderableObject.hpp" />
     <ClInclude Include="Stage.hpp" />
     <ClInclude Include="MasterRenderer.hpp" />
@@ -224,7 +234,7 @@
     <ClInclude Include="RenderWindow.hpp" />
     <ClInclude Include="RocketSlingersController.hpp" />
     <ClInclude Include="Utilities.hpp" />
-    <ClInclude Include="WorldRayCastCallback.hpp" />
+    <ClInclude Include="WorldRayCaster.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

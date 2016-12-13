@@ -1,16 +1,18 @@
-#include "PoBoundary.hpp"
+#include "PoBall.hpp"
 
-PoBoundary::PoBoundary(const std::string& objectId, GameState* gameState, const glm::vec3& scalers, const glm::vec3& position) : PhysicalObject(objectId, gameState) {
+PoBall::PoBall(const std::string& objectId, GameState* gameState, float radius, const b2Vec2& position) : PhysicalObject(objectId, gameState) {
 
-	this->scalers = scalers;
 	this->position = position;
+	this->radius = radius;
+	ropeAttachable = true;
+	ropeAttachmentPoint = position;
 
 	initShaders();
 	initGeometry();
 	initPhysics();
 }
 
-void PoBoundary::initShaders() {
+void PoBall::initShaders() {
 
 	// vertex shader
 	std::string vertexShaderSource =
@@ -55,30 +57,32 @@ void PoBoundary::initShaders() {
 
 }
 
-void PoBoundary::initGeometry() {
+void PoBall::initGeometry() {
 
-	modelVertexData.push_back(glm::vec3(0.0f * scalers.x, 0.0f * scalers.y, 0.0f));
-	modelVertexData.push_back(glm::vec3(1.0f * scalers.x, 0.0f * scalers.y, 0.0f));
-	modelVertexData.push_back(glm::vec3(1.0f * scalers.x, 1.0f * scalers.y, 0.0f));
-	modelVertexData.push_back(glm::vec3(0.0f * scalers.x, 0.0f * scalers.y, 0.0f));
-	modelVertexData.push_back(glm::vec3(1.0f * scalers.x, 1.0f * scalers.y, 0.0f));
-	modelVertexData.push_back(glm::vec3(0.0f * scalers.x, 1.0f * scalers.y, 0.0f));
+	unsigned int resolution = 20;
+	for (unsigned int i = 0; i < resolution; i++) {
 
-	textureCoordinateData.push_back(glm::vec2(0.0f, 0.0f));
-	textureCoordinateData.push_back(glm::vec2(0.25f * scalers.x, 0.0f));
-	textureCoordinateData.push_back(glm::vec2(0.25f * scalers.x, 0.25f * scalers.y));
-	textureCoordinateData.push_back(glm::vec2(0.0f, 0.0f));
-	textureCoordinateData.push_back(glm::vec2(0.25f * scalers.x, 0.25f * scalers.y));
-	textureCoordinateData.push_back(glm::vec2(0.0f, 0.25f * scalers.y));
+		float x = radius * glm::cos((glm::two_pi<float>() / resolution) * i);
+		float y = radius * glm::sin((glm::two_pi<float>() / resolution) * i);
+		float nextX = radius * glm::cos((glm::two_pi<float>() / resolution) * (i + 1));
+		float nextY = radius * glm::sin((glm::two_pi<float>() / resolution) * (i + 1));
+
+		modelVertexData.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+		modelVertexData.push_back(glm::vec3(x, y, 0.0f));
+		modelVertexData.push_back(glm::vec3(nextX, nextY, 0.0f));
+
+
+	}
+
+	// texture and color data
+	for (unsigned int i = 0; i < modelVertexData.size(); ++i) {
+		textureCoordinateData.push_back(glm::vec2(modelVertexData[i].x * 0.025f, modelVertexData[i].y * 0.025f));
+		colorData.push_back(glm::vec4(0.9216f, 0.1059f, 0.9490f, 1.0f));
+	}
 
 	std::string fileName = "resources/microscheme.png";
 	generateTexture(fileName);
 	transformData.push_back(glm::mat4());
-
-	// push color data
-	for (unsigned int i = 0; i < modelVertexData.size(); i++) {
-		colorData.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-	}
 
 	initModelVertexBuffer();
 	initColorBuffer();
@@ -86,29 +90,38 @@ void PoBoundary::initGeometry() {
 	buildVao(MODEL_VERTEX | COLOR | TEXTURE_COORDINATE);
 	gameState->masterRenderer->addRenderableObject(this);
 	shouldRender = true;
+
 }
 
-void PoBoundary::initPhysics() {
+void PoBall::initPhysics() {
 
 	b2BodyDef rigidBodyDef;
-	rigidBodyDef.position.Set(position.x + (scalers.x / 2.0f), position.y + (scalers.y / 2.0f));
+	rigidBodyDef.type = b2_dynamicBody;
+	rigidBodyDef.position = position;
 	rigidBody = gameState->physicsManager->box2dWorld->CreateBody(&rigidBodyDef);
-	b2PolygonShape rigidBodyShape;
-	rigidBodyShape.SetAsBox(scalers.x / 2.0f, scalers.y / 2.0f);
+	b2CircleShape rigidBodyShape;
+	rigidBodyShape.m_radius = radius;
 	b2FixtureDef rigidBodyFixtureDef;
 	rigidBodyFixtureDef.shape = &rigidBodyShape;
 	rigidBodyFixtureDef.friction = 0.3f;
-	rigidBodyFixtureDef.restitution = 0.0f;
 	rigidBodyFixtureDef.userData = this;
-	rigidBodyFixtureDef.filter.categoryBits = PhysicsManager::CollisionCategory::BOUNDARY;
-	rigidBodyFixtureDef.filter.maskBits = gameState->physicsManager->getCollisionMask(PhysicsManager::CollisionCategory::BOUNDARY);
+	rigidBodyFixtureDef.filter.categoryBits = PhysicsManager::CollisionCategory::DRAGABLE_MASS;
+	rigidBodyFixtureDef.filter.maskBits = gameState->physicsManager->getCollisionMask(PhysicsManager::CollisionCategory::DRAGABLE_MASS);
 	rigidBody->CreateFixture(&rigidBodyFixtureDef);
+
+	shouldDoPhysicalUpdate = true;
 }
 
-void PoBoundary::render() {
+void PoBall::doPhysicalUpdate() {
+	position = rigidBody->GetPosition();
+	ropeAttachmentPoint = position;
+}
+
+
+void PoBall::render() {
 
 	glm::mat4 modelTransform;
-	modelTransform = glm::translate(modelTransform, position);
+	modelTransform = glm::translate(modelTransform, Utilities::b2Vec2ToGlmVec3(position));
 	glm::mat4 viewTransform = gameState->camera->getViewTransform();
 	glm::mat4 projectionTransform = gameState->camera->getProjectionTransform();
 	glm::mat4 transform = projectionTransform * viewTransform * modelTransform;
@@ -124,6 +137,6 @@ void PoBoundary::render() {
 }
 
 
-PoBoundary::~PoBoundary() {
+PoBall::~PoBall() {
 	gameState->physicsManager->box2dWorld->DestroyBody(rigidBody);
 }

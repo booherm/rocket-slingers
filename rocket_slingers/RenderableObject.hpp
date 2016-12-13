@@ -54,6 +54,8 @@ protected:
 
 	void buildVao(unsigned int vaoComponents);
 	void setUniformValue(const std::string& uniformId, const glm::mat4& mat4);
+	void setUniformValue(const std::string& uniformId, float f);
+	void setUniformValue(const std::string& uniformId, const glm::vec2& vec2);
 	void setUniformValue(const std::string& uniformId, const glm::vec3& vec3);
 	void generateTexture(const std::string& fileName);
 	void abortOnOpenGlError();

@@ -2,27 +2,30 @@
 #define PHYSICSMANAGER_HPP
 
 #include <Box2D/Box2D.h>
-
-#include <glm.hpp>
-#include <gtc/type_ptr.hpp>
 #include <map>
-#include "WorldRayCastCallback.hpp"
 
-class PhysicsManager {
+class PhysicsManager : public b2ContactListener {
 public:
 
-	enum CollisionGroup {
-		NO_COLLISION  = 1,
-		ROPE_MASS     = 2,
-		PLAYER        = 4,
-		BOUNDARY      = 8,
-		SWINGING_MASS = 16
+	enum CollisionCategory {
+		NO_COLLISION     = 0,
+		ROPE_SEGMENT     = 1,
+		PLAYER           = 2,
+		BOUNDARY         = 4,
+		SWINGING_MASS    = 8,
+		ATTACHMENT_POINT = 16,
+		DRAGABLE_MASS    = 32
 	};
 
 	PhysicsManager();
 	void setBox2dDebugRenderer(b2Draw* debugRenderer);
 	void updatePhysics();
-	unsigned int getCollisionGroupInteractions(CollisionGroup collisionGroup);
+	unsigned int getCollisionMask(CollisionCategory collisionCategory);
+
+	// b2ContactListener implementation
+	void BeginContact(b2Contact* contact);
+	void EndContact(b2Contact* contact);
+
 	~PhysicsManager();
 
 	// Box2D
@@ -31,7 +34,7 @@ public:
 
 private:
 
-	std::map<CollisionGroup, unsigned int> collisionGroupInteractions;
+	std::map<CollisionCategory, unsigned int> collisionMasks;
 
 };
 
